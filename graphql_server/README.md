@@ -119,5 +119,5 @@ The `mirrorsFieldResolver` can resolve fields from concrete objects, instead of 
 first having to serialize them: [`API Document`](https://pub.dev/documentation/graphql_server2/latest/graphql_server2.mirrorsmirrorsFieldResolver.html)
 
 You can also use `convertDartType` to convert a concrete Dart type into a `GraphQLType`. However, the ideal choice is `package:graphql_generator2`.
-* [`API Document`](https://pub.dev/documentation/graphql_server2/latest/graphql_server2)mirrors/convertDartType.html
+* [`API Document`](https://pub.dev/documentation/graphql_server2/latest/graphql_server2/mirrors/convertDartType.html)
 * [`package:graphql_generator2`](https://pub.dev/packages/graphql_generator2)
