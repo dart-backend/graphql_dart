@@ -1,3 +1,7 @@
+# 2.0.1
+* Updated array_value.dart
+* Updated string_value.dart
+
 # 2.0.0
 * Migrated to support Dart SDK 2.12.x NNBD
 * Rename `graphql_parser` to `graphql_parser2`

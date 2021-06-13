@@ -29,13 +29,14 @@ class StringValueContext extends InputValueContext<String> {
     if (!isBlockString) {
       text = stringToken!.text!.substring(1, stringToken!.text!.length - 1);
     } else {
-      text = stringToken!.text!.substring(3, stringToken!.text!.length - 3).trim();
+      text =
+          stringToken!.text!.substring(3, stringToken!.text!.length - 3).trim();
     }
 
     var codeUnits = text.codeUnits;
     var buf = StringBuffer();
 
-    for (int i = 0; i < codeUnits.length; i++) {
+    for (var i = 0; i < codeUnits.length; i++) {
       var ch = codeUnits[i];
 
       if (ch == $backslash) {

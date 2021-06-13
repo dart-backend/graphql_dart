@@ -22,13 +22,13 @@ class ListValueContext extends InputValueContext {
 
   @override
   FileSpan get span {
-    var out =
-        values.fold<FileSpan?>(lBracketToken!.span, (o, v) => o!.expand(v.span!))!;
+    var out = values.fold<FileSpan?>(
+        lBracketToken!.span, (o, v) => o!.expand(v.span!))!;
     return out.expand(rBracketToken!.span!);
   }
 
   @override
-  computeValue(Map<String, dynamic> variables) {
+  List computeValue(Map<String, dynamic> variables) {
     return values.map((v) => v.computeValue(variables)).toList();
   }
 }
