@@ -131,8 +131,7 @@ UI, ready-to-go!
 Now you're ready to build a GraphQL API!
 
 ## Subscriptions
-Example: [`Source code`]
-(https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql/example/subscription.dart)
+Example: [`Source code`](https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql/example/subscription.dart)
 
 In GraphQL, as of the June 2018 spec, clients can subscribe to streams of events
 from the server. In your schema, all you need to do is return a `Stream` from a `resolve`
@@ -293,5 +292,5 @@ You can also manually provide documentation for
 parameters and endpoints, via a `description` parameter on almost
 all related functions.
 
-See [`package:graphql_schema2`](https://github.com/dukefirehawk/graphql_dart/tree/master/graphql_schema)
+See [`package:graphql_schema2`](https://pub.dev/packages/graphql_schema2)
 for more documentation.
