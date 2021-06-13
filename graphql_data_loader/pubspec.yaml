@@ -1,7 +1,7 @@
-name: data_loader
+name: graphql_data_loader2
 version: 2.0.0
 description: Batch and cache database lookups. Works well with GraphQL. Ported from JS.
-homepage: https://github.com/angel-dart/graphql
+homepage: https://github.com/dukefirehawk/graphql_dart/tree/master/graphql_data_loader
 environment:
   sdk: '>=2.12.0 <3.0.0'
 dev_dependencies:

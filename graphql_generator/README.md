@@ -1,11 +1,14 @@
 # graphql_generator
-[![Pub](https://img.shields.io/pub/v/graphql_generator.svg)](https://pub.dartlang.org/packages/graphql_generator)
-[![build status](https://travis-ci.org/angel-dart/graphql.svg)](https://travis-ci.org/angel-dart/graphql)
+[![version](https://img.shields.io/badge/pub-v2.0.0-brightgreen)](https://pub.dartlang.org/packages/graphql_generator2)
+[![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angel_dart/discussion)
 
-Generates `package:graphql_schema` schemas for
+[![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/graphql_generator/LICENSE)
+
+Generates `package:graphql_schema2` schemas for
 annotated class.
 
-Replaces `convertDartType` from `package:graphql_server`.
+Replaces `convertDartType` from `package:graphql_server2`.
 
 ## Usage
 Usage is very simple. You just need a `@graphQLClass` or `@GraphQLClass()` annotation

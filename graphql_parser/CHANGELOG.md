@@ -1,5 +1,6 @@
 # 2.0.0
 * Migrated to support Dart SDK 2.12.x NNBD
+* Rename `graphql_parser` to `graphql_parser2`
 
 # 1.2.0
 * Combine `ValueContext` and `VariableContext` into a single `InputValueContext` supertype.

@@ -1,17 +1,21 @@
-# graphql_server
-[![Pub](https://img.shields.io/pub/v/graphql_server.svg)](https://pub.dartlang.org/packages/graphql_server)
-[![build status](https://travis-ci.org/angel-dart/graphql.svg)](https://travis-ci.org/angel-dart/graphql)
+# graphql_server2
+[![version](https://img.shields.io/badge/pub-v2.0.0-brightgreen)](https://pub.dartlang.org/packages/graphql_server2)
+[![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angel_dart/discussion)
+
+[![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/graphql_dart/LICENSE)
+
 
 Base package for implementing GraphQL servers.
-You might prefer [`package:angel_graphql`](https://github.com/angel-dart/graphql),
+You might prefer [`package:angel3_graphql`](https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql),
 the fastest way to implement GraphQL backends in Dart.
 
-`package:graphql_server` does not require any specific
+`package:graphql_server2` does not require any specific
 framework, and thus can be used in any Dart project.
 
 ## Ad-hoc Usage
 The actual querying functionality is handled by the
-`GraphQL` class, which takes a schema (from `package:graphql_schema`).
+`GraphQL` class, which takes a schema (from `package:graphql_schema2`).
 In most cases, you'll want to call `parseAndExecute`
 on some string of GraphQL text. It returns either a `Stream`
 or `Map<String, dynamic>`, and can potentially throw
@@ -32,14 +36,14 @@ try {
 ```
 
 Consult the API reference for more:
-https://pub.dartlang.org/documentation/graphql_server/latest/graphql_server/GraphQL/parseAndExecute.html
+https://pub.dev/documentation/graphql_server2/latest/graphql_server2/GraphQL/parseAndExecute.html
 
 If you're looking for functionality like `graphQLHttp`
 in `graphql-js`, that is not included in this package, because
 it is typically specific to the framework/platform you are using.
-The `graphQLHttp` implementation in `package:angel_graphql` is
+The `graphQLHttp` implementation in `package:angel3_graphql` is
 a good example:
-https://github.com/angel-dart/graphql/blob/master/angel_graphql/lib/src/graphql_http.dart
+https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql/lib/src/graphql_http.dart
 
 ## Subscriptions
 GraphQL queries involving `subscription` operations can return
@@ -76,7 +80,7 @@ field(
 ```
 
 For the purposes of reusing existing tooling (i.e. JS clients, etc.),
-`package:graphql_server` rolls with an implementation of Apollo's
+`package:graphql_server2` rolls with an implementation of Apollo's
 `subscriptions-transport-ws` spec.
 
 **NOTE: At this point, Apollo's spec is extremely out-of-sync with the protocol their client actually expects.**
@@ -92,7 +96,7 @@ abstract class. `Server` will handle the transport and communication,
 but again, ultimately, emitting subscription events is up to your
 implementation.
 
-Here's a snippet from `graphQLWS` in `package:angel_graphql`.
+Here's a snippet from `graphQLWS` in `package:angel3_graphql`.
 It runs within the context of one single request:
 
 ```dart
@@ -103,8 +107,8 @@ var server =
 await server.done;
 ```
 
-See `graphQLWS` in `package:angel_graphql` for a good example:
-https://github.com/angel-dart/graphql/blob/master/angel_graphql/lib/src/graphql_ws.dart
+See `graphQLWS` in `package:angel3_graphql` for a good example:
+https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql/lib/src/graphql_ws.dart
 
 ## Introspection
 Introspection of a GraphQL schema allows clients to query the schema itself,
@@ -112,16 +116,16 @@ and get information about the response the server expects. The `GraphQL`
 class handles this automatically, so you don't have to write any code for it.
 
 However, you can call the `reflectSchema` method to manually reflect a schema:
-https://pub.dartlang.org/documentation/graphql_server/latest/introspection/reflectSchema.html
+https://pub.dev/documentation/graphql_server2/latest/introspection/reflectSchema.html
 
 ## Mirrors Usage
 By default, `dart:mirrors` is not required, but it can be optionally used.
 
 The `mirrorsFieldResolver` can resolve fields from concrete objects, instead of you
 first having to serialize them:
-https://pub.dartlang.org/documentation/graphql_server/latest/graphql_server.mirrors/mirrorsFieldResolver.html
+https://pub.dev/documentation/graphql_server2/latest/graphql_server2.mirrors/mirrorsFieldResolver.html
 
 You can also use `convertDartType` to convert a concrete Dart type into a `GraphQLType`. However,
-the ideal choice is `package:graphql_generator`.
-* https://pub.dartlang.org/documentation/graphql_server/latest/graphql_server.mirrors/convertDartType.html
-* https://pub.dartlang.org/packages/graphql_generator
+the ideal choice is `package:graphql_generator2`.
+* https://pub.dev/documentation/graphql_server2/latest/graphql_server2.mirrors/convertDartType.html
+* https://pub.dev/packages/graphql_generator2

@@ -1,3 +1,3 @@
-import 'package:graphql_parser/graphql_parser.dart';
+import 'package:graphql_parser2/graphql_parser2.dart';
 
 Parser parse(String text) => Parser(scan(text));

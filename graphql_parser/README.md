@@ -1,23 +1,26 @@
-# graphql_parser
-[![Pub](https://img.shields.io/pub/v/graphql_parser.svg)](https://pub.dartlang.org/packages/graphql_parser)
-[![build status](https://travis-ci.org/angel-dart/graphql.svg)](https://travis-ci.org/angel-dart/graphql)
+# graphql_parser2
+[![version](https://img.shields.io/badge/pub-v2.0.0-brightgreen)](https://pub.dartlang.org/packages/graphql_parser2)
+[![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angel_dart/discussion)
+
+[![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/graphql_dart/LICENSE)
 
 Parses GraphQL queries and schemas.
 
 *This library is merely a parser/visitor*. Any sort of actual GraphQL API functionality must be implemented by you,
 or by a third-party package.
 
-[Angel framework](https://angel-dart.github.io)
+[Angel3 framework](https://github.com/dukefirehawk/angel)
 users should consider 
-[`package:angel_graphql`](https://pub.dartlang.org/packages/angel_graphql)
+[`package:angel3_graphql`](https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql)
 as a dead-simple way to add GraphQL functionality to their servers.
 
 # Installation
-Add `graphql_parser` as a dependency in your `pubspec.yaml` file:
+Add `graphql_parser2` as a dependency in your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  graphql_parser: ^1.0.0
+  graphql_parser2: ^2.0.0
 ```
 
 # Usage
@@ -29,7 +32,7 @@ specification (
 [June 2018](https://facebook.github.io/graphql/June2018/)).
 
 ```dart
-import 'package:graphql_parser/graphql_parser.dart';
+import 'package:graphql_parser2/graphql_parser2.dart';
 
 doSomething(String text) {
   var tokens = scan(text);

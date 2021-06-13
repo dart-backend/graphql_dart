@@ -1,5 +1,6 @@
 # 2.0.0
 * Migrated to support Dart SDK 2.12.x NNBD
+* Rename `graphql_server` to `graphql_server2`
 
 # 1.1.0
 * Updates for `package:graphql_parser@1.2.0`.

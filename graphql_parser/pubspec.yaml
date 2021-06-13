@@ -1,8 +1,7 @@
-name: graphql_parser
+name: graphql_parser2
 version: 2.0.0
 description: Parses GraphQL queries and schemas. Also includes classes for the GraphQL AST.
-homepage: https://github.com/angel-dart/graphql
-publish_to: none
+homepage: https://github.com/dukefirehawk/graphql_dart/tree/master/graphql_parser
 environment:
   sdk: '>=2.12.0 <3.0.0'
 dependencies:

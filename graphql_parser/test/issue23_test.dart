@@ -1,4 +1,4 @@
-import 'package:graphql_parser/graphql_parser.dart';
+import 'package:graphql_parser2/graphql_parser2.dart';
 import 'package:test/test.dart';
 
 /// This is an *extremely* verbose test, but basically it
