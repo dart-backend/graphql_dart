@@ -7,7 +7,7 @@ environment:
 dev_dependencies:
   graphql_schema:
     git: 
-      url: https://github.com/dukefirehawk/angel.git
+      url: https://github.com/dukefirehawk/angel
       ref: sdk-2.12.x_nnbd
       path: packages/graphql/graphql_schema
   pedantic: ^1.0.0

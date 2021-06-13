@@ -13,14 +13,14 @@ dependencies:
       path: packages/serialize/angel_serialize
   graphql_schema:
     git: 
-      url: https://github.com/dukefirehawk/angel.git
+      url: https://github.com/dukefirehawk/graphql_dart
       ref: sdk-2.12.x_nnbd
-      path: packages/graphql/graphql_schema
+      path: graphql_schema
   graphql_parser:
     git: 
-      url: https://github.com/dukefirehawk/angel.git
+      url: https://github.com/dukefirehawk/graphql_dart
       ref: sdk-2.12.x_nnbd
-      path: packages/graphql/graphql_parser
+      path: graphql_parser
   collection: ^1.15.0
   meta: ^1.4.0
   recase: ^4.0.0
