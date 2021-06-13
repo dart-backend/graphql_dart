@@ -116,8 +116,7 @@ However, you can call the `reflectSchema` method to manually reflect a schema: [
 By default, `dart:mirrors` is not required, but it can be optionally used.
 
 The `mirrorsFieldResolver` can resolve fields from concrete objects, instead of you
-first having to serialize them: [`API Document`](
-https://pub.dev/documentation/graphql_server2/latest/graphql_server2.mirrors/mirrorsFieldResolver.html)
+first having to serialize them: [`API Document`](https://pub.dev/documentation/graphql_server2/latest/graphql_server2.mirrorsmirrorsFieldResolver.html)
 
 You can also use `convertDartType` to convert a concrete Dart type into a `GraphQLType`. However, the ideal choice is `package:graphql_generator2`.
 * [`API Document`](https://pub.dev/documentation/graphql_server2/latest/graphql_server2)mirrors/convertDartType.html
