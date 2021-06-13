@@ -1,5 +1,5 @@
-import 'package:angel_framework/angel_framework.dart';
-import 'package:graphql_schema/graphql_schema.dart';
+import 'package:angel3_framework/angel3_framework.dart';
+import 'package:graphql_schema2/graphql_schema2.dart';
 
 Map<String, dynamic> _fetchRequestInfo(Map<String, dynamic> arguments) {
   return <String, dynamic>{

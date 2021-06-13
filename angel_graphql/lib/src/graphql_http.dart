@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:angel_framework/angel_framework.dart';
-import 'package:angel_validate/server.dart';
+import 'package:angel3_framework/angel3_framework.dart';
+import 'package:angel3_validate/server.dart';
 import 'package:collection/collection.dart' show IterableExtension;
-import 'package:graphql_parser/graphql_parser.dart';
-import 'package:graphql_schema/graphql_schema.dart';
-import 'package:graphql_server/graphql_server.dart';
+import 'package:graphql_parser2/graphql_parser2.dart';
+import 'package:graphql_schema2/graphql_schema2.dart';
+import 'package:graphql_server2/graphql_server2.dart';
 
 final ContentType graphQlContentType = ContentType('application', 'graphql');
 

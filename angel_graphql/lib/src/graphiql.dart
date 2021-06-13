@@ -1,4 +1,4 @@
-import 'package:angel_framework/angel_framework.dart';
+import 'package:angel3_framework/angel3_framework.dart';
 import 'package:http_parser/http_parser.dart';
 
 /// Returns a simple [RequestHandler] that renders the GraphiQL visual interface for GraphQL.

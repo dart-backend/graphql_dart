@@ -1,55 +1,22 @@
 name: angel3_graphql
 version: 2.0.0
-description: The fastest + easiest way to get a GraphQL backend in Dart, using Angel.
+description: The fastest and easiest way to get a GraphQL backend in Dart, using Angel3.
 homepage: https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql
-publish_to: none
 environment:
   sdk: '>=2.12.0 <3.0.0'
 dependencies:
-  angel_file_service:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: sdk-2.12.x_nnbd
-      path: packages/file_service
-  angel_framework:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: sdk-2.12.x_nnbd
-      path: packages/framework
-  angel_websocket: 
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: sdk-2.12.x_nnbd
-      path: packages/websocket
-  angel_validate:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: sdk-2.12.x_nnbd
-      path: packages/validate
-  graphql_parser:
-    git: 
-      url: https://github.com/dukefirehawk/graphql_dart.git
-      ref: sdk-2.12.x_nnbd
-      path: graphql_parser
-  graphql_schema:
-    git: 
-      url: https://github.com/dukefirehawk/graphql_dart.git
-      ref: sdk-2.12.x_nnbd
-      path: graphql_schema
-  graphql_server:
-    git: 
-      url: https://github.com/dukefirehawk/graphql_dart.git
-      ref: sdk-2.12.x_nnbd
-      path: graphql_server
+  angel3_file_service: ^4.0.0
+  angel3_framework: ^4.0.0
+  angel3_websocket: ^4.0.0
+  angel3_validate: ^4.0.0
+  graphql_parser2: ^2.0.0
+  graphql_schema2: ^2.0.0
+  graphql_server2: ^2.0.0
   http_parser: ^4.0.0
   web_socket_channel: ^2.1.0
   collection: ^1.15.0
 dev_dependencies:
-  angel_serialize:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: sdk-2.12.x_nnbd
-      path: packages/serialize/angel_serialize
+  angel3_serialize: ^4.0.0
   file: ^6.1.1
   logging: ^1.0.1
   pedantic: ^1.11.0

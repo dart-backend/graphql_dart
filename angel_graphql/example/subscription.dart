@@ -1,13 +1,13 @@
 // Inspired by:
 // https://www.apollographql.com/docs/apollo-server/features/subscriptions/#subscriptions-example
 
-import 'package:angel_file_service/angel_file_service.dart';
-import 'package:angel_framework/angel_framework.dart';
-import 'package:angel_framework/http.dart';
-import 'package:angel_graphql/angel_graphql.dart';
+import 'package:angel3_file_service/angel3_file_service.dart';
+import 'package:angel3_framework/angel3_framework.dart';
+import 'package:angel3_framework/http.dart';
+import 'package:angel3_graphql/angel3_graphql.dart';
 import 'package:file/local.dart';
-import 'package:graphql_schema/graphql_schema.dart';
-import 'package:graphql_server/graphql_server.dart';
+import 'package:graphql_schema2/graphql_schema2.dart';
+import 'package:graphql_server2/graphql_server2.dart';
 import 'package:logging/logging.dart';
 
 void main() async {

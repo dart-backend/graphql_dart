@@ -1,10 +1,12 @@
+# angel3_graphql
+
 ![Logo](https://github.com/angel-dart/graphql/raw/master/img/angel_logo.png)
 
-<div style="text-align: center">
-<hr>
-<a href="https://pub.dartlang.org/packages/angel_graphql" rel="nofollow"><img src="https://img.shields.io/pub/v/angel_graphql.svg" alt="Pub" data-canonical-src="https://img.shields.io/pub/v/angel_graphql.svg" style="max-width:100%;"></a>
-<a href="https://travis-ci.org/angel-dart/graphql" rel="nofollow"><img src="https://travis-ci.org/angel-dart/graphql.svg" alt="Pub" data-canonical-src="https://img.shields.io/pub/v/angel_graphql.svg" style="max-width:100%;"></a>
-</div>
+[![version](https://img.shields.io/badge/pub-v2.0.0-brightgreen)](https://pub.dartlang.org/packages/angel3_graphql)
+[![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angel_dart/discussion)
+
+[![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/angel_graphql/LICENSE)
 
 * [Installation](#installation)
 * [Usage](#usage)
@@ -15,22 +17,21 @@
 
 A complete implementation of the official
 [GraphQL specification](http://facebook.github.io/graphql/October2016/#sec-Language) - these
-are the [Angel framework](https://angel-dart.github.io)-specific
-bindings.
+are the [Angel3 framework](https://github.com/dukefirehawk/angel)-specific bindings.
 
 The goal of this project is to provide to server-side
-users of Dart an alternative to REST API's. `package:angel_graphql`, which, when combined with the allows
+users of Dart an alternative to REST API's. `package:angel3_graphql`, which, when combined with the allows
 server-side Dart users to build backends with GraphQL and
 virtually any database imaginable.
 
 ## Installation
-To install `package:angel_graphql`, add the following to your
+To install `package:angel3_graphql`, add the following to your
 `pubspec.yaml`:
 
 ```yaml
 dependencies:
-    angel_framework: ^2.0.0-alpha
-    angel_graphql: ^1.0.0-alpha
+    angel3_framework: ^4.0.0
+    angel3_graphql: ^2.0.0
 ```
 
 ## Usage
@@ -53,11 +54,11 @@ You can use the `convertDartType` helper to wrap your existing
 effort.
 
 ```dart
-import 'package:angel_framework/angel_framework.dart';
-import 'package:angel_graphql/angel_graphql.dart';
-import 'package:graphql_schema/graphql_schema.dart';
-import 'package:graphql_server/graphql_server.dart';
-import 'package:graphql_server/mirrors.dart';
+import 'package:angel3_framework/angel3_framework.dart';
+import 'package:angel3_graphql/angel3_graphql.dart';
+import 'package:graphql_schema2/graphql_schema2.dart';
+import 'package:graphql_server2/graphql_server2.dart';
+import 'package:graphql_server2/mirrors.dart';
 
 Future configureServer(Angel app) async {
     var queryType = objectType(
@@ -125,13 +126,13 @@ print('Access graphiql at $graphiqlUri');
 Visit your `/graphiql` endpoint, and you'll see the `graphiql`
 UI, ready-to-go!
 
-![Graphiql screenshot](https://github.com/angel-dart/graphql/raw/master/img/angel_graphql.png)
+![Graphiql screenshot](./img/angel_graphql.png)
 
 Now you're ready to build a GraphQL API!
 
 ## Subscriptions
-Example:
-https://github.com/angel-dart/graphql/blob/master/angel_graphql/example/subscription.dart
+Example: [`Source code`]
+(https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql/example/subscription.dart)
 
 In GraphQL, as of the June 2018 spec, clients can subscribe to streams of events
 from the server. In your schema, all you need to do is return a `Stream` from a `resolve`
@@ -193,7 +194,7 @@ as the database interface within an Angel application. They are well-suited
 for NoSQL or other databases without a schema (they can be used with
 SQL, but that's not their primary focus).
 
-`package:angel_graphql` has functionality to resolve fields by interacting with
+`package:angel3_graphql` has functionality to resolve fields by interacting with
 services.
 
 Consider our previous example, and note the calls to
@@ -235,7 +236,7 @@ it much quicker to implement CRUD functionality in a GraphQL
 API.
 
 ## Documentation
-Using `package:graphql_generator`, you can generate GraphQL schemas for concrete Dart
+Using `package:graphql_generator2`, you can generate GraphQL schemas for concrete Dart
 types:
 
 ```dart
@@ -256,8 +257,7 @@ class Todo {
 }
 ```
 
-For more documentation, see:
-https://pub.dartlang.org/packages/graphql_generator
+For more documentation, see: [`package:graphql_generator2`](https://pub.dev/packages/graphql_generator2)
 
 ## Mirrors
 **NOTE: Mirrors support is deprecated, and will not be updated further.**
@@ -293,5 +293,5 @@ You can also manually provide documentation for
 parameters and endpoints, via a `description` parameter on almost
 all related functions.
 
-See [`package:graphql_schema`](https://github.com/angel-dart/graphql/tree/master/graphql_schema)
+See [`package:graphql_schema2`](https://github.com/dukefirehawk/graphql_dart/tree/master/graphql_schema)
 for more documentation.

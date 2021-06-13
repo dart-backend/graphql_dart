@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:angel_framework/angel_framework.dart';
-import 'package:angel_framework/http.dart';
-import 'package:graphql_schema/graphql_schema.dart';
-import 'package:graphql_server/graphql_server.dart';
-import 'package:graphql_server/subscriptions_transport_ws.dart' as stw;
+import 'package:angel3_framework/angel3_framework.dart';
+import 'package:angel3_framework/http.dart';
+import 'package:graphql_schema2/graphql_schema2.dart';
+import 'package:graphql_server2/graphql_server2.dart';
+import 'package:graphql_server2/subscriptions_transport_ws.dart' as stw;
 import 'package:web_socket_channel/io.dart';
 
 /// A [RequestHandler] that serves a spec-compliant GraphQL backend, over WebSockets.
