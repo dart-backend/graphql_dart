@@ -1,5 +1,5 @@
 import 'package:graphql_schema/graphql_schema.dart';
-import 'episode.dart';
+//import 'episode.dart';
 part 'character.g.dart';
 
 @graphQLClass

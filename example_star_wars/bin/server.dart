@@ -7,7 +7,7 @@ import 'package:logging/logging.dart';
 import 'package:star_wars/src/pretty_logging.dart' as star_wars;
 import 'package:star_wars/star_wars.dart' as star_wars;
 
-main() async {
+void main() async {
   Future<Angel> createServer() async {
     hierarchicalLoggingEnabled = true;
     var logger = Logger.detached('star_wars')
