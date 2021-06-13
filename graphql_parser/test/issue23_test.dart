@@ -9,8 +9,8 @@ import 'package:test/test.dart';
 void main() {
   void testStr<T>(String name, String text) {
     test('name', () {
-      final List<Token> tokens = scan(text);
-      final Parser parser = Parser(tokens);
+      final tokens = scan(text);
+      final parser = Parser(tokens);
 
       if (parser.errors.isNotEmpty) {
         print(parser.errors.toString());
@@ -18,7 +18,7 @@ void main() {
       expect(parser.errors, isEmpty);
 
       // Parse the GraphQL document using recursive descent
-      final DocumentContext doc = parser.parseDocument();
+      final doc = parser.parseDocument();
 
       expect(doc.definitions, isNotNull);
       expect(doc.definitions, isNotEmpty);
@@ -27,29 +27,29 @@ void main() {
       var queryDef = doc.definitions[0] as OperationDefinitionContext;
       expect(queryDef.isQuery, true);
       expect(queryDef.name, 'customerMemberAttributes');
-      expect(queryDef.variableDefinitions.variableDefinitions, hasLength(1));
-      var memberIdDef = queryDef.variableDefinitions.variableDefinitions[0];
+      expect(queryDef.variableDefinitions!.variableDefinitions, hasLength(1));
+      var memberIdDef = queryDef.variableDefinitions!.variableDefinitions[0];
       expect(memberIdDef.variable.name, 'memberId');
 
       // Find $memberId
       var customerByCustomerId = queryDef.selectionSet.selections[0];
       var customerMemberAttributesByCustomerId =
-          customerByCustomerId.field.selectionSet.selections[0];
-      var nodes0 =
-          customerMemberAttributesByCustomerId.field.selectionSet.selections[0];
-      var customerMemberAttributeId = nodes0.field.selectionSet.selections[0];
-      expect(customerMemberAttributeId.field.fieldName.name,
+          customerByCustomerId.field!.selectionSet!.selections[0];
+      var nodes0 = customerMemberAttributesByCustomerId
+          .field!.selectionSet!.selections[0];
+      var customerMemberAttributeId = nodes0.field!.selectionSet!.selections[0];
+      expect(customerMemberAttributeId.field!.fieldName.name,
           'customerMemberAttributeId');
-      var memberAttr = nodes0.field.selectionSet.selections[1];
-      expect(memberAttr.field.fieldName.name,
+      var memberAttr = nodes0.field!.selectionSet!.selections[1];
+      expect(memberAttr.field!.fieldName.name,
           'memberAttributesByCustomerMemberAttributeId');
-      expect(memberAttr.field.arguments, hasLength(1));
-      var condition = memberAttr.field.arguments[0];
+      expect(memberAttr.field!.arguments, hasLength(1));
+      var condition = memberAttr.field!.arguments[0];
       expect(condition.name, 'condition');
       expect(condition.value, TypeMatcher<ObjectValueContext>());
       var conditionValue = condition.value as ObjectValueContext;
       var memberId = conditionValue.fields
-          .singleWhere((f) => f.nameToken.text == 'memberId');
+          .singleWhere((f) => f.nameToken!.text == 'memberId');
       expect(memberId.value, TypeMatcher<T>());
       print('Found \$memberId: Instance of $T');
     });

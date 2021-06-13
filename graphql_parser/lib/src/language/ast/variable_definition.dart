@@ -8,7 +8,7 @@ import 'variable.dart';
 /// A single variable definition.
 class VariableDefinitionContext extends Node {
   /// The source token.
-  final Token colonToken;
+  final Token? colonToken;
 
   /// The declared variable.
   final VariableContext variable;
@@ -17,14 +17,14 @@ class VariableDefinitionContext extends Node {
   final TypeContext type;
 
   /// The default value of the variable.
-  final DefaultValueContext defaultValue;
+  final DefaultValueContext? defaultValue;
 
   VariableDefinitionContext(this.variable, this.colonToken, this.type,
       [this.defaultValue]);
 
   /// Use [colonToken] instead.
   @deprecated
-  Token get COLON => colonToken;
+  Token? get COLON => colonToken;
 
   @override
   FileSpan get span => variable.span.expand(defaultValue?.span ?? type.span);

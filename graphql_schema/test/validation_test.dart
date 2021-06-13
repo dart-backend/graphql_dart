@@ -20,12 +20,12 @@ void main() {
   ]);
 
   var isValidPokemon = predicate(
-      (x) =>
+      (dynamic x) =>
           pokemonType.validate('@root', x as Map<String, dynamic>).successful,
       'is a valid Pokémon');
 
-  var throwsATypeError = throwsA(predicate(
-      (x) => x is TypeError || x is CastError, 'is a type or cast error'));
+  var throwsATypeError = throwsA(
+      predicate((dynamic x) => x is TypeError, 'is a type or cast error'));
 
   test('object accepts valid input', () {
     expect({'name': 'Charmander', 'type': 'FIRE'}, isValidPokemon);
@@ -63,7 +63,7 @@ void main() {
       ],
     );
 
-    var u = new GraphQLUnionType('Monster', [pokemonType, digimonType]);
+    var u = GraphQLUnionType('Monster', [pokemonType, digimonType]);
 
     test('any of its types returns valid', () {
       expect(u.validate('@root', {'size': 32.0}).successful, true);

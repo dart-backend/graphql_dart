@@ -5,7 +5,7 @@ import 'common.dart';
 import 'type_test.dart';
 import 'value_test.dart';
 
-main() {
+void main() {
   test('no default value', () {
     expect(r'$foo: bar',
         isVariableDefinition('foo', type: isType('bar', isNullable: true)));
@@ -19,12 +19,12 @@ main() {
   });
 
   test('exceptions', () {
-    var throwsSyntaxError = predicate((x) {
+    var throwsSyntaxError = predicate((dynamic x) {
       var parser = parse(x.toString())..parseVariableDefinition();
       return parser.errors.isNotEmpty;
     }, 'fails to parse variable definition');
 
-    var throwsSyntaxErrorOnDefinitions = predicate((x) {
+    var throwsSyntaxErrorOnDefinitions = predicate((dynamic x) {
       var parser = parse(x.toString())..parseVariableDefinitions();
       return parser.errors.isNotEmpty;
     }, 'fails to parse variable definitions');
@@ -37,16 +37,16 @@ main() {
   });
 }
 
-VariableDefinitionContext parseVariableDefinition(String text) =>
+VariableDefinitionContext? parseVariableDefinition(String text) =>
     parse(text).parseVariableDefinition();
 
 Matcher isVariableDefinition(String name,
-        {Matcher type, Matcher defaultValue}) =>
+        {Matcher? type, Matcher? defaultValue}) =>
     _IsVariableDefinition(name, type, defaultValue);
 
 class _IsVariableDefinition extends Matcher {
   final String name;
-  final Matcher type, defaultValue;
+  final Matcher? type, defaultValue;
 
   _IsVariableDefinition(this.name, this.type, this.defaultValue);
 
@@ -55,11 +55,11 @@ class _IsVariableDefinition extends Matcher {
     var desc = description.add('is variable definition with name "$name"');
 
     if (type != null) {
-      desc = type.describe(desc.add(' with type that '));
+      desc = type!.describe(desc.add(' with type that '));
     }
 
     if (defaultValue != null) {
-      desc = type.describe(desc.add(' with default value that '));
+      desc = type!.describe(desc.add(' with default value that '));
     }
 
     return desc;
@@ -75,12 +75,12 @@ class _IsVariableDefinition extends Matcher {
     bool result = true;
 
     if (type != null) {
-      result == result && type.matches(def.type, matchState);
+      result == result && type!.matches(def.type, matchState);
     }
 
     if (defaultValue != null) {
       result =
-          result && defaultValue.matches(def.defaultValue.value, matchState);
+          result && defaultValue!.matches(def.defaultValue!.value, matchState);
     }
 
     return result;

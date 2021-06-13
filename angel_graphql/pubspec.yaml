@@ -1,32 +1,57 @@
 name: angel_graphql
-version: 1.1.0
+version: 2.0.0
 description: The fastest + easiest way to get a GraphQL backend in Dart, using Angel.
 homepage: https://github.com/angel-dart/graphql
-author: Tobe O <thosakwe@gmail.com>
+publish_to: none
 environment:
-  sdk: '>=2.10.0 <2.12.0'
+  sdk: '>=2.12.0 <3.0.0'
 dependencies:
-  angel_file_service: #^2.0.0
-    path: ../../file_service
-  angel_framework: #^2.0.0
-    path: ../../framework
-  angel_websocket: #^2.0.0
-    path: ../../websocket
+  angel_file_service:
+    git: 
+      url: https://github.com/dukefirehawk/angel.git
+      ref: sdk-2.12.x_nnbd
+      path: packages/file_service
+  angel_framework:
+    git: 
+      url: https://github.com/dukefirehawk/angel.git
+      ref: sdk-2.12.x_nnbd
+      path: packages/framework
+  angel_websocket: 
+    git: 
+      url: https://github.com/dukefirehawk/angel.git
+      ref: sdk-2.12.x_nnbd
+      path: packages/websocket
   angel_validate: #^2.0.0
-    path: ../../validate
-  graphql_parser: #^1.0.0
-    path: ../graphql_parser
-  graphql_schema: #^1.0.0
-    path: ../graphql_schema
-  graphql_server: #^1.0.0
-    path: ../graphql_server
-  http_parser: ^3.0.0
-  web_socket_channel: ^1.0.0
+    git: 
+      url: https://github.com/dukefirehawk/angel.git
+      ref: sdk-2.12.x_nnbd
+      path: packages/validate
+  graphql_parser:
+    git: 
+      url: https://github.com/dukefirehawk/angel.git
+      ref: sdk-2.12.x_nnbd
+      path: packages/graphql/graphql_parser
+  graphql_schema:
+    git: 
+      url: https://github.com/dukefirehawk/angel.git
+      ref: sdk-2.12.x_nnbd
+      path: packages/graphql/graphql_schema
+  graphql_server:
+    git: 
+      url: https://github.com/dukefirehawk/angel.git
+      ref: sdk-2.12.x_nnbd
+      path: packages/graphql/graphql_server
+  http_parser: ^4.0.0
+  web_socket_channel: ^2.1.0
+  collection: ^1.15.0-nullsafety.4
 dev_dependencies:
-  angel_serialize: #^2.0.0
-    path: ../../serialize/angel_serialize
-  file: ^5.0.0
-  logging: ^0.11.0
-  pedantic: ^1.0.0
+  angel_serialize:
+    git: 
+      url: https://github.com/dukefirehawk/angel.git
+      ref: sdk-2.12.x_nnbd
+      path: packages/serialize/angel_serialize
+  file: ^6.1.1
+  logging: ^1.0.1
+  pedantic: ^1.11.0
 
  

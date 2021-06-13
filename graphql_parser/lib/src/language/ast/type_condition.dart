@@ -8,5 +8,5 @@ class TypeConditionContext extends Node {
   TypeConditionContext(this.typeName);
 
   @override
-  FileSpan get span => typeName.span;
+  FileSpan? get span => typeName.span;
 }

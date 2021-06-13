@@ -7,7 +7,7 @@ import 'field_test.dart';
 import 'fragment_spread_test.dart';
 import 'selection_set_test.dart';
 
-main() {
+void main() {
   test('no directives', () {
     expect(
         '... on foo {bar, baz: quux}',
@@ -31,7 +31,7 @@ main() {
   });
 
   test('exceptions', () {
-    var throwsSyntaxError = predicate((x) {
+    var throwsSyntaxError = predicate((dynamic x) {
       var parser = parse(x.toString())..parseInlineFragment();
       return parser.errors.isNotEmpty;
     }, 'fails to parse inline fragment');
@@ -42,16 +42,16 @@ main() {
   });
 }
 
-InlineFragmentContext parseInlineFragment(String text) =>
+InlineFragmentContext? parseInlineFragment(String text) =>
     parse(text).parseInlineFragment();
 
 Matcher isInlineFragment(String name,
-        {Matcher directives, Matcher selectionSet}) =>
+        {Matcher? directives, Matcher? selectionSet}) =>
     _IsInlineFragment(name, directives, selectionSet);
 
 class _IsInlineFragment extends Matcher {
   final String name;
-  final Matcher directives, selectionSet;
+  final Matcher? directives, selectionSet;
 
   _IsInlineFragment(this.name, this.directives, this.selectionSet);
 
@@ -68,9 +68,9 @@ class _IsInlineFragment extends Matcher {
     if (fragment == null) return false;
     if (fragment.typeCondition.typeName.name != name) return false;
     if (directives != null &&
-        !directives.matches(fragment.directives, matchState)) return false;
+        !directives!.matches(fragment.directives, matchState)) return false;
     if (selectionSet != null &&
-        !selectionSet.matches(fragment.selectionSet, matchState)) return false;
+        !selectionSet!.matches(fragment.selectionSet, matchState)) return false;
     return true;
   }
 }

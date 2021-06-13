@@ -5,17 +5,17 @@ import '../token.dart';
 /// The name of a GraphQL type.
 class TypeNameContext extends Node {
   /// The source token.
-  final Token nameToken;
+  final Token? nameToken;
 
   TypeNameContext(this.nameToken);
 
   /// Use [nameToken] instead.
   @deprecated
-  Token get NAME => nameToken;
+  Token? get NAME => nameToken;
 
   /// The [String] value of the [nameToken].
-  String get name => nameToken.text;
+  String? get name => nameToken!.text;
 
   @override
-  FileSpan get span => nameToken.span;
+  FileSpan? get span => nameToken!.span;
 }

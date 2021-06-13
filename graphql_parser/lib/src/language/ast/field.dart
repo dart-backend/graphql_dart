@@ -17,21 +17,21 @@ class FieldContext extends Node {
   final List<DirectiveContext> directives = [];
 
   /// The list of selections to resolve on an object.
-  final SelectionSetContext selectionSet;
+  final SelectionSetContext? selectionSet;
 
   FieldContext(this.fieldName, [this.selectionSet]);
 
   @override
-  FileSpan get span {
+  FileSpan? get span {
     if (selectionSet != null) {
-      return fieldName.span.expand(selectionSet.span);
+      return fieldName.span!.expand(selectionSet!.span!);
     } else if (directives.isNotEmpty) {
-      return directives.fold<FileSpan>(
-          fieldName.span, (out, d) => out.expand(d.span));
+      return directives.fold<FileSpan?>(
+          fieldName.span, (out, d) => out!.expand(d.span));
     }
     if (arguments.isNotEmpty) {
-      return arguments.fold<FileSpan>(
-          fieldName.span, (out, a) => out.expand(a.span));
+      return arguments.fold<FileSpan?>(
+          fieldName.span, (out, a) => out!.expand(a.span));
     } else {
       return fieldName.span;
     }

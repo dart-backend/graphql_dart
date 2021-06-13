@@ -8,7 +8,7 @@ import 'fragment_spread_test.dart';
 import 'selection_set_test.dart';
 import 'value_test.dart';
 
-main() {
+void main() {
   group('field name', () {
     test('plain field name', () {
       expect('foo', isFieldName('foo'));
@@ -17,7 +17,7 @@ main() {
       expect('foo: bar', isFieldName('foo', alias: 'bar'));
     });
     test('exceptions', () {
-      var throwsSyntaxError = predicate((x) {
+      var throwsSyntaxError = predicate((dynamic x) {
         var parser = parse(x.toString())..parseFieldName();
         return parser.errors.isNotEmpty;
       }, 'fails to parse field name');
@@ -77,21 +77,21 @@ main() {
   });
 }
 
-FieldContext parseField(String text) => parse(text).parseField();
+FieldContext? parseField(String text) => parse(text).parseField();
 
-FieldNameContext parseFieldName(String text) => parse(text).parseFieldName();
+FieldNameContext? parseFieldName(String text) => parse(text).parseFieldName();
 
 Matcher isField(
-        {Matcher fieldName,
-        Matcher arguments,
-        Matcher directives,
-        Matcher selectionSet}) =>
+        {Matcher? fieldName,
+        Matcher? arguments,
+        Matcher? directives,
+        Matcher? selectionSet}) =>
     _IsField(fieldName, arguments, directives, selectionSet);
 
-Matcher isFieldName(String name, {String alias}) => _IsFieldName(name, alias);
+Matcher isFieldName(String name, {String? alias}) => _IsFieldName(name, alias);
 
 class _IsField extends Matcher {
-  final Matcher fieldName, arguments, directives, selectionSet;
+  final Matcher? fieldName, arguments, directives, selectionSet;
 
   _IsField(this.fieldName, this.arguments, this.directives, this.selectionSet);
 
@@ -105,10 +105,10 @@ class _IsField extends Matcher {
   bool matches(item, Map matchState) {
     var field = item is FieldContext ? item : parseField(item.toString());
     if (field == null) return false;
-    if (fieldName != null && !fieldName.matches(field.fieldName, matchState)) {
+    if (fieldName != null && !fieldName!.matches(field.fieldName, matchState)) {
       return false;
     }
-    if (arguments != null && !arguments.matches(field.arguments, matchState)) {
+    if (arguments != null && !arguments!.matches(field.arguments, matchState)) {
       return false;
     }
     return true;
@@ -116,7 +116,7 @@ class _IsField extends Matcher {
 }
 
 class _IsFieldName extends Matcher {
-  final String name, realName;
+  final String? name, realName;
 
   _IsFieldName(this.name, this.realName);
 
@@ -134,10 +134,10 @@ class _IsFieldName extends Matcher {
     var fieldName =
         item is FieldNameContext ? item : parseFieldName(item.toString());
     if (realName != null) {
-      return fieldName.alias?.alias == name &&
+      return fieldName!.alias?.alias == name &&
           fieldName.alias?.name == realName;
     } else {
-      return fieldName.name == name;
+      return fieldName!.name == name;
     }
   }
 }

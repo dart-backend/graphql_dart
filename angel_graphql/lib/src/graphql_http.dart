@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:angel_framework/angel_framework.dart';
 import 'package:angel_validate/server.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:graphql_parser/graphql_parser.dart';
 import 'package:graphql_schema/graphql_schema.dart';
 import 'package:graphql_server/graphql_server.dart';
@@ -12,7 +13,7 @@ final ContentType graphQlContentType = ContentType('application', 'graphql');
 final Validator graphQlPostBody = Validator({
   'query*': isNonEmptyString,
   'operation_name': isNonEmptyString,
-  'variables': predicate((v) => v == null || v is String || v is Map),
+  'variables': predicate((dynamic v) => v == null || v is String || v is Map),
 });
 
 final RegExp _num = RegExp(r'^[0-9]+$');
@@ -22,7 +23,7 @@ final RegExp _num = RegExp(r'^[0-9]+$');
 /// Follows the guidelines listed here:
 /// https://graphql.org/learn/serving-over-http/
 RequestHandler graphQLHttp(GraphQL graphQL,
-    {Function(RequestContext, ResponseContext, Stream<Map<String, dynamic>>)
+    {Function(RequestContext, ResponseContext, Stream<Map<String, dynamic>>)?
         onSubscription}) {
   return (req, res) async {
     var globalVariables = <String, dynamic>{
@@ -30,7 +31,7 @@ RequestHandler graphQLHttp(GraphQL graphQL,
       '__responsectx': res,
     };
 
-    sendGraphQLResponse(result) async {
+    Future sendGraphQLResponse(result) async {
       if (result is Stream<Map<String, dynamic>>) {
         if (onSubscription == null) {
           throw StateError(
@@ -45,14 +46,14 @@ RequestHandler graphQLHttp(GraphQL graphQL,
       };
     }
 
-    executeMap(Map map) async {
+    Future executeMap(Map map) async {
       var body = await req.parseBody().then((_) => req.bodyAsMap);
       var text = body['query'] as String;
-      var operationName = body['operation_name'] as String;
+      var operationName = body['operation_name'] as String?;
       var variables = body['variables'];
 
       if (variables is String) {
-        variables = json.decode(variables as String);
+        variables = json.decode(variables);
       }
 
       return await sendGraphQLResponse(await graphQL.parseAndExecute(
@@ -70,20 +71,21 @@ RequestHandler graphQLHttp(GraphQL graphQL,
           return await executeMap(req.queryParameters);
         }
       } else if (req.method == 'POST') {
-        if (req.headers.contentType?.mimeType == graphQlContentType.mimeType) {
-          var text = await req.body.transform(utf8.decoder).join();
+        if (req.headers!.contentType?.mimeType == graphQlContentType.mimeType) {
+          var text = await req.body!.transform(utf8.decoder).join();
           return sendGraphQLResponse(await graphQL.parseAndExecute(
             text,
             sourceUrl: 'input',
             globalVariables: globalVariables,
           ));
-        } else if (req.headers.contentType?.mimeType == 'application/json') {
+        } else if (req.headers!.contentType?.mimeType == 'application/json') {
           if (await validate(graphQlPostBody)(req, res) as bool) {
             return await executeMap(req.bodyAsMap);
           }
-        } else if (req.headers.contentType?.mimeType == 'multipart/form-data') {
+        } else if (req.headers!.contentType?.mimeType ==
+            'multipart/form-data') {
           var fields = await req.parseBody().then((_) => req.bodyAsMap);
-          var operations = fields['operations'] as String;
+          var operations = fields['operations'] as String?;
           if (operations == null) {
             throw AngelHttpException.badRequest(
                 message: 'Missing "operations" field.');
@@ -96,9 +98,9 @@ RequestHandler graphQLHttp(GraphQL graphQL,
                 message: '"map" field must decode to a JSON object.');
           }
           var variables = Map<String, dynamic>.from(globalVariables);
-          for (var entry in (map as Map).entries) {
-            var file = req.uploadedFiles
-                .firstWhere((f) => f.name == entry.key, orElse: () => null);
+          for (var entry in map.entries) {
+            var file =
+                req.uploadedFiles!.firstWhereOrNull((f) => f.name == entry.key);
             if (file == null) {
               throw AngelHttpException.badRequest(
                   message:
@@ -115,7 +117,7 @@ RequestHandler graphQLHttp(GraphQL graphQL,
               var subPaths = (objectPath as String).split('.');
               if (subPaths[0] == 'variables') {
                 Object current = variables;
-                for (int i = 1; i < subPaths.length; i++) {
+                for (var i = 1; i < subPaths.length; i++) {
                   var name = subPaths[i];
                   var parent = subPaths.take(i).join('.');
                   if (_num.hasMatch(name)) {
@@ -125,7 +127,7 @@ RequestHandler graphQLHttp(GraphQL graphQL,
                               'Object "$parent" is not a JSON array, but the '
                               '"map" field contained a mapping to $parent.$name.');
                     }
-                    (current as List)[int.parse(name)] = file;
+                    current[int.parse(name)] = file;
                   } else {
                     if (current is! Map) {
                       throw AngelHttpException.badRequest(
@@ -133,7 +135,7 @@ RequestHandler graphQLHttp(GraphQL graphQL,
                               'Object "$parent" is not a JSON object, but the '
                               '"map" field contained a mapping to $parent.$name.');
                     }
-                    (current as Map)[name] = file;
+                    current[name] = file;
                   }
                 }
               } else {
@@ -165,12 +167,12 @@ RequestHandler graphQLHttp(GraphQL graphQL,
       errors.addAll(e.errors.map((ee) => GraphQLExceptionError(ee)).toList());
       return GraphQLException(errors).toJson();
     } on SyntaxError catch (e) {
-      return GraphQLException.fromSourceSpan(e.message, e.span);
+      return GraphQLException.fromSourceSpan(e.message, e.span!);
     } on GraphQLException catch (e) {
       return e.toJson();
     } catch (e, st) {
       if (req.app?.logger != null) {
-        req.app.logger.severe(
+        req.app!.logger!.severe(
             'An error occurred while processing GraphQL query at ${req.uri}.',
             e,
             st);

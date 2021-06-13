@@ -15,12 +15,12 @@ import 'package:web_socket_channel/io.dart';
 ///
 /// See:
 /// * https://github.com/apollographql/subscriptions-transport-ws
-RequestHandler graphQLWS(GraphQL graphQL, {Duration keepAliveInterval}) {
+RequestHandler graphQLWS(GraphQL graphQL, {Duration? keepAliveInterval}) {
   return (req, res) async {
     if (req is HttpRequestContext) {
-      if (WebSocketTransformer.isUpgradeRequest(req.rawRequest)) {
+      if (WebSocketTransformer.isUpgradeRequest(req.rawRequest!)) {
         await res.detach();
-        var socket = await WebSocketTransformer.upgrade(req.rawRequest,
+        var socket = await WebSocketTransformer.upgrade(req.rawRequest!,
             protocolSelector: (protocols) {
           if (protocols.contains('graphql-ws')) {
             return 'graphql-ws';
@@ -51,15 +51,15 @@ class _GraphQLWSServer extends stw.Server {
   final ResponseContext res;
 
   _GraphQLWSServer(stw.RemoteClient client, this.graphQL, this.req, this.res,
-      Duration keepAliveInterval)
+      Duration? keepAliveInterval)
       : super(client, keepAliveInterval: keepAliveInterval);
 
   @override
-  bool onConnect(stw.RemoteClient client, [Map connectionParams]) => true;
+  bool onConnect(stw.RemoteClient client, [Map? connectionParams]) => true;
 
   @override
-  Future<stw.GraphQLResult> onOperation(String id, String query,
-      [Map<String, dynamic> variables, String operationName]) async {
+  Future<stw.GraphQLResult> onOperation(String? id, String query,
+      [Map<String, dynamic>? variables, String? operationName]) async {
     try {
       var globalVariables = <String, dynamic>{
         '__requestctx': req,
@@ -70,7 +70,7 @@ class _GraphQLWSServer extends stw.Server {
         operationName: operationName,
         sourceUrl: 'input',
         globalVariables: globalVariables,
-        variableValues: variables,
+        variableValues: variables!,
       );
       return stw.GraphQLResult(data);
     } on GraphQLException catch (e) {

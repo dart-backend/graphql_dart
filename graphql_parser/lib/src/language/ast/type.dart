@@ -7,13 +7,13 @@ import 'type_name.dart';
 /// A GraphQL type node.
 class TypeContext extends Node {
   /// A source token, present in a nullable type literal.
-  final Token exclamationToken;
+  final Token? exclamationToken;
 
   /// The name of the referenced type.
-  final TypeNameContext typeName;
+  final TypeNameContext? typeName;
 
   /// A list type that is being referenced.
-  final ListTypeContext listType;
+  final ListTypeContext? listType;
 
   /// Whether the type is nullable.
   bool get isNullable => exclamationToken == null;
@@ -24,11 +24,11 @@ class TypeContext extends Node {
 
   /// Use [exclamationToken] instead.
   @deprecated
-  Token get EXCLAMATION => exclamationToken;
+  Token? get EXCLAMATION => exclamationToken;
 
   @override
   FileSpan get span {
-    var out = typeName?.span ?? listType.span;
-    return exclamationToken != null ? out.expand(exclamationToken.span) : out;
+    var out = typeName?.span ?? listType!.span;
+    return exclamationToken != null ? out.expand(exclamationToken!.span!) : out;
   }
 }

@@ -7,13 +7,13 @@ import 'node.dart';
 /// A GraphQL directive, which may or may not have runtime semantics.
 class DirectiveContext extends Node {
   /// The source tokens.
-  final Token arrobaToken, nameToken, colonToken, lParenToken, rParenToken;
+  final Token? arrobaToken, nameToken, colonToken, lParenToken, rParenToken;
 
   /// The argument being passed as the directive.
-  final ArgumentContext argument;
+  final ArgumentContext? argument;
 
   /// The (optional) value being passed with the directive.
-  final InputValueContext value;
+  final InputValueContext? value;
 
   DirectiveContext(this.arrobaToken, this.nameToken, this.colonToken,
       this.lParenToken, this.rParenToken, this.argument, this.value) {
@@ -22,39 +22,39 @@ class DirectiveContext extends Node {
 
   /// Use [value] instead.
   @deprecated
-  InputValueContext get valueOrVariable => value;
+  InputValueContext? get valueOrVariable => value;
 
   /// Use [arrobaToken] instead.
   @deprecated
-  Token get ARROBA => arrobaToken;
+  Token? get ARROBA => arrobaToken;
 
   /// Use [nameToken] instead.
   @deprecated
-  Token get NAME => nameToken;
+  Token? get NAME => nameToken;
 
   /// Use [colonToken] instead.
   @deprecated
-  Token get COLON => colonToken;
+  Token? get COLON => colonToken;
 
   /// Use [lParenToken] instead.
   @deprecated
-  Token get LPAREN => lParenToken;
+  Token? get LPAREN => lParenToken;
 
   /// Use [rParenToken] instead.
   @deprecated
-  Token get RPAREN => rParenToken;
+  Token? get RPAREN => rParenToken;
 
   @override
   FileSpan get span {
-    var out = arrobaToken.span.expand(nameToken.span);
+    var out = arrobaToken!.span!.expand(nameToken!.span!);
 
     if (colonToken != null) {
-      out = out.expand(colonToken.span).expand(value.span);
+      out = out.expand(colonToken!.span!).expand(value!.span!);
     } else if (lParenToken != null) {
       out = out
-          .expand(lParenToken.span)
-          .expand(argument.span)
-          .expand(rParenToken.span);
+          .expand(lParenToken!.span!)
+          .expand(argument!.span)
+          .expand(rParenToken!.span!);
     }
 
     return out;

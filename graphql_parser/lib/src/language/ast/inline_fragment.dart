@@ -8,7 +8,7 @@ import 'type_condition.dart';
 /// An inline fragment, which typically appears in a [SelectionSetContext].
 class InlineFragmentContext extends Node {
   /// The source tokens.
-  final Token ellipsisToken, onToken;
+  final Token? ellipsisToken, onToken;
 
   /// The type which this fragment matches.
   final TypeConditionContext typeCondition;
@@ -24,17 +24,17 @@ class InlineFragmentContext extends Node {
 
   /// Use [ellipsisToken] instead.
   @deprecated
-  Token get ELLIPSIS => ellipsisToken;
+  Token? get ELLIPSIS => ellipsisToken;
 
   /// Use [onToken] instead.
   @deprecated
-  Token get ON => onToken;
+  Token? get ON => onToken;
 
   @override
   FileSpan get span {
     var out =
-        ellipsisToken.span.expand(onToken.span).expand(typeCondition.span);
+        ellipsisToken!.span!.expand(onToken!.span!).expand(typeCondition.span!);
     out = directives.fold<FileSpan>(out, (o, d) => o.expand(d.span));
-    return out.expand(selectionSet.span);
+    return out.expand(selectionSet.span!);
   }
 }

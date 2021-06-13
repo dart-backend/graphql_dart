@@ -9,7 +9,7 @@ import 'type_test.dart';
 import 'value_test.dart';
 import 'variable_definition_test.dart';
 
-main() {
+void main() {
   test('fragment', () {
     var fragment = parse('''
     fragment PostInfo on Post {
@@ -18,7 +18,7 @@ main() {
         id
       }
     }
-    ''').parseFragmentDefinition();
+    ''').parseFragmentDefinition()!;
 
     expect(fragment, isNotNull);
     expect(fragment.name, 'PostInfo');
@@ -35,7 +35,7 @@ main() {
   });
 
   test('fragment exceptions', () {
-    var throwsSyntaxError = predicate((x) {
+    var throwsSyntaxError = predicate((dynamic x) {
       var parser = parse(x.toString())..parseFragmentDefinition();
       return parser.errors.isNotEmpty;
     }, 'fails to parse fragment definition');
@@ -48,7 +48,7 @@ main() {
 
   group('operation', () {
     test('with selection set', () {
-      var op = parse('{foo, bar: baz}').parseOperationDefinition();
+      var op = parse('{foo, bar: baz}').parseOperationDefinition()!;
       expect(op.variableDefinitions, isNull);
       expect(op.isQuery, isTrue);
       expect(op.isMutation, isFalse);
@@ -62,7 +62,7 @@ main() {
     });
 
     test('mutation', () {
-      var op = parse('mutation {foo, bar: baz}').parseOperationDefinition();
+      var op = parse('mutation {foo, bar: baz}').parseOperationDefinition()!;
       expect(op.variableDefinitions, isNull);
       expect(op.isQuery, isFalse);
       expect(op.isMutation, isTrue);
@@ -79,16 +79,16 @@ main() {
       var doc =
           parse(r'query foo ($one: [int] = 2) @foo @bar: 2 {foo, bar: baz}')
               .parseDocument();
-      print(doc.span.highlight());
+      print(doc.span!.highlight());
       expect(doc.definitions, hasLength(1));
       expect(doc.definitions.first is OperationDefinitionContext, isTrue);
       var op = doc.definitions.first as OperationDefinitionContext;
       expect(op.isMutation, isFalse);
       expect(op.isQuery, isTrue);
 
-      expect(op.variableDefinitions.variableDefinitions, hasLength(1));
+      expect(op.variableDefinitions!.variableDefinitions, hasLength(1));
       expect(
-          op.variableDefinitions.variableDefinitions.first,
+          op.variableDefinitions!.variableDefinitions.first,
           isVariableDefinition('one',
               type: isListType(isType('int'), isNullable: true),
               defaultValue: isValue(2)));
@@ -107,7 +107,7 @@ main() {
     });
 
     test('exceptions', () {
-      var throwsSyntaxError = predicate((x) {
+      var throwsSyntaxError = predicate((dynamic x) {
         var parser = parse(x.toString())..parseOperationDefinition();
         return parser.errors.isNotEmpty;
       }, 'fails to parse operation definition');

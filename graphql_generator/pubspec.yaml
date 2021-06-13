@@ -1,21 +1,30 @@
 name: graphql_generator
-version: 1.0.0+1
+version: 2.0.0
 description: Generates GraphQL schemas from Dart classes, for use with pkg:graphql_server.
-author: Tobe O <thosakwe@gmail.com>
 homepage: https://github.com/angel-dart/graphql
+publish_to: none
 environment:
-  sdk: ">=2.10.0 <2.12.0"
+  sdk: ">=2.10.0 <3.0.0"
 dependencies:
   analyzer: ">=0.27.1 <2.0.0"
   angel_model: #^1.0.0
-    path: ../../model
-  angel_serialize_generator: #^2.0.0
-    path: ../../serialize/angel_serialize_generator
+    git: 
+      url: https://github.com/dukefirehawk/angel.git
+      ref: sdk-2.12.x_nnbd
+      path: packages/model
+  angel_serialize_generator:
+    git: 
+      url: https://github.com/dukefirehawk/angel.git
+      ref: sdk-2.12.x_nnbd
+      path: packages/serialize/angel_serialize_generator
+  graphql_schema:
+    git: 
+      url: https://github.com/dukefirehawk/angel.git
+      ref: sdk-2.12.x_nnbd
+      path: packages/graphql/graphql_schema
   build: ^1.0.0
   build_config: ^0.3.0
   code_builder: ^3.0.0
-  graphql_schema: #^1.0.2
-    path: ../graphql_schema
   recase: ^2.0.0
   source_gen: ^0.9.4
 dev_dependencies:

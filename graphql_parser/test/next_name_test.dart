@@ -11,11 +11,11 @@ query searchRepos($queryString: String!, $repositoryOrder: RepositoryOrder, $fir
 
 void main() {
   test('can parse formerly-reserved words', () {
-    var def = parse(githubSrc).parseOperationDefinition();
+    var def = parse(githubSrc).parseOperationDefinition()!;
     expect(def.isQuery, isTrue);
-    expect(def.variableDefinitions.variableDefinitions, hasLength(3));
+    expect(def.variableDefinitions!.variableDefinitions, hasLength(3));
 
-    var searchField = def.selectionSet.selections[0].field;
+    var searchField = def.selectionSet.selections[0].field!;
     expect(searchField.fieldName.name, 'search');
 
     var argNames = searchField.arguments.map((a) => a.name).toList();

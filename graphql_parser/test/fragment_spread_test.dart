@@ -4,7 +4,7 @@ import 'common.dart';
 import 'argument_test.dart';
 import 'directive_test.dart';
 
-main() {
+void main() {
   test('name only', () {
     expect(['...foo', '... foo'], everyElement(isFragmentSpread('foo')));
   });
@@ -21,22 +21,22 @@ main() {
   });
 }
 
-FragmentSpreadContext parseFragmentSpread(String text) =>
+FragmentSpreadContext? parseFragmentSpread(String text) =>
     parse(text).parseFragmentSpread();
 
-Matcher isFragmentSpread(String name, {Matcher directives}) =>
+Matcher isFragmentSpread(String name, {Matcher? directives}) =>
     _IsFragmentSpread(name, directives);
 
 class _IsFragmentSpread extends Matcher {
   final String name;
-  final Matcher directives;
+  final Matcher? directives;
 
   _IsFragmentSpread(this.name, this.directives);
 
   @override
   Description describe(Description description) {
     if (directives != null) {
-      return directives.describe(
+      return directives!.describe(
           description.add('is a fragment spread named "$name" that also '));
     }
     return description.add('is a fragment spread named "$name"');
@@ -50,7 +50,7 @@ class _IsFragmentSpread extends Matcher {
     if (spread == null) return false;
     if (spread.name != name) return false;
     if (directives != null) {
-      return directives.matches(spread.directives, matchState);
+      return directives!.matches(spread.directives, matchState);
     } else {
       return true;
     }

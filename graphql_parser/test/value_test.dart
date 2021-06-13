@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 import 'common.dart';
 
-main() {
+void main() {
   test('boolean', () {
     expect('true', isValue(true));
     expect('false', isValue(false));
@@ -63,7 +63,7 @@ main() {
   });
 
   test('exceptions', () {
-    var throwsSyntaxError = predicate((x) {
+    var throwsSyntaxError = predicate((dynamic x) {
       var parser = parse(x.toString())..parseInputValue();
       return parser.errors.isNotEmpty;
     }, 'fails to parse value');
@@ -72,7 +72,7 @@ main() {
   });
 }
 
-InputValueContext parseValue(String text) => parse(text).parseInputValue();
+InputValueContext? parseValue(String text) => parse(text).parseInputValue();
 
 Matcher isValue(value) => _IsValue(value);
 
@@ -87,7 +87,7 @@ class _IsValue extends Matcher {
 
   @override
   bool matches(item, Map matchState) {
-    var v = item is InputValueContext ? item : parseValue(item.toString());
+    var v = item is InputValueContext ? item : parseValue(item.toString())!;
     return equals(value).matches(v.computeValue({}), matchState);
   }
 }

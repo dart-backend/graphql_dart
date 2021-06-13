@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 import 'argument_test.dart';
 import 'common.dart';
 
-main() {
+void main() {
   test('name only', () {
     expect('@foo', isDirective('foo'));
   });
@@ -21,7 +21,7 @@ main() {
   });
 
   test('exceptions', () {
-    var isSyntaxError = predicate((x) {
+    var isSyntaxError = predicate((dynamic x) {
       var parser = parse(x.toString())..parseDirective();
       return parser.errors.isNotEmpty;
     }, 'fails to parse directive');
@@ -34,9 +34,10 @@ main() {
   });
 }
 
-DirectiveContext parseDirective(String text) => parse(text).parseDirective();
+DirectiveContext? parseDirective(String text) => parse(text).parseDirective();
 
-Matcher isDirective(String name, {Matcher valueOrVariable, Matcher argument}) =>
+Matcher isDirective(String name,
+        {Matcher? valueOrVariable, Matcher? argument}) =>
     _IsDirective(name, valueOrVariable: valueOrVariable, argument: argument);
 
 Matcher isDirectiveList(List<Matcher> directives) =>
@@ -44,7 +45,7 @@ Matcher isDirectiveList(List<Matcher> directives) =>
 
 class _IsDirective extends Matcher {
   final String name;
-  final Matcher valueOrVariable, argument;
+  final Matcher? valueOrVariable, argument;
 
   _IsDirective(this.name, {this.valueOrVariable, this.argument});
 
@@ -53,9 +54,9 @@ class _IsDirective extends Matcher {
     var desc = description.add('is a directive with name "$name"');
 
     if (valueOrVariable != null) {
-      return valueOrVariable.describe(desc.add(' and '));
+      return valueOrVariable!.describe(desc.add(' and '));
     } else if (argument != null) {
-      return argument.describe(desc.add(' and '));
+      return argument!.describe(desc.add(' and '));
     } else {
       return desc;
     }
@@ -72,17 +73,17 @@ class _IsDirective extends Matcher {
       } else {
         var v = directive.value;
         if (v is VariableContext) {
-          return valueOrVariable.matches(v.name, matchState);
+          return valueOrVariable!.matches(v.name, matchState);
         } else {
-          return valueOrVariable.matches(
-              directive.value.computeValue({}), matchState);
+          return valueOrVariable!
+              .matches(directive.value!.computeValue({}), matchState);
         }
       }
     } else if (argument != null) {
       if (directive.argument == null) {
         return false;
       } else {
-        return argument.matches(directive.argument, matchState);
+        return argument!.matches(directive.argument, matchState);
       }
     } else {
       return true;
@@ -108,7 +109,7 @@ class _IsDirectiveList extends Matcher {
 
     if (args.length != directives.length) return false;
 
-    for (int i = 0; i < args.length; i++) {
+    for (var i = 0; i < args.length; i++) {
       if (!directives[i].matches(args[i], matchState)) return false;
     }
 

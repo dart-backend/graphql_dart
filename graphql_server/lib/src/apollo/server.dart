@@ -4,11 +4,11 @@ import 'transport.dart';
 
 abstract class Server {
   final RemoteClient client;
-  final Duration keepAliveInterval;
+  final Duration? keepAliveInterval;
   final Completer _done = Completer();
-  StreamSubscription<OperationMessage> _sub;
+  StreamSubscription<OperationMessage>? _sub;
   bool _init = false;
-  Timer _timer;
+  Timer? _timer;
 
   Future get done => _done.future;
 
@@ -17,9 +17,9 @@ abstract class Server {
         (msg) async {
           if ((msg.type == OperationMessage.gqlConnectionInit) && !_init) {
             try {
-              Map connectionParams;
+              Map? connectionParams;
               if (msg.payload is Map) {
-                connectionParams = msg.payload as Map;
+                connectionParams = msg.payload as Map?;
               } else if (msg.payload != null) {
                 throw FormatException(
                     '${msg.type} payload must be a map (object).');
@@ -34,7 +34,7 @@ abstract class Server {
               if (keepAliveInterval != null) {
                 client.sink.add(
                     OperationMessage(OperationMessage.gqlConnectionKeepAlive));
-                _timer ??= Timer.periodic(keepAliveInterval, (timer) {
+                _timer ??= Timer.periodic(keepAliveInterval!, (timer) {
                   client.sink.add(OperationMessage(
                       OperationMessage.gqlConnectionKeepAlive));
                 });
@@ -75,9 +75,9 @@ abstract class Server {
               }
               var result = await onOperation(
                   msg.id,
-                  query as String,
-                  (variables as Map)?.cast<String, dynamic>(),
-                  operationName as String);
+                  query,
+                  (variables as Map?)?.cast<String, dynamic>(),
+                  operationName as String?);
               var data = result.data;
 
               if (result.errors.isNotEmpty) {
@@ -126,8 +126,8 @@ abstract class Server {
         payload: {'message': message}));
   }
 
-  FutureOr<bool> onConnect(RemoteClient client, [Map connectionParams]);
+  FutureOr<bool> onConnect(RemoteClient client, [Map? connectionParams]);
 
-  FutureOr<GraphQLResult> onOperation(String id, String query,
-      [Map<String, dynamic> variables, String operationName]);
+  FutureOr<GraphQLResult> onOperation(String? id, String query,
+      [Map<String, dynamic>? variables, String? operationName]);
 }

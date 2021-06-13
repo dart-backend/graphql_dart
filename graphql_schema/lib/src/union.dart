@@ -7,6 +7,7 @@ class GraphQLUnionType
     extends GraphQLType<Map<String, dynamic>, Map<String, dynamic>>
     with _NonNullableMixin<Map<String, dynamic>, Map<String, dynamic>> {
   /// The name of this type.
+  @override
   final String name;
 
   /// A list of all types that conform to this union.
@@ -32,7 +33,7 @@ class GraphQLUnionType
   @override
   GraphQLType<Map<String, dynamic>, Map<String, dynamic>>
       coerceToInputObject() {
-    return new GraphQLUnionType(
+    return GraphQLUnionType(
         '${name}Input', possibleTypes.map((t) => t.coerceToInputObject()));
   }
 
@@ -46,7 +47,7 @@ class GraphQLUnionType
       } catch (_) {}
     }
 
-    throw new ArgumentError();
+    throw ArgumentError();
   }
 
   @override
@@ -57,13 +58,13 @@ class GraphQLUnionType
       } catch (_) {}
     }
 
-    throw new ArgumentError();
+    throw ArgumentError();
   }
 
   @override
   ValidationResult<Map<String, dynamic>> validate(
       String key, Map<String, dynamic> input) {
-    List<String> errors = [];
+    var errors = <String>[];
 
     for (var type in possibleTypes) {
       var result = type.validate(key, input);
@@ -75,7 +76,7 @@ class GraphQLUnionType
       }
     }
 
-    return new ValidationResult<Map<String, dynamic>>._failure(errors);
+    return ValidationResult<Map<String, dynamic>>._failure(errors);
   }
 
   @override

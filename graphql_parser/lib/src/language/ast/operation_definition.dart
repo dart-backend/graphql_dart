@@ -8,10 +8,10 @@ import 'variable_definitions.dart';
 /// An executable GraphQL operation definition.
 class OperationDefinitionContext extends ExecutableDefinitionContext {
   /// The source tokens.
-  final Token typeToken, nameToken;
+  final Token? typeToken, nameToken;
 
   /// The variables defined in the operation.
-  final VariableDefinitionsContext variableDefinitions;
+  final VariableDefinitionsContext? variableDefinitions;
 
   /// Any directives affixed to this operation.
   final List<DirectiveContext> directives = [];
@@ -29,31 +29,31 @@ class OperationDefinitionContext extends ExecutableDefinitionContext {
   bool get isQuery => typeToken?.text == 'query' || typeToken == null;
 
   /// The [String] value of the [nameToken].
-  String get name => nameToken?.text;
+  String? get name => nameToken?.text;
 
   /// Use [nameToken] instead.
   @deprecated
-  Token get NAME => nameToken;
+  Token? get NAME => nameToken;
 
   /// Use [typeToken] instead.
   @deprecated
-  Token get TYPE => typeToken;
+  Token? get TYPE => typeToken;
 
   OperationDefinitionContext(this.typeToken, this.nameToken,
       this.variableDefinitions, this.selectionSet) {
     assert(typeToken == null ||
-        typeToken.text == 'query' ||
-        typeToken.text == 'mutation' ||
-        typeToken.text == 'subscription');
+        typeToken!.text == 'query' ||
+        typeToken!.text == 'mutation' ||
+        typeToken!.text == 'subscription');
   }
 
   @override
-  FileSpan get span {
+  FileSpan? get span {
     if (typeToken == null) return selectionSet.span;
     var out = nameToken == null
-        ? typeToken.span
-        : typeToken.span.expand(nameToken.span);
-    out = directives.fold<FileSpan>(out, (o, d) => o.expand(d.span));
-    return out.expand(selectionSet.span);
+        ? typeToken!.span
+        : typeToken!.span!.expand(nameToken!.span!);
+    out = directives.fold<FileSpan?>(out, (o, d) => o!.expand(d.span));
+    return out!.expand(selectionSet.span!);
   }
 }

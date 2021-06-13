@@ -29,18 +29,21 @@ class GraphQLUploadType extends GraphQLScalarType<UploadedFile, UploadedFile> {
 
   @override
   ValidationResult<UploadedFile> validate(String key, UploadedFile input) {
-    if (input != null && input is! UploadedFile) {
+    if (input is! UploadedFile) {
       return _Vr(false, errors: ['Expected "$key" to be a boolean.']);
     }
-    return _Vr(true, value: input);
+    return _Vr(true, value: input, errors: []);
   }
 }
 
 // TODO: Really need to make the validation result constructors *public*
 class _Vr<T> implements ValidationResult<T> {
+  @override
   final bool successful;
+  @override
   final List<String> errors;
-  final T value;
+  @override
+  final T? value;
 
-  _Vr(this.successful, {this.errors, this.value});
+  _Vr(this.successful, {required this.errors, this.value});
 }

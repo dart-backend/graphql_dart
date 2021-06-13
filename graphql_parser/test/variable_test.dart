@@ -2,7 +2,7 @@ import 'package:test/test.dart';
 
 import 'common.dart';
 
-main() {
+void main() {
   test('variables', () {
     expect(r'$a', isVariable('a'));
     expect(r'$abc', isVariable('abc'));
@@ -13,7 +13,7 @@ main() {
   });
 
   test('exceptions', () {
-    var throwsSyntaxError = predicate((x) {
+    var throwsSyntaxError = predicate((dynamic x) {
       var parser = parse(x.toString())..parseVariable();
       return parser.errors.isNotEmpty;
     }, 'fails to parse variable');

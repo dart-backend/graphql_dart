@@ -4,24 +4,24 @@ import '../token.dart';
 
 /// A GraphQL boolean value literal.
 class BooleanValueContext extends InputValueContext<bool> {
-  bool _valueCache;
+  bool? _valueCache;
 
   /// The source token.
-  final Token booleanToken;
+  final Token? booleanToken;
 
   BooleanValueContext(this.booleanToken) {
     assert(booleanToken?.text == 'true' || booleanToken?.text == 'false');
   }
 
   /// The [bool] value of this literal.
-  bool get booleanValue => _valueCache ??= booleanToken.text == 'true';
+  bool get booleanValue => _valueCache ??= booleanToken!.text == 'true';
 
   /// Use [booleanToken] instead.
   @deprecated
-  Token get BOOLEAN => booleanToken;
+  Token? get BOOLEAN => booleanToken;
 
   @override
-  FileSpan get span => booleanToken.span;
+  FileSpan? get span => booleanToken!.span;
 
   @override
   bool computeValue(Map<String, dynamic> variables) => booleanValue;

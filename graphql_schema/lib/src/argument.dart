@@ -9,12 +9,12 @@ class GraphQLFieldInput<Value, Serialized> {
   final GraphQLType<Value, Serialized> type;
 
   /// An optional default value for this field.
-  final Value defaultValue;
+  final Value? defaultValue;
 
   /// An optional description for this field.
   ///
   /// This is useful when documenting your API for consumers like GraphiQL.
-  final String description;
+  final String? description;
 
   /// If [defaultValue] is `null`, and `null` is a valid value for this parameter, set this to `true`.
   final bool defaultsToNull;
@@ -36,7 +36,7 @@ class GraphQLFieldInput<Value, Serialized> {
   }
 
   GraphQLFieldInput(this.name, this.type,
-      {this.defaultValue, this.defaultsToNull: false, this.description}) {
+      {this.defaultValue, this.defaultsToNull = false, this.description}) {
     assert(_isInputTypeOrScalar(type),
         'All inputs to a GraphQL field must either be scalar types, or explicitly marked as INPUT_OBJECT. Call `GraphQLObjectType.asInputObject()` on any object types you are passing as inputs to a field.');
   }

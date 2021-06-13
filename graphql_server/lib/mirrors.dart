@@ -5,12 +5,12 @@ import 'package:graphql_schema/graphql_schema.dart';
 import 'package:recase/recase.dart';
 
 /// Uses `dart:mirrors` to read field names from items. If they are Maps, performs a regular lookup.
-T mirrorsFieldResolver<T>(objectValue, String fieldName,
-    [Map<String, dynamic> objectValues]) {
+T? mirrorsFieldResolver<T>(objectValue, String fieldName,
+    [Map<String, dynamic>? objectValues]) {
   if (objectValue is Map) {
-    return objectValue[fieldName] as T;
+    return objectValue[fieldName] as T?;
   } else {
-    return reflect(objectValue).getField(Symbol(fieldName)).reflectee as T;
+    return reflect(objectValue).getField(Symbol(fieldName)).reflectee as T?;
   }
 }
 
@@ -19,7 +19,7 @@ T mirrorsFieldResolver<T>(objectValue, String fieldName,
 /// This function is aware of the annotations from `package:angel_serialize`, and works seamlessly
 /// with them.
 @deprecated
-GraphQLType convertDartType(Type type, [List<Type> typeArguments]) {
+GraphQLType? convertDartType(Type type, [List<Type>? typeArguments]) {
   if (_cache[type] != null) {
     return _cache[type];
   } else {
@@ -29,13 +29,13 @@ GraphQLType convertDartType(Type type, [List<Type> typeArguments]) {
 
 /// Shorthand for [convertDartType], for when you know the result will be an object type.
 @deprecated
-GraphQLObjectType convertDartClass(Type type, [List<Type> typeArguments]) {
-  return convertDartType(type, typeArguments) as GraphQLObjectType;
+GraphQLObjectType? convertDartClass(Type type, [List<Type>? typeArguments]) {
+  return convertDartType(type, typeArguments) as GraphQLObjectType?;
 }
 
 final Map<Type, GraphQLType> _cache = <Type, GraphQLType>{};
 
-GraphQLType _objectTypeFromDartType(Type type, [List<Type> typeArguments]) {
+GraphQLType? _objectTypeFromDartType(Type type, [List<Type>? typeArguments]) {
   if (type == bool) {
     return graphQLBoolean;
   } else if (type == int) {
@@ -61,11 +61,11 @@ GraphQLType _objectTypeFromDartType(Type type, [List<Type> typeArguments]) {
         '$type is not a class, and therefore cannot be converted into a GraphQL object type.');
   }
 
-  var clazz = mirror as ClassMirror;
+  var clazz = mirror;
 
   if (clazz.isAssignableTo(reflectType(Iterable))) {
     if (clazz.typeArguments.isNotEmpty) {
-      var inner = convertDartType(clazz.typeArguments[0].reflectedType);
+      var inner = convertDartType(clazz.typeArguments[0].reflectedType)!;
       //if (inner == null) return null;
       return listOf(inner.nonNullable());
     }
@@ -82,9 +82,9 @@ GraphQLType _objectTypeFromDartType(Type type, [List<Type> typeArguments]) {
 }
 
 @deprecated
-GraphQLObjectType objectTypeFromClassMirror(ClassMirror mirror) {
+GraphQLObjectType? objectTypeFromClassMirror(ClassMirror mirror) {
   if (_cache[mirror.reflectedType] != null) {
-    return _cache[mirror.reflectedType] as GraphQLObjectType;
+    return _cache[mirror.reflectedType] as GraphQLObjectType?;
   } else {}
 
   var fields = <GraphQLObjectField>[];
@@ -93,7 +93,7 @@ GraphQLObjectType objectTypeFromClassMirror(ClassMirror mirror) {
 
   void walkMap(Map<Symbol, MethodMirror> map) {
     for (var name in map.keys) {
-      var methodMirror = map[name];
+      var methodMirror = map[name]!;
       var exclude = _getExclude(name, methodMirror);
       var canAdd = name != #hashCode &&
           name != #runtimeType &&
@@ -181,12 +181,12 @@ GraphQLObjectType objectTypeFromClassMirror(ClassMirror mirror) {
         }
       }
 
-      walk(parent.superclass);
+      walk(parent.superclass!);
       parent.superinterfaces.forEach(walk);
     }
   }
 
-  walk(mirror.superclass);
+  walk(mirror.superclass!);
   mirror.superinterfaces.forEach(walk);
 
   var result = _cache[mirror.reflectedType];
@@ -212,7 +212,7 @@ GraphQLEnumType enumTypeFromClassMirror(ClassMirror mirror) {
 
   for (var name in mirror.staticMembers.keys) {
     if (name != #values) {
-      var methodMirror = mirror.staticMembers[name];
+      var methodMirror = mirror.staticMembers[name]!;
       values.add(
         GraphQLEnumValue(
           MirrorSystem.getName(name),
@@ -233,7 +233,7 @@ GraphQLEnumType enumTypeFromClassMirror(ClassMirror mirror) {
 
 @deprecated
 GraphQLObjectField fieldFromGetter(
-    Symbol name, MethodMirror mirror, Exclude exclude, ClassMirror clazz) {
+    Symbol name, MethodMirror mirror, Exclude? exclude, ClassMirror clazz) {
   var type = _getProvidedType(mirror.metadata);
   var wasProvided = type != null;
 
@@ -246,7 +246,7 @@ GraphQLObjectField fieldFromGetter(
     }
   }
 
-  var nameString = _getSerializedName(name, mirror, clazz);
+  var nameString = _getSerializedName(name, mirror, clazz)!;
   var defaultValue = _getDefaultValue(mirror);
 
   if (!wasProvided && (nameString == 'id' && _autoNames(clazz))) {
@@ -255,7 +255,7 @@ GraphQLObjectField fieldFromGetter(
 
   return field(
     nameString,
-    type,
+    type!,
     deprecationReason: _getDeprecationReason(mirror.metadata),
     resolve: (obj, _) {
       if (obj is Map && exclude?.canSerialize != true) {
@@ -269,10 +269,10 @@ GraphQLObjectField fieldFromGetter(
   );
 }
 
-Exclude _getExclude(Symbol name, MethodMirror mirror) {
+Exclude? _getExclude(Symbol name, MethodMirror mirror) {
   for (var obj in mirror.metadata) {
     if (obj.reflectee is Exclude) {
-      var exclude = obj.reflectee as Exclude;
+      var exclude = obj.reflectee as Exclude?;
       return exclude;
     }
   }
@@ -280,7 +280,7 @@ Exclude _getExclude(Symbol name, MethodMirror mirror) {
   return null;
 }
 
-String _getSerializedName(Symbol name, MethodMirror mirror, ClassMirror clazz) {
+String? _getSerializedName(Symbol name, MethodMirror mirror, ClassMirror clazz) {
   // First search for an @Alias()
   for (var obj in mirror.metadata) {
     if (obj.reflectee is SerializableField) {
@@ -328,7 +328,7 @@ bool _autoNames(ClassMirror clazz) {
   return false;
 }
 
-String _getDeprecationReason(List<InstanceMirror> metadata) {
+String? _getDeprecationReason(List<InstanceMirror> metadata) {
   for (var obj in metadata) {
     if (obj.reflectee is Deprecated) {
       var expires = (obj.reflectee as Deprecated).message;
@@ -346,7 +346,7 @@ String _getDeprecationReason(List<InstanceMirror> metadata) {
   return null;
 }
 
-String _getDescription(List<InstanceMirror> metadata) {
+String? _getDescription(List<InstanceMirror> metadata) {
   for (var obj in metadata) {
     if (obj.reflectee is GraphQLDocumentation) {
       return (obj.reflectee as GraphQLDocumentation).description;
@@ -356,10 +356,10 @@ String _getDescription(List<InstanceMirror> metadata) {
   return null;
 }
 
-GraphQLType _getProvidedType(List<InstanceMirror> metadata) {
+GraphQLType? _getProvidedType(List<InstanceMirror> metadata) {
   for (var obj in metadata) {
     if (obj.reflectee is GraphQLDocumentation) {
-      return (obj.reflectee as GraphQLDocumentation).type();
+      return (obj.reflectee as GraphQLDocumentation).type!();
     }
   }
 

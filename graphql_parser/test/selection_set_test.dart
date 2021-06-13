@@ -5,7 +5,7 @@ import 'field_test.dart';
 import 'fragment_spread_test.dart';
 import 'inline_fragment_test.dart';
 
-main() {
+void main() {
   test('empty', () {
     expect('{}', isSelectionSet([]));
   });
@@ -43,7 +43,7 @@ main() {
   });
 
   test('exceptions', () {
-    var throwsSyntaxError = predicate((x) {
+    var throwsSyntaxError = predicate((dynamic x) {
       var parser = parse(x.toString())..parseSelectionSet();
       return parser.errors.isNotEmpty;
     }, 'fails to parse selection set');
@@ -52,7 +52,7 @@ main() {
   });
 }
 
-SelectionSetContext parseSelectionSet(String text) =>
+SelectionSetContext? parseSelectionSet(String text) =>
     parse(text).parseSelectionSet();
 
 Matcher isSelectionSet(List<Matcher> selections) => _IsSelectionSet(selections);
@@ -83,7 +83,7 @@ class _IsSelectionSet extends Matcher {
     if (set == null) return false;
     if (set.selections.length != selections.length) return false;
 
-    for (int i = 0; i < set.selections.length; i++) {
+    for (var i = 0; i < set.selections.length; i++) {
       var sel = set.selections[i];
       if (!selections[i].matches(
           sel.field ?? sel.fragmentSpread ?? sel.inlineFragment, matchState)) {

@@ -8,7 +8,7 @@ import 'input_value.dart';
 /// A GraphQL string value literal.
 class StringValueContext extends InputValueContext<String> {
   /// The source token.
-  final Token stringToken;
+  final Token? stringToken;
 
   /// Whether this is a block string.
   final bool isBlockString;
@@ -16,20 +16,20 @@ class StringValueContext extends InputValueContext<String> {
   StringValueContext(this.stringToken, {this.isBlockString = false});
 
   @override
-  FileSpan get span => stringToken.span;
+  FileSpan? get span => stringToken!.span;
 
   /// Use [stringToken] instead.
   @deprecated
-  Token get STRING => stringToken;
+  Token? get STRING => stringToken;
 
   /// The [String] value of the [stringToken].
   String get stringValue {
     String text;
 
     if (!isBlockString) {
-      text = stringToken.text.substring(1, stringToken.text.length - 1);
+      text = stringToken!.text!.substring(1, stringToken!.text!.length - 1);
     } else {
-      text = stringToken.text.substring(3, stringToken.text.length - 3).trim();
+      text = stringToken!.text!.substring(3, stringToken!.text!.length - 3).trim();
     }
 
     var codeUnits = text.codeUnits;

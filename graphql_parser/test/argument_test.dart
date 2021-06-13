@@ -4,19 +4,19 @@ import 'package:test/test.dart';
 
 import 'common.dart';
 
-main() {
+void main() {
   test('argument', () {
     expect('foo: 2', isArgument('foo', 2));
     expect(r'foo: $bar', isArgument('foo', 'bar'));
   });
 
   test('exception', () {
-    var isSyntaxError = predicate((x) {
+    var isSyntaxError = predicate((dynamic x) {
       var parser = parse(x.toString())..parseArgument();
       return parser.errors.isNotEmpty;
     }, 'fails to parse argument');
 
-    var isSyntaxErrorOnArguments = predicate((x) {
+    var isSyntaxErrorOnArguments = predicate((dynamic x) {
       var parser = parse(x.toString())..parseArguments();
       return parser.errors.isNotEmpty;
     }, 'fails to parse arguments');
@@ -27,9 +27,9 @@ main() {
   });
 }
 
-ArgumentContext parseArgument(String text) => parse(text).parseArgument();
+ArgumentContext? parseArgument(String text) => parse(text).parseArgument();
 
-List<ArgumentContext> parseArgumentList(String text) =>
+List<ArgumentContext>? parseArgumentList(String text) =>
     parse(text).parseArguments();
 
 Matcher isArgument(String name, value) => _IsArgument(name, value);
@@ -74,11 +74,11 @@ class _IsArgumentList extends Matcher {
   bool matches(item, Map matchState) {
     var args = item is List<ArgumentContext>
         ? item
-        : parse(item.toString()).parseArguments();
+        : parse(item.toString()).parseArguments()!;
 
     if (args.length != arguments.length) return false;
 
-    for (int i = 0; i < args.length; i++) {
+    for (var i = 0; i < args.length; i++) {
       if (!arguments[i].matches(args[i], matchState)) return false;
     }
 

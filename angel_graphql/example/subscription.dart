@@ -10,11 +10,11 @@ import 'package:graphql_schema/graphql_schema.dart';
 import 'package:graphql_server/graphql_server.dart';
 import 'package:logging/logging.dart';
 
-main() async {
+void main() async {
   var logger = Logger('angel_graphql');
   var app = Angel(logger: logger);
   var http = AngelHttp(app);
-  app.logger.onRecord.listen((rec) {
+  app.logger!.onRecord.listen((rec) {
     print(rec);
     if (rec.error != null) print(rec.error);
     if (rec.stackTrace != null) print(rec.stackTrace);

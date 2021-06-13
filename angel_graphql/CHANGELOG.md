@@ -1,3 +1,6 @@
+# 2.0.0
+* Migrated to support Dart SDK 2.12.x NNBD
+
 # 1.1.0
 * Support the GraphQL multipart spec: https://github.com/jaydenseric/graphql-multipart-request-spec
 

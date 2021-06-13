@@ -8,7 +8,7 @@ import 'package:graphql_server/graphql_server.dart';
 import 'package:graphql_server/mirrors.dart';
 import 'package:logging/logging.dart';
 
-main() async {
+void main() async {
   var logger = Logger('angel_graphql');
   var app = Angel(
       logger: logger
@@ -27,12 +27,12 @@ main() async {
     fields: [
       field(
         'todos',
-        listOf(convertDartType(Todo).nonNullable()),
+        listOf(convertDartType(Todo)!.nonNullable()),
         resolve: resolveViaServiceIndex(todoService),
       ),
       field(
         'todo',
-        convertDartType(Todo),
+        convertDartType(Todo)!,
         resolve: resolveViaServiceRead(todoService),
         inputs: [
           GraphQLFieldInput('id', graphQLId.nonNullable()),
@@ -47,10 +47,10 @@ main() async {
     fields: [
       field(
         'createTodo',
-        convertDartType(Todo),
+        convertDartType(Todo)!,
         inputs: [
           GraphQLFieldInput(
-              'data', convertDartType(Todo).coerceToInputObject()),
+              'data', convertDartType(Todo)!.coerceToInputObject()),
         ],
         resolve: resolveViaServiceCreate(todoService),
       ),
@@ -84,19 +84,20 @@ main() async {
 
 @GraphQLDocumentation(description: 'Any object with a .text (String) property.')
 abstract class HasText {
-  String get text;
+  String? get text;
 }
 
 @serializable
 @GraphQLDocumentation(
     description: 'A task that might not be completed yet. **Yay! Markdown!**')
 class Todo extends Model implements HasText {
-  String text;
+  @override
+  String? text;
 
   @GraphQLDocumentation(deprecationReason: 'Use `completion_status` instead.')
-  bool completed;
+  bool? completed;
 
-  CompletionStatus completionStatus;
+  CompletionStatus? completionStatus;
 
   Todo({this.text, this.completed, this.completionStatus});
 }

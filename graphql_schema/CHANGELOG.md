@@ -1,3 +1,6 @@
+# 2.0.0
+* Migrated to support Dart SDK 2.12.x NNBD
+
 # 1.0.4
 * Add `convert` method to types, to avoid some annoying generics bugs.
 

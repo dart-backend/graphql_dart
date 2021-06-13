@@ -2,18 +2,18 @@ part of graphql_schema.src.schema;
 
 /// Shorthand for building a [GraphQLEnumType].
 GraphQLEnumType enumType<Value>(String name, Map<String, Value> values,
-    {String description}) {
-  return new GraphQLEnumType<Value>(
-      name, values.keys.map((k) => new GraphQLEnumValue(k, values[k])).toList(),
+    {String? description}) {
+  return GraphQLEnumType<Value?>(
+      name, values.keys.map((k) => GraphQLEnumValue(k, values[k])).toList(),
       description: description);
 }
 
 /// Shorthand for building a [GraphQLEnumType] where all the possible values
 /// are mapped to Dart strings.
 GraphQLEnumType<String> enumTypeFromStrings(String name, List<String> values,
-    {String description}) {
-  return new GraphQLEnumType<String>(
-      name, values.map((s) => new GraphQLEnumValue(s, s)).toList(),
+    {String? description}) {
+  return GraphQLEnumType<String>(
+      name, values.map((s) => GraphQLEnumValue(s, s)).toList(),
       description: description);
 }
 
@@ -23,6 +23,7 @@ GraphQLEnumType<String> enumTypeFromStrings(String name, List<String> values,
 class GraphQLEnumType<Value> extends GraphQLScalarType<Value, String>
     with _NonNullableMixin<Value, String> {
   /// The name of this enum type.
+  @override
   final String name;
 
   /// The defined set of possible values for this type.
@@ -31,13 +32,14 @@ class GraphQLEnumType<Value> extends GraphQLScalarType<Value, String>
   final List<GraphQLEnumValue<Value>> values;
 
   /// A description of this enum type, for tools like GraphiQL.
-  final String description;
+  @override
+  final String? description;
 
   GraphQLEnumType(this.name, this.values, {this.description});
 
   @override
   String serialize(Value value) {
-    if (value == null) return null;
+    //if (value == null) return null;
     return values.firstWhere((v) => v.value == value).name;
   }
 
@@ -49,16 +51,16 @@ class GraphQLEnumType<Value> extends GraphQLScalarType<Value, String>
   @override
   ValidationResult<String> validate(String key, String input) {
     if (!values.any((v) => v.name == input)) {
-      if (input == null) {
-        return new ValidationResult<String>._failure(
-            ['The enum "$name" does not accept null values.']);
-      }
+      //if (input == null) {
+      //  return new ValidationResult<String>._failure(
+      //      ['The enum "$name" does not accept null values.']);
+      //}
 
-      return new ValidationResult<String>._failure(
+      return ValidationResult<String>._failure(
           ['"$input" is not a valid value for the enum "$name".']);
     }
 
-    return new ValidationResult<String>._ok(input);
+    return ValidationResult<String>._ok(input);
   }
 
   @override
@@ -83,10 +85,10 @@ class GraphQLEnumValue<Value> {
   final Value value;
 
   /// An optional description of this value; useful for tools like GraphiQL.
-  final String description;
+  final String? description;
 
   /// The reason, if any, that this value was deprecated, if it indeed is deprecated.
-  final String deprecationReason;
+  final String? deprecationReason;
 
   GraphQLEnumValue(this.name, this.value,
       {this.description, this.deprecationReason});

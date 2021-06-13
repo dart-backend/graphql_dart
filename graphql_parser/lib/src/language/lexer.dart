@@ -41,11 +41,11 @@ final Map<Pattern, TokenType> _patterns = {
 };
 
 List<Token> scan(String text, {sourceUrl}) {
-  List<Token> out = [];
+  var out = <Token>[];
   var scanner = SpanScanner(text, sourceUrl: sourceUrl);
 
   while (!scanner.isDone) {
-    List<Token> potential = [];
+    var potential = <Token>[];
 
     if (scanner.scan(_comment) ||
         scanner.scan(_whitespace) ||
@@ -55,7 +55,7 @@ List<Token> scan(String text, {sourceUrl}) {
     for (var pattern in _patterns.keys) {
       if (scanner.matches(pattern)) {
         potential.add(
-            Token(_patterns[pattern], scanner.lastMatch[0], scanner.lastSpan));
+            Token(_patterns[pattern], scanner.lastMatch![0], scanner.lastSpan));
       }
     }
 
@@ -64,10 +64,10 @@ List<Token> scan(String text, {sourceUrl}) {
       throw SyntaxError("Unexpected token '$ch'.", scanner.emptySpan);
     } else {
       // Choose longest token
-      potential.sort((a, b) => b.text.length.compareTo(a.text.length));
+      potential.sort((a, b) => b.text!.length.compareTo(a.text!.length));
       var chosen = potential.first;
       out.add(chosen);
-      scanner.scan(chosen.text);
+      scanner.scan(chosen.text!);
     }
   }
 

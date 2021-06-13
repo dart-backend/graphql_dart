@@ -6,7 +6,7 @@ import 'node.dart';
 /// The default value to be passed to an [ArgumentContext].
 class DefaultValueContext extends Node {
   /// The source token.
-  final Token equalsToken;
+  final Token? equalsToken;
 
   /// The default value for the argument.
   final InputValueContext value;
@@ -15,8 +15,8 @@ class DefaultValueContext extends Node {
 
   /// Use [equalsToken] instead.
   @deprecated
-  Token get EQUALS => equalsToken;
+  Token? get EQUALS => equalsToken;
 
   @override
-  FileSpan get span => equalsToken.span.expand(value.span);
+  FileSpan get span => equalsToken!.span!.expand(value.span!);
 }
