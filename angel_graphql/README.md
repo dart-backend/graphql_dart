@@ -16,7 +16,7 @@
 * [Deprecated - Mirrors Usage](#mirrors)
 
 A complete implementation of the official
-[GraphQL specification](http://facebook.github.io/graphql/October2016/#sec-Language) - these
+[GraphQL specification](https://facebook.github.io/graphql/October2016/#sec-Language) - these
 are the [Angel3 framework](https://github.com/dukefirehawk/angel)-specific bindings.
 
 The goal of this project is to provide to server-side
