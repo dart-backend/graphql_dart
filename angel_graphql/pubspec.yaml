@@ -8,37 +8,37 @@ environment:
 dependencies:
   angel_file_service:
     git: 
-      url: https://github.com/dukefirehawk/angel
+      url: https://github.com/dukefirehawk/angel.git
       ref: sdk-2.12.x_nnbd
       path: packages/file_service
   angel_framework:
     git: 
-      url: https://github.com/dukefirehawk/angel
+      url: https://github.com/dukefirehawk/angel.git
       ref: sdk-2.12.x_nnbd
       path: packages/framework
   angel_websocket: 
     git: 
-      url: https://github.com/dukefirehawk/angel
+      url: https://github.com/dukefirehawk/angel.git
       ref: sdk-2.12.x_nnbd
       path: packages/websocket
   angel_validate:
     git: 
-      url: https://github.com/dukefirehawk/angel
+      url: https://github.com/dukefirehawk/angel.git
       ref: sdk-2.12.x_nnbd
       path: packages/validate
   graphql_parser:
     git: 
-      url: https://github.com/dukefirehawk/graphql_dart
+      url: https://github.com/dukefirehawk/graphql_dart.git
       ref: sdk-2.12.x_nnbd
       path: graphql_parser
   graphql_schema:
     git: 
-      url: https://github.com/dukefirehawk/graphql_dart
+      url: https://github.com/dukefirehawk/graphql_dart.git
       ref: sdk-2.12.x_nnbd
       path: graphql_schema
   graphql_server:
     git: 
-      url: https://github.com/dukefirehawk/graphql_dart
+      url: https://github.com/dukefirehawk/graphql_dart.git
       ref: sdk-2.12.x_nnbd
       path: graphql_server
   http_parser: ^4.0.0
@@ -47,7 +47,7 @@ dependencies:
 dev_dependencies:
   angel_serialize:
     git: 
-      url: https://github.com/dukefirehawk/angel
+      url: https://github.com/dukefirehawk/angel.git
       ref: sdk-2.12.x_nnbd
       path: packages/serialize/angel_serialize
   file: ^6.1.1
