@@ -35,15 +35,10 @@ try {
 }
 ```
 
-Consult the API reference for more:
-https://pub.dev/documentation/graphql_server2/latest/graphql_server2/GraphQL/parseAndExecute.html
+Consult the API reference for more: [`API Document`](https://pub.dev/documentation/graphql_server2/latest/graphql_server2/GraphQL/parseAndExecute.html)
 
-If you're looking for functionality like `graphQLHttp`
-in `graphql-js`, that is not included in this package, because
-it is typically specific to the framework/platform you are using.
-The `graphQLHttp` implementation in `package:angel3_graphql` is
-a good example:
-https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql/lib/src/graphql_http.dart
+If you're looking for functionality like `graphQLHttp` in `graphql-js`, that is not included in this package, because it is typically specific to the framework/platform you are using. The `graphQLHttp` implementation in `package:angel3_graphql` is
+a good example: [`graphQLHttp source code`](https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql/lib/src/graphql_http.dart)
 
 ## Subscriptions
 GraphQL queries involving `subscription` operations can return
@@ -107,25 +102,23 @@ var server =
 await server.done;
 ```
 
-See `graphQLWS` in `package:angel3_graphql` for a good example:
-https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql/lib/src/graphql_ws.dart
+See `graphQLWS` in `package:angel3_graphql` for a good example: [`graphQLWS source code`](
+https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql/lib/src/graphql_ws.dart)
 
 ## Introspection
 Introspection of a GraphQL schema allows clients to query the schema itself,
 and get information about the response the server expects. The `GraphQL`
 class handles this automatically, so you don't have to write any code for it.
 
-However, you can call the `reflectSchema` method to manually reflect a schema:
-https://pub.dev/documentation/graphql_server2/latest/introspection/reflectSchema.html
+However, you can call the `reflectSchema` method to manually reflect a schema: [`API Document`](https://pub.dev/documentation/graphql_server2/latest/introspection/reflectSchema.html)
 
 ## Mirrors Usage
 By default, `dart:mirrors` is not required, but it can be optionally used.
 
 The `mirrorsFieldResolver` can resolve fields from concrete objects, instead of you
-first having to serialize them:
-https://pub.dev/documentation/graphql_server2/latest/graphql_server2.mirrors/mirrorsFieldResolver.html
+first having to serialize them: [`API Document`](
+https://pub.dev/documentation/graphql_server2/latest/graphql_server2.mirrors/mirrorsFieldResolver.html)
 
-You can also use `convertDartType` to convert a concrete Dart type into a `GraphQLType`. However,
-the ideal choice is `package:graphql_generator2`.
-* https://pub.dev/documentation/graphql_server2/latest/graphql_server2.mirrors/convertDartType.html
-* https://pub.dev/packages/graphql_generator2
+You can also use `convertDartType` to convert a concrete Dart type into a `GraphQLType`. However, the ideal choice is `package:graphql_generator2`.
+* [`API Document`](https://pub.dev/documentation/graphql_server2/latest/graphql_server2)mirrors/convertDartType.html
+* [`package:graphql_generator2`](https://pub.dev/packages/graphql_generator2)
