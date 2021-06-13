@@ -1,7 +1,7 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 import 'dart:mirrors';
-import 'package:angel_serialize/angel_serialize.dart';
-import 'package:graphql_schema/graphql_schema.dart';
+import 'package:angel3_serialize/angel3_serialize.dart';
+import 'package:graphql_schema2/graphql_schema2.dart';
 import 'package:recase/recase.dart';
 
 /// Uses `dart:mirrors` to read field names from items. If they are Maps, performs a regular lookup.
@@ -280,7 +280,8 @@ Exclude? _getExclude(Symbol name, MethodMirror mirror) {
   return null;
 }
 
-String? _getSerializedName(Symbol name, MethodMirror mirror, ClassMirror clazz) {
+String? _getSerializedName(
+    Symbol name, MethodMirror mirror, ClassMirror clazz) {
   // First search for an @Alias()
   for (var obj in mirror.metadata) {
     if (obj.reflectee is SerializableField) {

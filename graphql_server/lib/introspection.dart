@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart' show IterableExtension;
-import 'package:graphql_parser/graphql_parser.dart';
-import 'package:graphql_schema/graphql_schema.dart';
+import 'package:graphql_parser2/graphql_parser2.dart';
+import 'package:graphql_schema2/graphql_schema2.dart';
 
 /// Performs introspection over a GraphQL [schema], and returns a one, containing
 /// introspective information.

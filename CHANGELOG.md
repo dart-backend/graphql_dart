@@ -5,6 +5,7 @@
 * Changed package `graphql_schema` to `graphql_schema2`
 * Changed package `graphql_server` to `graphql_server2`
 * Changed package `graphql_generator` to `graphql_generator2`
+* Changed package `data_loader` to `graphql_data_loader2`
 * Changed package `angel_graphql` to `angel3_graphql`
 
 # 1.0.0
