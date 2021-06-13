@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:mirrors';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:angel_model/angel_model.dart';
-import 'package:angel_serialize_generator/build_context.dart';
-import 'package:angel_serialize_generator/context.dart';
+import 'package:angel3_model/angel3_model.dart';
+import 'package:angel3_serialize_generator/build_context.dart';
+import 'package:angel3_serialize_generator/context.dart';
 import 'package:build/build.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:collection/collection.dart' show IterableExtension;
-import 'package:graphql_schema/graphql_schema.dart';
+import 'package:graphql_schema2/graphql_schema2.dart';
 import 'package:recase/recase.dart';
 import 'package:source_gen/source_gen.dart';
 
