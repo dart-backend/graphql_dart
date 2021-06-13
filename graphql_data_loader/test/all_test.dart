@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:data_loader/data_loader.dart';
+import 'package:graphql_data_loader2/graphql_data_loader2.dart';
 import 'package:test/test.dart';
 
 void main() {
