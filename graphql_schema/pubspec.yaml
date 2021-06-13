@@ -1,6 +1,6 @@
 name: graphql_schema2
 version: 2.0.0
-description: An implementation of GraphQL's type system in Dart. Basis of graphql_server.
+description: An implementation of GraphQL's type system in Dart. Basis of graphql_server2.
 homepage: https://github.com/dukefirehawk/graphql_dart/tree/master/graphql_schema
 environment:
   sdk: '>=2.12.0 <3.0.0'
