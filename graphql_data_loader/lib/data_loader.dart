@@ -14,8 +14,8 @@ class DataLoader<Id, Data> {
   /// Whether to use a memoization cache to store the results of past lookups.
   final bool cache;
 
-  var _cache = <Id, Data>{};
-  var _queue = Queue<_QueueItem<Id, Data>>();
+  final _cache = <Id, Data>{};
+  final _queue = Queue<_QueueItem<Id, Data>>();
   bool _started = false;
 
   DataLoader(this.loadMany, {this.cache = true});
@@ -25,14 +25,13 @@ class DataLoader<Id, Data> {
       var current = _queue.toList();
       _queue.clear();
 
-      List<Id> loadIds =
-          current.map((i) => i.id).toSet().toList(growable: false);
+      var loadIds = current.map((i) => i.id).toSet().toList(growable: false);
 
       var data = await loadMany(
         loadIds,
       );
 
-      for (int i = 0; i < loadIds.length; i++) {
+      for (var i = 0; i < loadIds.length; i++) {
         var id = loadIds[i];
         var value = data.elementAt(i);
 

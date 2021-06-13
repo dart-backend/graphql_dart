@@ -35,16 +35,25 @@ void main() {
     expect(
       batch,
       [
-        { 0: [0, 1, 2]},
-        { 1: [0, 1, 2]},
-        { 2: [0, 1, 2]},
-        { 0: [0, 1, 2]},
+        {
+          0: [0, 1, 2]
+        },
+        {
+          1: [0, 1, 2]
+        },
+        {
+          2: [0, 1, 2]
+        },
+        {
+          0: [0, 1, 2]
+        },
       ],
     );
   });
 
   group('cache', () {
-    DataLoader<int, _Unique> uniqueLoader, noCache;
+    late DataLoader<int, _Unique> uniqueLoader;
+    late DataLoader<int, _Unique> noCache;
 
     setUp(() {
       uniqueLoader = DataLoader<int, _Unique>((ids) async {
