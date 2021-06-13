@@ -33,7 +33,7 @@ It's easy to define a schema with the
 [helper functions](#helpers):
 
 ```dart
-final GraphQLSchema todoSchema = new GraphQLSchema(
+final GraphQLSchema todoSchema = GraphQLSchema(
     query: objectType('Todo', [
   field('text', graphQLString.nonNullable()),
   field('created_at', graphQLDate)
@@ -47,7 +47,7 @@ GraphQL types can `serialize` and `deserialize` input data.
 The exact implementation of this depends on the type.
 
 ```dart
-var iso8601String = graphQLDate.serialize(new DateTime.now());
+var iso8601String = graphQLDate.serialize(DateTime.now());
 var date = graphQLDate.deserialize(iso8601String);
 print(date.millisecondsSinceEpoch);
 ```
