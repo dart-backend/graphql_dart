@@ -1,6 +1,9 @@
-# graphql_schema
-[![Pub](https://img.shields.io/pub/v/graphql_schema.svg)](https://pub.dartlang.org/packages/graphql_schema)
-[![build status](https://travis-ci.org/angel-dart/graphql.svg)](https://travis-ci.org/angel-dart/graphql)
+# graphql_schema2
+[![version](https://img.shields.io/badge/pub-v2.0.0-brightgreen)](https://pub.dartlang.org/packages/graphql_schema2)
+[![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angel_dart/discussion)
+
+[![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/graphql_dart/LICENSE)
 
 An implementation of GraphQL's type system in Dart. Supports any platform where Dart runs.
 The decisions made in the design of this library were done to make the experience
@@ -118,7 +121,7 @@ type Character {
 ```
 
 The field `characters` accepts a parameter, `title`. To reproduce this in
-`package:graphql_schema`, use `GraphQLFieldInput`:
+`package:graphql_schema2`, use `GraphQLFieldInput`:
 
 ```dart
 final GraphQLObjectType queryType = objectType('AnimeQuery', fields: [
@@ -140,7 +143,7 @@ In the majority of cases where you use GraphQL, you will be delegate the
 actual fetching of data to a database object, or some asynchronous resolver
 function.
 
-`package:graphql_schema` includes this functionality in the `resolve` property,
+`package:graphql_schema2` includes this functionality in the `resolve` property,
 which is passed a context object and a `Map<String, dynamic>` of arguments.
 
 A hypothetical example of the above might be:

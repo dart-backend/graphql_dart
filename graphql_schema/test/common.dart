@@ -1,4 +1,4 @@
-import 'package:graphql_schema/graphql_schema.dart';
+import 'package:graphql_schema2/graphql_schema2.dart';
 
 final GraphQLObjectType pokemonType = objectType('Pokemon', fields: [
   field('species', graphQLString),

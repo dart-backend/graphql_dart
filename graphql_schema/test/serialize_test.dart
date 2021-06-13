@@ -1,9 +1,9 @@
-import 'package:graphql_schema/graphql_schema.dart';
+import 'package:graphql_schema2/graphql_schema2.dart';
 import 'package:test/test.dart';
 
 import 'common.dart';
 
-main() {
+void main() {
   test('int', () {
     expect(graphQLInt.serialize(23), 23);
   });
@@ -39,7 +39,7 @@ main() {
     expect(listOf(graphQLString).serialize(['foo', 'bar']), ['foo', 'bar']);
 
     var today = DateTime.now();
-    var tomorrow = today.add( Duration(days: 1));
+    var tomorrow = today.add(Duration(days: 1));
     expect(listOf(graphQLDate).serialize([today, tomorrow]),
         [today.toIso8601String(), tomorrow.toIso8601String()]);
   });
@@ -60,7 +60,7 @@ main() {
   });
 
   test('object', () {
-    var catchDate =  DateTime.now();
+    var catchDate = DateTime.now();
 
     var pikachu = {'species': 'Pikachu', 'catch_date': catchDate};
 
@@ -93,7 +93,7 @@ main() {
       ],
     );
 
-    var u =  GraphQLUnionType('Monster', [pokemonType, digimonType]);
+    var u = GraphQLUnionType('Monster', [pokemonType, digimonType]);
 
     expect(u.serialize({'size': 10.0}), {'size': 10.0});
     expect(u.serialize({'name': 'Charmander', 'type': 'FIRE'}),
@@ -101,8 +101,8 @@ main() {
   });
 
   test('nested object', () {
-    var pikachuDate =  DateTime.now(),
-        charizardDate = pikachuDate.subtract( Duration(days: 10));
+    var pikachuDate = DateTime.now(),
+        charizardDate = pikachuDate.subtract(Duration(days: 10));
 
     var pikachu = {'species': 'Pikachu', 'catch_date': pikachuDate};
     var charizard = {'species': 'Charizard', 'catch_date': charizardDate};

@@ -1,4 +1,4 @@
-import 'package:graphql_schema/graphql_schema.dart';
+import 'package:graphql_schema2/graphql_schema2.dart';
 
 final GraphQLSchema todoSchema = GraphQLSchema(
   queryType: objectType('Todo', fields: [
