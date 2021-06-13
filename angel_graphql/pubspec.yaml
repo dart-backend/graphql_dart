@@ -1,5 +1,5 @@
 name: angel3_graphql
-version: 2.0.0
+version: 2.0.1
 description: The fastest and easiest way to get a GraphQL backend in Dart, using Angel3.
 homepage: https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql
 environment:
