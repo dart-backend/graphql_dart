@@ -1,11 +1,11 @@
 name: graphql_generator2
-version: 2.0.0
+version: 2.1.0
 description: Generates GraphQL schemas from Dart classes, for use with pkg:graphql_server2.
 homepage: https://github.com/dukefirehawk/graphql_dart/tree/master/graphql_generator
 environment:
   sdk: '>=2.12.0 <3.0.0'
 dependencies:
-  analyzer: ^1.7.0
+  analyzer: ^2.0.0
   angel3_model: ^3.0.0
   angel3_serialize_generator: ^4.0.0
   graphql_schema2: ^2.0.0
