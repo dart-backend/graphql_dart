@@ -23,5 +23,5 @@ class FieldNameContext extends Node {
   String? get name => nameToken?.text;
 
   @override
-  FileSpan? get span => alias?.span ?? nameToken!.span;
+  FileSpan? get span => alias?.span ?? nameToken?.span;
 }

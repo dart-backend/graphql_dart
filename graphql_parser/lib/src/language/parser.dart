@@ -16,9 +16,9 @@ class Parser {
 
   Token? get current => _current;
 
-  bool next(TokenType type, {Iterable<String>? exclude}) {
+  bool next(TokenType type, {Iterable<String> exclude = const []}) {
     var tok = peek();
-    if (tok?.type == type && exclude?.contains(tok!.span!.text) != true) {
+    if (tok?.type == type && exclude.contains(tok?.span?.text) != true) {
       _current = tokens[++_index];
       return true;
     }
@@ -28,7 +28,7 @@ class Parser {
 
   bool nextName(String name) {
     var tok = peek();
-    if (tok?.type == TokenType.NAME && tok!.span!.text == name) {
+    if (tok?.type == TokenType.NAME && tok?.span?.text == name) {
       return next(TokenType.NAME);
     }
 
@@ -52,8 +52,8 @@ class Parser {
   }
 
   DocumentContext parseDocument() {
-    List<DefinitionContext> defs = [];
-    DefinitionContext? def = parseDefinition();
+    var defs = <DefinitionContext>[];
+    var def = parseDefinition();
 
     while (def != null) {
       defs.add(def);
@@ -75,7 +75,7 @@ class Parser {
           nextName('query') ||
           nextName('subscription')) {
         var TYPE = current;
-        Token? NAME = next(TokenType.NAME) ? current : null;
+        var NAME = next(TokenType.NAME) ? current : null;
         var variables = parseVariableDefinitions();
         var dirs = parseDirectives();
         var selectionSet = parseSelectionSet();
@@ -85,7 +85,7 @@ class Parser {
         } else {
           errors.add(SyntaxError(
               'Missing selection set in fragment definition.',
-              NAME?.span ?? TYPE!.span));
+              NAME?.span ?? TYPE?.span));
           return null;
         }
       } else {
@@ -95,8 +95,8 @@ class Parser {
   }
 
   FragmentDefinitionContext? parseFragmentDefinition() {
-    if (nextName('fragment')) {
-      var FRAGMENT = current;
+    if (nextName('fragment') && current != null) {
+      var FRAGMENT = current!;
       if (next(TokenType.NAME)) {
         var NAME = current;
         if (nextName('on')) {
@@ -118,19 +118,19 @@ class Parser {
           } else {
             errors.add(SyntaxError(
                 'Expected type condition after "on" in fragment definition.',
-                ON!.span));
+                ON?.span));
             return null;
           }
         } else {
           errors.add(SyntaxError(
-              'Expected "on" after name "${NAME!.text}" in fragment definition.',
-              NAME.span));
+              'Expected "on" after name "${NAME?.text}" in fragment definition.',
+              NAME?.span));
           return null;
         }
       } else {
         errors.add(SyntaxError(
             'Expected name after "fragment" in fragment definition.',
-            FRAGMENT!.span));
+            FRAGMENT.span));
         return null;
       }
     } else {
@@ -139,10 +139,10 @@ class Parser {
   }
 
   FragmentSpreadContext? parseFragmentSpread() {
-    if (next(TokenType.ELLIPSIS)) {
-      var ELLIPSIS = current;
+    if (next(TokenType.ELLIPSIS) && current != null) {
+      var ELLIPSIS = current!;
       if (next(TokenType.NAME, exclude: ['on'])) {
-        var NAME = current;
+        var NAME = current!;
         return FragmentSpreadContext(ELLIPSIS, NAME)
           ..directives.addAll(parseDirectives());
       } else {
@@ -155,10 +155,10 @@ class Parser {
   }
 
   InlineFragmentContext? parseInlineFragment() {
-    if (next(TokenType.ELLIPSIS)) {
-      var ELLIPSIS = current;
+    if (next(TokenType.ELLIPSIS) && current != null) {
+      var ELLIPSIS = current!;
       if (nextName('on')) {
-        var ON = current;
+        var ON = current!;
         var typeCondition = parseTypeCondition();
         if (typeCondition != null) {
           var directives = parseDirectives();
@@ -178,12 +178,12 @@ class Parser {
         } else {
           errors.add(SyntaxError(
               'Missing type condition after "on" in inline fragment.',
-              ON!.span));
+              ON.span));
           return null;
         }
       } else {
         errors.add(SyntaxError(
-            'Missing "on" after "..." in inline fragment.', ELLIPSIS!.span));
+            'Missing "on" after "..." in inline fragment.', ELLIPSIS.span));
         return null;
       }
     } else {
@@ -192,10 +192,10 @@ class Parser {
   }
 
   SelectionSetContext? parseSelectionSet() {
-    if (next(TokenType.LBRACE)) {
-      var LBRACE = current;
-      List<SelectionContext> selections = [];
-      SelectionContext? selection = parseSelection();
+    if (next(TokenType.LBRACE) && current != null) {
+      var LBRACE = current!;
+      var selections = <SelectionContext>[];
+      var selection = parseSelection();
 
       while (selection != null) {
         selections.add(selection);
@@ -209,7 +209,7 @@ class Parser {
           ..selections.addAll(selections);
       } else {
         errors.add(SyntaxError('Missing "}" after selection set.',
-            selections.isEmpty ? LBRACE!.span : selections.last.span));
+            selections.isEmpty ? LBRACE.span : selections.last.span));
         return null;
       }
     } else {
@@ -245,15 +245,15 @@ class Parser {
   }
 
   FieldNameContext? parseFieldName() {
-    if (next(TokenType.NAME)) {
-      var NAME1 = current;
+    if (next(TokenType.NAME) && current != null) {
+      var NAME1 = current!;
       if (next(TokenType.COLON)) {
-        var COLON = current;
+        var COLON = current!;
         if (next(TokenType.NAME)) {
-          return FieldNameContext(null, AliasContext(NAME1, COLON, current));
+          return FieldNameContext(null, AliasContext(NAME1, COLON, current!));
         } else {
           errors.add(
-              SyntaxError('Missing name after colon in alias.', COLON!.span));
+              SyntaxError('Missing name after colon in alias.', COLON.span));
           return null;
         }
       } else {
@@ -265,10 +265,10 @@ class Parser {
   }
 
   VariableDefinitionsContext? parseVariableDefinitions() {
-    if (next(TokenType.LPAREN)) {
-      var LPAREN = current;
-      List<VariableDefinitionContext> defs = [];
-      VariableDefinitionContext? def = parseVariableDefinition();
+    if (next(TokenType.LPAREN) && current != null) {
+      var LPAREN = current!;
+      var defs = <VariableDefinitionContext>[];
+      var def = parseVariableDefinition();
 
       while (def != null) {
         defs.add(def);
@@ -281,7 +281,7 @@ class Parser {
           ..variableDefinitions.addAll(defs);
       } else {
         errors.add(SyntaxError(
-            'Missing ")" after variable definitions.', LPAREN!.span));
+            'Missing ")" after variable definitions.', LPAREN.span));
         return null;
       }
     } else {
@@ -292,15 +292,15 @@ class Parser {
   VariableDefinitionContext? parseVariableDefinition() {
     var variable = parseVariable();
     if (variable != null) {
-      if (next(TokenType.COLON)) {
-        var COLON = current;
+      if (next(TokenType.COLON) && current != null) {
+        var COLON = current!;
         var type = parseType();
         if (type != null) {
           var defaultValue = parseDefaultValue();
           return VariableDefinitionContext(variable, COLON, type, defaultValue);
         } else {
           errors.add(
-              SyntaxError('Missing type in variable definition.', COLON!.span));
+              SyntaxError('Missing type in variable definition.', COLON.span));
           return null;
         }
       } else {
@@ -328,18 +328,18 @@ class Parser {
   }
 
   ListTypeContext? parseListType() {
-    if (next(TokenType.LBRACKET)) {
-      var LBRACKET = current;
+    if (next(TokenType.LBRACKET) && current != null) {
+      var LBRACKET = current!;
       var type = parseType();
       if (type != null) {
         if (next(TokenType.RBRACKET)) {
-          return ListTypeContext(LBRACKET, type, current);
+          return ListTypeContext(LBRACKET, type, current!);
         } else {
           errors.add(SyntaxError('Missing "]" in list type.', type.span));
           return null;
         }
       } else {
-        errors.add(SyntaxError('Missing type after "[".', LBRACKET!.span));
+        errors.add(SyntaxError('Missing type after "[".', LBRACKET.span));
         return null;
       }
     } else {
@@ -348,8 +348,8 @@ class Parser {
   }
 
   List<DirectiveContext> parseDirectives() {
-    List<DirectiveContext> out = [];
-    DirectiveContext? d = parseDirective();
+    var out = <DirectiveContext>[];
+    var d = parseDirective();
     while (d != null) {
       out.add(d);
       d = parseDirective();
@@ -359,24 +359,24 @@ class Parser {
   }
 
   DirectiveContext? parseDirective() {
-    if (next(TokenType.ARROBA)) {
-      var ARROBA = current;
+    if (next(TokenType.ARROBA) && current != null) {
+      var ARROBA = current!;
       if (next(TokenType.NAME)) {
-        var NAME = current;
+        var NAME = current!;
 
         if (next(TokenType.COLON)) {
-          var COLON = current;
+          var COLON = current!;
           var val = parseInputValue();
           if (val != null) {
             return DirectiveContext(ARROBA, NAME, COLON, null, null, null, val);
           } else {
             errors.add(SyntaxError(
                 'Missing value or variable in directive after colon.',
-                COLON!.span));
+                COLON.span));
             return null;
           }
         } else if (next(TokenType.LPAREN)) {
-          var LPAREN = current;
+          var LPAREN = current!;
           var arg = parseArgument();
           if (arg != null) {
             if (next(TokenType.RPAREN)) {
@@ -388,14 +388,14 @@ class Parser {
             }
           } else {
             errors.add(
-                SyntaxError('Missing argument in directive.', LPAREN!.span));
+                SyntaxError('Missing argument in directive.', LPAREN.span));
             return null;
           }
         } else {
           return DirectiveContext(ARROBA, NAME, null, null, null, null, null);
         }
       } else {
-        errors.add(SyntaxError('Missing name for directive.', ARROBA!.span));
+        errors.add(SyntaxError('Missing name for directive.', ARROBA.span));
         return null;
       }
     } else {
@@ -404,10 +404,10 @@ class Parser {
   }
 
   List<ArgumentContext>? parseArguments() {
-    if (next(TokenType.LPAREN)) {
-      var LPAREN = current;
-      List<ArgumentContext> out = [];
-      ArgumentContext? arg = parseArgument();
+    if (next(TokenType.LPAREN) && current != null) {
+      var LPAREN = current!;
+      var out = <ArgumentContext>[];
+      var arg = parseArgument();
 
       while (arg != null) {
         out.add(arg);
@@ -418,7 +418,7 @@ class Parser {
       if (next(TokenType.RPAREN)) {
         return out;
       } else {
-        errors.add(SyntaxError('Missing ")" in argument list.', LPAREN!.span));
+        errors.add(SyntaxError('Missing ")" in argument list.', LPAREN.span));
         return null;
       }
     } else {
@@ -427,21 +427,21 @@ class Parser {
   }
 
   ArgumentContext? parseArgument() {
-    if (next(TokenType.NAME)) {
-      var NAME = current;
+    if (next(TokenType.NAME) && current != null) {
+      var NAME = current!;
       if (next(TokenType.COLON)) {
-        var COLON = current;
+        var COLON = current!;
         var val = parseInputValue();
         if (val != null) {
           return ArgumentContext(NAME, COLON, val);
         } else {
           errors.add(SyntaxError(
-              'Missing value or variable in argument.', COLON!.span));
+              'Missing value or variable in argument.', COLON.span));
           return null;
         }
       } else {
         errors.add(
-            SyntaxError('Missing colon after name in argument.', NAME!.span));
+            SyntaxError('Missing colon after name in argument.', NAME.span));
         return null;
       }
     } else {
@@ -454,14 +454,14 @@ class Parser {
   InputValueContext? parseValueOrVariable() => parseInputValue();
 
   VariableContext? parseVariable() {
-    if (next(TokenType.DOLLAR)) {
-      var DOLLAR = current;
+    if (next(TokenType.DOLLAR) && current != null) {
+      var DOLLAR = current!;
       if (next(TokenType.NAME)) {
-        return VariableContext(DOLLAR, current);
+        return VariableContext(DOLLAR, current!);
       } else {
         errors.add(SyntaxError(
             'Missing name for variable; found a lone "\$" instead.',
-            DOLLAR!.span));
+            DOLLAR.span));
         return null;
       }
     } else {
@@ -470,13 +470,13 @@ class Parser {
   }
 
   DefaultValueContext? parseDefaultValue() {
-    if (next(TokenType.EQUALS)) {
-      var EQUALS = current;
+    if (next(TokenType.EQUALS) && current != null) {
+      var EQUALS = current!;
       var value = parseInputValue();
       if (value != null) {
         return DefaultValueContext(EQUALS, value);
       } else {
-        errors.add(SyntaxError('Missing value after "=" sign.', EQUALS!.span));
+        errors.add(SyntaxError('Missing value after "=" sign.', EQUALS.span));
         return null;
       }
     } else {
@@ -516,31 +516,35 @@ class Parser {
         parseObjectValue()) as InputValueContext?;
   }
 
-  StringValueContext? parseStringValue() => next(TokenType.STRING)
-      ? StringValueContext(current)
-      : (next(TokenType.BLOCK_STRING)
-          ? StringValueContext(current, isBlockString: true)
-          : null);
+  StringValueContext? parseStringValue() =>
+      next(TokenType.STRING) && current != null
+          ? StringValueContext(current!)
+          : (next(TokenType.BLOCK_STRING) && current != null
+              ? StringValueContext(current!, isBlockString: true)
+              : null);
 
   NumberValueContext? parseNumberValue() =>
-      next(TokenType.NUMBER) ? NumberValueContext(current) : null;
-
-  BooleanValueContext? parseBooleanValue() =>
-      (nextName('true') || nextName('false'))
-          ? BooleanValueContext(current)
+      next(TokenType.NUMBER) && current != null
+          ? NumberValueContext(current!)
           : null;
 
-  EnumValueContext? parseEnumValue() =>
-      next(TokenType.NAME) ? EnumValueContext(current) : null;
+  BooleanValueContext? parseBooleanValue() =>
+      (nextName('true') || nextName('false') && current != null)
+          ? BooleanValueContext(current!)
+          : null;
+
+  EnumValueContext? parseEnumValue() => next(TokenType.NAME) && current != null
+      ? EnumValueContext(current!)
+      : null;
 
   NullValueContext? parseNullValue() =>
-      nextName('null') ? NullValueContext(current) : null;
+      nextName('null') && current != null ? NullValueContext(current!) : null;
 
   ListValueContext? parseListValue() {
-    if (next(TokenType.LBRACKET)) {
+    if (next(TokenType.LBRACKET) && current != null) {
       var LBRACKET = current!;
       var lastSpan = LBRACKET.span;
-      List<InputValueContext> values = [];
+      var values = <InputValueContext>[];
       var value = parseInputValue();
 
       while (value != null) {
@@ -551,8 +555,8 @@ class Parser {
       }
 
       eatCommas();
-      if (next(TokenType.RBRACKET)) {
-        return ListValueContext(LBRACKET, current)..values.addAll(values);
+      if (next(TokenType.RBRACKET) && current != null) {
+        return ListValueContext(LBRACKET, current!)..values.addAll(values);
       } else {
         errors.add(SyntaxError('Unterminated list literal.', lastSpan));
         return null;
@@ -563,7 +567,7 @@ class Parser {
   }
 
   ObjectValueContext? parseObjectValue() {
-    if (next(TokenType.LBRACE)) {
+    if (next(TokenType.LBRACE) && current != null) {
       var LBRACE = current!;
       var lastSpan = LBRACE.span;
       var fields = <ObjectFieldContext>[];
@@ -578,8 +582,8 @@ class Parser {
 
       eatCommas();
 
-      if (next(TokenType.RBRACE)) {
-        return ObjectValueContext(LBRACE, fields, current);
+      if (next(TokenType.RBRACE) && current != null) {
+        return ObjectValueContext(LBRACE, fields, current!);
       } else {
         errors.add(SyntaxError('Unterminated object literal.', lastSpan));
         return null;
@@ -590,22 +594,22 @@ class Parser {
   }
 
   ObjectFieldContext? parseObjectField() {
-    if (next(TokenType.NAME)) {
-      var NAME = current;
+    if (next(TokenType.NAME) && current != null) {
+      var NAME = current!;
 
       if (next(TokenType.COLON)) {
-        var COLON = current;
+        var COLON = current!;
         var value = parseInputValue();
 
         if (value != null) {
           return ObjectFieldContext(NAME, COLON, value);
         } else {
-          errors.add(SyntaxError('Missing value after ":".', COLON!.span));
+          errors.add(SyntaxError('Missing value after ":".', COLON.span));
           return null;
         }
       } else {
         errors.add(SyntaxError(
-            'Missing ":" after name "${NAME!.span!.text}".', NAME.span));
+            'Missing ":" after name "${NAME.span!.text}".', NAME.span));
         return null;
       }
     } else {

@@ -6,7 +6,7 @@ import 'type.dart';
 /// Represents a type that holds a list of another type.
 class ListTypeContext extends Node {
   /// The source tokens.
-  final Token? lBracketToken, rBracketToken;
+  final Token lBracketToken, rBracketToken;
 
   /// The inner type.
   final TypeContext innerType;
@@ -27,5 +27,5 @@ class ListTypeContext extends Node {
 
   @override
   FileSpan get span =>
-      lBracketToken!.span!.expand(innerType.span).expand(rBracketToken!.span!);
+      lBracketToken.span!.expand(innerType.span).expand(rBracketToken.span!);
 }

@@ -54,8 +54,11 @@ List<Token> scan(String text, {sourceUrl}) {
 
     for (var pattern in _patterns.keys) {
       if (scanner.matches(pattern)) {
-        potential.add(
-            Token(_patterns[pattern], scanner.lastMatch![0], scanner.lastSpan));
+        var pat = _patterns[pattern];
+        var scan = scanner.lastMatch?[0];
+        if (pat != null && scan != null) {
+          potential.add(Token(pat, scan, scanner.lastSpan));
+        }
       }
     }
 
@@ -64,10 +67,10 @@ List<Token> scan(String text, {sourceUrl}) {
       throw SyntaxError("Unexpected token '$ch'.", scanner.emptySpan);
     } else {
       // Choose longest token
-      potential.sort((a, b) => b.text!.length.compareTo(a.text!.length));
+      potential.sort((a, b) => b.text.length.compareTo(a.text.length));
       var chosen = potential.first;
       out.add(chosen);
-      scanner.scan(chosen.text!);
+      scanner.scan(chosen.text);
     }
   }
 

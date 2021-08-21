@@ -8,5 +8,5 @@ class SyntaxError implements Exception {
 
   @override
   String toString() =>
-      'Syntax error at ${span!.start.toolString}: $message\n${span!.highlight()}';
+      'Syntax error at ${span?.start.toolString}: $message\n${span?.highlight()}';
 }

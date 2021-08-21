@@ -49,7 +49,7 @@ void main() {
       expect(condition.value, TypeMatcher<ObjectValueContext>());
       var conditionValue = condition.value as ObjectValueContext;
       var memberId = conditionValue.fields
-          .singleWhere((f) => f.nameToken!.text == 'memberId');
+          .singleWhere((f) => f.nameToken.text == 'memberId');
       expect(memberId.value, TypeMatcher<T>());
       print('Found \$memberId: Instance of $T');
     });

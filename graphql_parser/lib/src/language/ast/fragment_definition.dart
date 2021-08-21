@@ -38,12 +38,36 @@ class FragmentDefinitionContext extends ExecutableDefinitionContext {
   Token? get ON => onToken;
 
   @override
-  FileSpan get span {
-    var out = fragmentToken!.span!
-        .expand(nameToken!.span!)
-        .expand(onToken!.span!)
-        .expand(typeCondition.span!);
+  FileSpan? get span {
+    var out = fragmentToken?.span;
+    var nameSpan = nameToken?.span;
+    var onSpan = onToken?.span;
+    var conditionSpan = typeCondition.span;
+
+    if (out == null) {
+      return selectionSet.span;
+    }
+    if (nameSpan != null) {
+      out = out.expand(nameSpan);
+    }
+
+    if (onSpan != null) {
+      out = out.expand(onSpan);
+    }
+
+    if (conditionSpan != null) {
+      out = out.expand(conditionSpan);
+    }
+
+    //var out = fragmentToken?.span
+    //    .expand(nameToken?.span!)
+    //    .expand(onToken?.span!)
+    //    .expand(typeCondition.span!);
     out = directives.fold<FileSpan>(out, (o, d) => o.expand(d.span));
-    return out.expand(selectionSet.span!);
+    if (selectionSet.span != null) {
+      return out.expand(selectionSet.span!);
+    } else {
+      return out;
+    }
   }
 }

@@ -9,9 +9,18 @@ class DocumentContext extends Node {
 
   @override
   FileSpan? get span {
-    if (definitions.isEmpty) return null;
-    return definitions
-        .map<FileSpan?>((d) => d.span)
-        .reduce((a, b) => a!.expand(b!));
+    if (definitions.isEmpty) {
+      return null;
+    }
+    return definitions.map<FileSpan?>((d) => d.span).reduce((a, b) {
+      if (a == null) {
+        return b;
+      }
+
+      if (b == null) {
+        return a;
+      }
+      return a.expand(b);
+    });
   }
 }

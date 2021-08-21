@@ -1,5 +1,6 @@
-# graphql_parser2
-[![version](https://img.shields.io/badge/pub-v2.0.1-brightgreen)](https://pub.dartlang.org/packages/graphql_parser2)
+# Graphql Parser 2
+
+[![version](https://img.shields.io/badge/pub-v2.0.2-brightgreen)](https://pub.dartlang.org/packages/graphql_parser2)
 [![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angel_dart/discussion)
 
@@ -10,12 +11,12 @@ Parses GraphQL queries and schemas.
 *This library is merely a parser/visitor*. Any sort of actual GraphQL API functionality must be implemented by you,
 or by a third-party package.
 
-[Angel3 framework](https://github.com/dukefirehawk/angel)
-users should consider 
+[Angel3 framework](https://github.com/dukefirehawk/angel) users should consider
 [`package:angel3_graphql`](https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql)
 as a dead-simple way to add GraphQL functionality to their servers.
 
-# Installation
+## Installation
+
 Add `graphql_parser2` as a dependency in your `pubspec.yaml` file:
 
 ```yaml
@@ -23,9 +24,10 @@ dependencies:
   graphql_parser2: ^2.0.0
 ```
 
-# Usage
+## Usage
+
 The AST featured in this library was originally directly based off this ANTLR4 grammar created by Joseph T. McBride:
-https://github.com/antlr/grammars-v4/blob/master/graphql/GraphQL.g4
+<https://github.com/antlr/grammars-v4/blob/master/graphql/GraphQL.g4>
 
 It has since been updated to reflect upon the grammar in the official GraphQL
 specification (
