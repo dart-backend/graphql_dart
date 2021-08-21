@@ -1,4 +1,4 @@
-# angel3_graphql
+# Angel3 Graphql
 
 ![Logo](https://github.com/angel-dart/graphql/raw/master/img/angel_logo.png)
 
@@ -8,7 +8,7 @@
 
 [![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/angel_graphql/LICENSE)
 
-- [angel3_graphql](#angel3_graphql)
+- [Angel3 Graphql](#angel3-graphql)
   - [Installation](#installation)
   - [Usage](#usage)
   - [Subscriptions](#subscriptions)
@@ -26,6 +26,7 @@ server-side Dart users to build backends with GraphQL and
 virtually any database imaginable.
 
 ## Installation
+
 To install `package:angel3_graphql`, add the following to your
 `pubspec.yaml`:
 
@@ -36,6 +37,7 @@ dependencies:
 ```
 
 ## Usage
+
 Using this package is very similar to GraphQL.js - you define
 a schema, and then mount `graphQLHttp` in your router to start
 serving. This implementation supports GraphQL features like
@@ -132,6 +134,7 @@ UI, ready-to-go!
 Now you're ready to build a GraphQL API!
 
 ## Subscriptions
+
 Example: [`Source code`](https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql/example/subscription.dart)
 
 In GraphQL, as of the June 2018 spec, clients can subscribe to streams of events
@@ -185,9 +188,10 @@ app.get('/graphiql',
 
 **NOTE: Apollo's spec for the aforementioned protocol is very far outdated, and completely inaccurate,**
 **See this issue for more:**
-**https://github.com/apollographql/subscriptions-transport-ws/issues/551**
+**<https://github.com/apollographql/subscriptions-transport-ws/issues/551>**
 
 ## Using Services
+
 What would Angel be without services? For those unfamiliar - in Angel,
 `Service` is a base class that implements CRUD functionality, and serves
 as the database interface within an Angel application. They are well-suited
@@ -223,19 +227,21 @@ var queryType = objectType(
 ```
 
 In all, there are:
-* `resolveViaServiceIndex`
-* `resolveViaServiceFindOne`
-* `resolveViaServiceRead`
-* `resolveViaServiceCreate`
-* `resolveViaServiceModify`
-* `resolveViaServiceUpdate`
-* `resolveViaServiceRemove`
+
+- `resolveViaServiceIndex`
+- `resolveViaServiceFindOne`
+- `resolveViaServiceRead`
+- `resolveViaServiceCreate`
+- `resolveViaServiceModify`
+- `resolveViaServiceUpdate`
+- `resolveViaServiceRemove`
 
 As one might imagine, using these convenience helpers makes
 it much quicker to implement CRUD functionality in a GraphQL
 API.
 
 ## Documentation
+
 Using `package:graphql_generator2`, you can generate GraphQL schemas for concrete Dart
 types:
 
@@ -260,6 +266,7 @@ class Todo {
 For more documentation, see: [`package:graphql_generator2`](https://pub.dev/packages/graphql_generator2)
 
 ## Mirrors
+
 **NOTE: Mirrors support is deprecated, and will not be updated further.**
 
 The `convertDartType` function can automatically read the documentation
