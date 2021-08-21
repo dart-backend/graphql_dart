@@ -1,10 +1,10 @@
-# graphql_server2
-[![version](https://img.shields.io/badge/pub-v2.0.0-brightgreen)](https://pub.dartlang.org/packages/graphql_server2)
+# Graphql Server 2
+
+[![version](https://img.shields.io/badge/pub-v2.0.1-brightgreen)](https://pub.dartlang.org/packages/graphql_server2)
 [![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angel_dart/discussion)
 
 [![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/graphql_dart/LICENSE)
-
 
 Base package for implementing GraphQL servers.
 You might prefer [`package:angel3_graphql`](https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql),
@@ -14,12 +14,8 @@ the fastest way to implement GraphQL backends in Dart.
 framework, and thus can be used in any Dart project.
 
 ## Ad-hoc Usage
-The actual querying functionality is handled by the
-`GraphQL` class, which takes a schema (from `package:graphql_schema2`).
-In most cases, you'll want to call `parseAndExecute`
-on some string of GraphQL text. It returns either a `Stream`
-or `Map<String, dynamic>`, and can potentially throw
-a `GraphQLException` (which is JSON-serializable):
+
+The actual querying functionality is handled by the `GraphQL` class, which takes a schema (from `package:graphql_schema2`). In most cases, you'll want to call `parseAndExecute` on some string of GraphQL text. It returns either a `Stream` or `Map<String, dynamic>`, and can potentially throw a `GraphQLException` (which is JSON-serializable):
 
 ```dart
 try {
@@ -41,6 +37,7 @@ If you're looking for functionality like `graphQLHttp` in `graphql-js`, that is 
 a good example: [`graphQLHttp source code`](https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql/lib/src/graphql_http.dart)
 
 ## Subscriptions
+
 GraphQL queries involving `subscription` operations can return
 a `Stream`. Ultimately, the transport for relaying subscription
 events to clients is not specified in the GraphQL spec, so it's
@@ -80,9 +77,9 @@ For the purposes of reusing existing tooling (i.e. JS clients, etc.),
 
 **NOTE: At this point, Apollo's spec is extremely out-of-sync with the protocol their client actually expects.**
 **See the following issue to track this:**
-**https://github.com/apollographql/subscriptions-transport-ws/issues/551**
+**<https://github.com/apollographql/subscriptions-transport-ws/issues/551>**
 
-The implementation is built on `package:stream_channel`, and 
+The implementation is built on `package:stream_channel`, and
 therefore can be used on any two-way transport, whether it is
 WebSockets, TCP sockets, Isolates, or otherwise.
 
@@ -106,6 +103,7 @@ See `graphQLWS` in `package:angel3_graphql` for a good example: [`graphQLWS sour
 https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql/lib/src/graphql_ws.dart)
 
 ## Introspection
+
 Introspection of a GraphQL schema allows clients to query the schema itself,
 and get information about the response the server expects. The `GraphQL`
 class handles this automatically, so you don't have to write any code for it.
@@ -113,11 +111,13 @@ class handles this automatically, so you don't have to write any code for it.
 However, you can call the `reflectSchema` method to manually reflect a schema: [`API Document`](https://pub.dev/documentation/graphql_server2/latest/introspection/reflectSchema.html)
 
 ## Mirrors Usage
+
 By default, `dart:mirrors` is not required, but it can be optionally used.
 
 The `mirrorsFieldResolver` can resolve fields from concrete objects, instead of you
 first having to serialize them: [`API Document`](https://pub.dev/documentation/graphql_server2/latest/graphql_server2.mirrorsmirrorsFieldResolver.html)
 
 You can also use `convertDartType` to convert a concrete Dart type into a `GraphQLType`. However, the ideal choice is `package:graphql_generator2`.
+
 * [`API Document`](https://pub.dev/documentation/graphql_server2/latest/graphql_server2/mirrors/convertDartType.html)
 * [`package:graphql_generator2`](https://pub.dev/packages/graphql_generator2)
