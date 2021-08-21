@@ -60,7 +60,7 @@ RequestHandler graphQLHttp(GraphQL graphQL,
         text,
         sourceUrl: 'input',
         operationName: operationName,
-        variableValues: foldToStringDynamic(variables as Map),
+        variableValues: foldToStringDynamic(variables as Map?),
         globalVariables: globalVariables,
       ));
     }

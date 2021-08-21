@@ -2,18 +2,19 @@
 
 ![Logo](https://github.com/angel-dart/graphql/raw/master/img/angel_logo.png)
 
-[![version](https://img.shields.io/badge/pub-v2.0.1-brightgreen)](https://pub.dartlang.org/packages/angel3_graphql)
+[![version](https://img.shields.io/badge/pub-v2.0.2-brightgreen)](https://pub.dartlang.org/packages/angel3_graphql)
 [![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angel_dart/discussion)
 
 [![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/angel_graphql/LICENSE)
 
-* [Installation](#installation)
-* [Usage](#usage)
-* [Subscriptions](#subscriptions)
-* [Integration with Angel `Service`s](#using-services)
-* [Documenting API's](#documentation)
-* [Deprecated - Mirrors Usage](#mirrors)
+- [angel3_graphql](#angel3_graphql)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [Subscriptions](#subscriptions)
+  - [Using Services](#using-services)
+  - [Documentation](#documentation)
+  - [Mirrors](#mirrors)
 
 A complete implementation of the official
 [GraphQL specification](https://facebook.github.io/graphql/October2016/#sec-Language) - these
