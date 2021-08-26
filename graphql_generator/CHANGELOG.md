@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.1.1
+
+* Updated `build.xml` to use the correct packages
+
 ## 2.1.0
 
 * Updated `build.xml` to use `angel3` packages

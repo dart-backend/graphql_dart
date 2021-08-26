@@ -54,3 +54,8 @@ fabric.properties
 .idea/httpRequests
 
 .dart_tool
+.metals
+example
+
+.vscode
+!.vscode/settings.json
