@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.2.0
+
+* Upgraded from `pendantic` to `lints` linter
+
 ## 2.1.1
 
 * Updated `build.xml` to use the correct packages
