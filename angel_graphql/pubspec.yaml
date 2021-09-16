@@ -10,9 +10,9 @@ dependencies:
   angel3_framework: ^4.1.0
   angel3_websocket: ^4.0.0
   angel3_validate: ^4.0.0
-  graphql_parser2: ^2.0.0
-  graphql_schema2: ^2.0.0
-  graphql_server2: ^2.0.0
+  graphql_parser2: ^2.1.0
+  graphql_schema2: ^2.1.0
+  graphql_server2: ^2.1.0
   http_parser: ^4.0.0
   web_socket_channel: ^2.1.0
   collection: ^1.15.0

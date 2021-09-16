@@ -161,21 +161,21 @@ packages:
       name: graphql_parser2
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.2"
+    version: "2.1.0"
   graphql_schema2:
     dependency: "direct main"
     description:
       name: graphql_schema2
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0"
+    version: "2.1.0"
   graphql_server2:
     dependency: "direct main"
     description:
       name: graphql_server2
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.1"
+    version: "2.1.0"
   http:
     dependency: transitive
     description:

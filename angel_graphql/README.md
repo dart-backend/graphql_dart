@@ -15,14 +15,9 @@
   - [Documentation](#documentation)
   - [Mirrors](#mirrors)
 
-A complete implementation of the official
-[GraphQL specification](https://facebook.github.io/graphql/October2016/#sec-Language) - these
-are the [Angel3 framework](https://github.com/dukefirehawk/angel)-specific bindings.
+A complete implementation of the official [GraphQL specification](https://facebook.github.io/graphql/October2016/#sec-Language) - these are the [Angel3 framework](https://pub.dev/packages/angel3_framework)-specific bindings.
 
-The goal of this project is to provide to server-side
-users of Dart an alternative to REST API's. `package:angel3_graphql`, which, when combined with the allows
-server-side Dart users to build backends with GraphQL and
-virtually any database imaginable.
+The goal of this project is to provide to server-side users of Dart an alternative to REST API's. `package:angel3_graphql`, which, when combined with the allows server-side Dart users to build backends with GraphQL and virtually any database imaginable.
 
 ## Installation
 
@@ -31,29 +26,19 @@ To install `package:angel3_graphql`, add the following to your
 
 ```yaml
 dependencies:
-    angel3_framework: ^4.0.0
-    angel3_graphql: ^2.0.0
+    angel3_framework: ^4.1.0
+    angel3_graphql: ^2.1.0
 ```
 
 ## Usage
 
-Using this package is very similar to GraphQL.js - you define
-a schema, and then mount `graphQLHttp` in your router to start
-serving. This implementation supports GraphQL features like
-introspection, so you can play around with `graphiql` as well!
+Using this package is very similar to GraphQL.js - you define a schema, and then mount `graphQLHttp` in your router to start serving. This implementation supports GraphQL features like introspection, so you can play around with `graphiql` as well!
 
-Firstly, define your schema. A GraphQL schema contains an
-*object type* that defines all querying operations that can be
-applied to the backend.
+Firstly, define your schema. A GraphQL schema contains an *object type* that defines all querying operations that can be applied to the backend.
 
-A GraphQL schema may also have a *mutation* object type,
-which defines operations that change the backend's state, and
-optionally a *subscription* type, which defines real-time
-interactions (coming soon!).
+A GraphQL schema may also have a *mutation* object type, which defines operations that change the backend's state, and optionally a *subscription* type, which defines real-time interactions (coming soon!).
 
-You can use the `convertDartType` helper to wrap your existing
-`Model`/PODO classes, and make GraphQL aware of them without duplicated
-effort.
+You can use the `convertDartType` helper to wrap your existing `Model`/PODO classes, and make GraphQL aware of them without duplicated effort.
 
 ```dart
 import 'package:angel3_framework/angel3_framework.dart';
@@ -101,13 +86,9 @@ Future configureServer(Angel app) async {
 }
 ```
 
-After you've created your `GraphQLSchema`, you just need to
-wrap in a call to `graphQLHttp`, a request handler that responds
-to GraphQL.
+After you've created your `GraphQLSchema`, you just need to wrap in a call to `graphQLHttp`, a request handler that responds to GraphQL.
 
-In *development*, it's also highly recommended to mount the
-`graphiQL` handler, which serves GraphQL's official visual
-interface, for easy querying and feedback.
+In *development*, it's also highly recommended to mount the `graphiQL` handler, which serves GraphQL's official visual interface, for easy querying and feedback.
 
 ```dart
 app.all('/graphql', graphQLHttp(GraphQL(schema)));
@@ -125,8 +106,7 @@ print('Listening at $uri');
 print('Access graphiql at $graphiqlUri');
 ```
 
-Visit your `/graphiql` endpoint, and you'll see the `graphiql`
-UI, ready-to-go!
+Visit your `/graphiql` endpoint, and you'll see the `graphiql` UI, ready-to-go!
 
 ![Graphiql screenshot](./img/angel_graphql.png)
 
@@ -136,9 +116,7 @@ Now you're ready to build a GraphQL API!
 
 Example: [`Source code`](https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql/example/subscription.dart)
 
-In GraphQL, as of the June 2018 spec, clients can subscribe to streams of events
-from the server. In your schema, all you need to do is return a `Stream` from a `resolve`
-callback, rather than a plain object:
+In GraphQL, as of the June 2018 spec, clients can subscribe to streams of events from the server. In your schema, all you need to do is return a `Stream` from a `resolve` callback, rather than a plain object:
 
 ```dart
 var postAdded = postService.afterCreated
@@ -157,9 +135,7 @@ var schema = graphQLSchema(
 );
 ```
 
-By default, `graphQLHttp` has no support for subscriptions, because regular
-HTTP requests are stateless, and are not ideal for continuous data pushing.
-You can add your own handler:
+By default, `graphQLHttp` has no support for subscriptions, because regular HTTP requests are stateless, and are not ideal for continuous data pushing. You can add your own handler:
 
 ```dart
 graphQLHttp(graphQL, onSubscription: (req, res, stream) {
@@ -167,8 +143,7 @@ graphQLHttp(graphQL, onSubscription: (req, res, stream) {
 });
 ```
 
-There is, however, `graphQLWS`, which implements Apollo's
-`subscriptions-transport-ws` protocol:
+There is, however, `graphQLWS`, which implements Apollo's `subscriptions-transport-ws` protocol:
 
 ```dart
 app.get('/subscriptions', graphQLWS(GraphQL(schema)));
@@ -176,9 +151,7 @@ app.get('/subscriptions', graphQLWS(GraphQL(schema)));
 
 You can then use existing JavaScript clients to handle subscriptions.
 
-The `graphiQL` handler also supports using subscriptions. In the following snippet, the
-necessary scripts will be added to the rendered page, so that the `subscriptions-transport-ws`
-client can be used by GraphiQL:
+The `graphiQL` handler also supports using subscriptions. In the following snippet, the necessary scripts will be added to the rendered page, so that the `subscriptions-transport-ws` client can be used by GraphiQL:
 
 ```dart
 app.get('/graphiql',
@@ -191,17 +164,11 @@ app.get('/graphiql',
 
 ## Using Services
 
-What would Angel be without services? For those unfamiliar - in Angel,
-`Service` is a base class that implements CRUD functionality, and serves
-as the database interface within an Angel application. They are well-suited
-for NoSQL or other databases without a schema (they can be used with
-SQL, but that's not their primary focus).
+What would Angel be without services? For those unfamiliar - in Angel, `Service` is a base class that implements CRUD functionality, and serves as the database interface within an Angel application. They are well-suited for NoSQL or other databases without a schema (they can be used with SQL, but that's not their primary focus).
 
-`package:angel3_graphql` has functionality to resolve fields by interacting with
-services.
+`package:angel3_graphql` has functionality to resolve fields by interacting with services.
 
-Consider our previous example, and note the calls to
-`resolveViaServiceIndex` and `resolveViaServiceRead`:
+Consider our previous example, and note the calls to `resolveViaServiceIndex` and `resolveViaServiceRead`:
 
 ```dart
 var queryType = objectType(
@@ -235,14 +202,11 @@ In all, there are:
 - `resolveViaServiceUpdate`
 - `resolveViaServiceRemove`
 
-As one might imagine, using these convenience helpers makes
-it much quicker to implement CRUD functionality in a GraphQL
-API.
+As one might imagine, using these convenience helpers makes it much quicker to implement CRUD functionality in a GraphQL API.
 
 ## Documentation
 
-Using `package:graphql_generator2`, you can generate GraphQL schemas for concrete Dart
-types:
+Using `package:graphql_generator2`, you can generate GraphQL schemas for concrete Dart types:
 
 ```dart
 configureServer(Angel app) async {
@@ -268,8 +232,7 @@ For more documentation, see: [`package:graphql_generator2`](https://pub.dev/pack
 
 **NOTE: Mirrors support is deprecated, and will not be updated further.**
 
-The `convertDartType` function can automatically read the documentation
-from a type like the following:
+The `convertDartType` function can automatically read the documentation from a type like the following:
 
 ```dart
 @GraphQLDocumentation(description: 'Any object with a .text (String) property.')
@@ -295,9 +258,6 @@ class Todo extends Model implements HasText {
 enum CompletionStatus { COMPLETE, INCOMPLETE }
 ```
 
-You can also manually provide documentation for
-parameters and endpoints, via a `description` parameter on almost
-all related functions.
+You can also manually provide documentation for parameters and endpoints, via a `description` parameter on almost all related functions.
 
-See [`package:graphql_schema2`](https://pub.dev/packages/graphql_schema2)
-for more documentation.
+See [`package:graphql_schema2`](https://pub.dev/packages/graphql_schema2) for more documentation.
