@@ -1,9 +1,10 @@
-# graphql_schema2
-[![version](https://img.shields.io/badge/pub-v2.0.0-brightgreen)](https://pub.dartlang.org/packages/graphql_schema2)
+# GraphQL Schema 2
+
+![Pub Version (including pre-releases)](https://img.shields.io/pub/v/graphql_schema2?include_prereleases)
 [![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angel_dart/discussion)
+[![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/graphql_dart/blob/master/graphql_schema/LICENSE)
 
-[![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/graphql_dart/LICENSE)
 
 An implementation of GraphQL's type system in Dart. Supports any platform where Dart runs.
 The decisions made in the design of this library were done to make the experience
@@ -11,6 +12,7 @@ as similar to the JavaScript reference implementation as possible, and to also
 correctly implement the official specification.
 
 Contains functionality to build *all* GraphQL types:
+
 * `String`
 * `Int`
 * `Float`
@@ -23,12 +25,13 @@ Contains functionality to build *all* GraphQL types:
 
 Of course, for a full description of GraphQL's type system, see the official
 specification:
-http://facebook.github.io/graphql/October2016/
+<http://facebook.github.io/graphql/October2016/>
 
 Mostly analogous to `graphql-js`; many names are verbatim:
-https://graphql.org/graphql-js/type/
+<https://graphql.org/graphql-js/type/>
 
-# Usage
+## Usage
+
 It's easy to define a schema with the
 [helper functions](#helpers):
 
@@ -42,7 +45,8 @@ final GraphQLSchema todoSchema = GraphQLSchema(
 
 All GraphQL types are generic, in order to leverage Dart's strong typing support.
 
-# Serialization
+## Serialization
+
 GraphQL types can `serialize` and `deserialize` input data.
 The exact implementation of this depends on the type.
 
@@ -52,7 +56,8 @@ var date = graphQLDate.deserialize(iso8601String);
 print(date.millisecondsSinceEpoch);
 ```
 
-# Validation
+## Validation
+
 GraphQL types can `validate` input data.
 
 ```dart
@@ -65,7 +70,8 @@ if (validation.successful) {
 }
 ```
 
-# Helpers
+## Helpers
+
 * `graphQLSchema` - Create a `GraphQLSchema`
 * `objectType` - Create a `GraphQLObjectType` with fields
 * `field` - Create a `GraphQLField` with a type/argument/resolver
@@ -73,8 +79,10 @@ if (validation.successful) {
 * `inputObjectType` - Creates a `GraphQLInputObjectType`
 * `inputField` - Creates a field for a `GraphQLInputObjectType`
 
-# Types
+## Types
+
 All of the GraphQL scalar types are built in, as well as a `Date` type:
+
 * `graphQLString`
 * `graphQLId`
 * `graphQLBoolean`
@@ -83,9 +91,11 @@ All of the GraphQL scalar types are built in, as well as a `Date` type:
 * `graphQLDate`
 
 ## Non-Nullable Types
+
 You can easily make a type non-nullable by calling its `nonNullable` method.
 
 ## List Types
+
 Support for list types is also included. Use the `listType` helper for convenience.
 
 ```dart
@@ -94,6 +104,7 @@ listOf(graphQLInt.nonNullable()).nonNullable();
 ```
 
 ### Input values and parameters
+
 Take the following GraphQL query:
 
 ```graphql

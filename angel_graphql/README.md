@@ -2,11 +2,10 @@
 
 ![Logo](https://github.com/angel-dart/graphql/raw/master/img/angel_logo.png)
 
-[![version](https://img.shields.io/badge/pub-v2.0.2-brightgreen)](https://pub.dartlang.org/packages/angel3_graphql)
+![Pub Version (including pre-releases)](https://img.shields.io/pub/v/angel3_graphql?include_prereleases)
 [![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angel_dart/discussion)
-
-[![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/angel_graphql/LICENSE)
+[![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/graphql_dart/blob/master/angel_graphql/LICENSE)
 
 - [Angel3 Graphql](#angel3-graphql)
   - [Installation](#installation)

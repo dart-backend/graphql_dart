@@ -1,5 +1,5 @@
 name: graphql_schema2
-version: 2.0.0
+version: 2.1.0
 description: An implementation of GraphQL's type system in Dart. Basis of graphql_server2.
 homepage: https://github.com/dukefirehawk/graphql_dart/tree/master/graphql_schema
 environment:
@@ -9,5 +9,5 @@ dependencies:
   meta: ^1.4.0
   source_span: ^1.8.1
 dev_dependencies:
-  test: ^1.17.7
-  pedantic: ^1.11.0
+  test: ^1.17.5
+  lints: ^1.0.0

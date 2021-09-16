@@ -1,6 +1,6 @@
 # Graphql Server 2
 
-[![version](https://img.shields.io/badge/pub-v2.0.1-brightgreen)](https://pub.dartlang.org/packages/graphql_server2)
+![Pub Version (including pre-releases)](https://img.shields.io/pub/v/graphql_server2?include_prereleases)
 [![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angel_dart/discussion)
 
