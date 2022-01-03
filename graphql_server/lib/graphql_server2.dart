@@ -434,10 +434,9 @@ class GraphQL {
         }
       } else {
         try {
-          var validation = argumentType.validate(
-              argumentName,
-              argumentValue.value
-                  .computeValue(variableValues as Map<String, dynamic>));
+          final inputValue = argumentValue.value
+              .computeValue(variableValues as Map<String, dynamic>);
+          final validation = argumentType.validate(argumentName, inputValue);
 
           if (!validation.successful) {
             var errors = <GraphQLExceptionError>[
@@ -467,7 +466,8 @@ class GraphQL {
 
             throw GraphQLException(errors);
           } else {
-            var coercedValue = validation.value;
+            final coercedValue = argumentType.deserialize(inputValue);
+
             coercedValues[argumentName] = coercedValue;
           }
         } on TypeError catch (e) {
