@@ -3,9 +3,13 @@ part of graphql_schema.src.schema;
 /// Shorthand for building a [GraphQLEnumType].
 GraphQLEnumType enumType<Value>(String name, Map<String, Value> values,
     {String? description}) {
+  final len = values.keys.length;
+
   return GraphQLEnumType<Value>(
-      name, values.keys.mapIndexed(
-          (i, k) => GraphQLEnumValue(k, values.values.elementAt(i))).toList(),
+      name, [
+    for (var i = 0; i < len; i++)
+      GraphQLEnumValue(values.keys.elementAt(i), values.values.elementAt(i)),
+  ],
       description: description);
 }
 
