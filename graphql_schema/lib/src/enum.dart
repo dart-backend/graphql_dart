@@ -6,10 +6,12 @@ GraphQLEnumType enumType<Value>(String name, Map<String, Value> values,
   final len = values.keys.length;
 
   return GraphQLEnumType<Value>(
-      name, [
-    for (var i = 0; i < len; i++)
-      GraphQLEnumValue(values.keys.elementAt(i), values.values.elementAt(i)),
-  ],
+      name,
+      [
+        for (var i = 0; i < len; i++)
+          GraphQLEnumValue(
+              values.keys.elementAt(i), values.values.elementAt(i)),
+      ],
       description: description);
 }
 
