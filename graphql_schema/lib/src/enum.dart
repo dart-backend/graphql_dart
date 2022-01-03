@@ -3,8 +3,9 @@ part of graphql_schema.src.schema;
 /// Shorthand for building a [GraphQLEnumType].
 GraphQLEnumType enumType<Value>(String name, Map<String, Value> values,
     {String? description}) {
-  return GraphQLEnumType<Value?>(
-      name, values.keys.map((k) => GraphQLEnumValue(k, values[k])).toList(),
+  return GraphQLEnumType<Value>(
+      name, values.keys.mapIndexed(
+          (i, k) => GraphQLEnumValue(k, values.values.elementAt(i))).toList(),
       description: description);
 }
 
