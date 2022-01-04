@@ -561,16 +561,12 @@ class GraphQL {
 
     if (fieldType is GraphQLScalarType) {
       try {
-        var validation = fieldType.validate(fieldName!, result);
+        final ret = fieldType.serialize(result);
 
-        if (!validation.successful) {
-          return null;
-        } else {
-          return validation.value;
-        }
+        return ret;
       } on TypeError {
         throw GraphQLException.fromMessage(
-            'Value of field "$fieldName" must be ${fieldType.valueType}, got $result instead.');
+            'Value of field "$fieldName" must be ${fieldType.valueType}, got $result (${result.runtimeType}) instead.');
       }
     }
 
