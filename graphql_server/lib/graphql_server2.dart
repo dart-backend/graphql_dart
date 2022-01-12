@@ -434,10 +434,9 @@ class GraphQL {
         }
       } else {
         try {
-          var validation = argumentType.validate(
-              argumentName,
-              argumentValue.value
-                  .computeValue(variableValues as Map<String, dynamic>));
+          final inputValue = argumentValue.value
+              .computeValue(variableValues as Map<String, dynamic>);
+          final validation = argumentType.validate(argumentName, inputValue);
 
           if (!validation.successful) {
             var errors = <GraphQLExceptionError>[
@@ -467,7 +466,8 @@ class GraphQL {
 
             throw GraphQLException(errors);
           } else {
-            var coercedValue = validation.value;
+            final coercedValue = argumentType.deserialize(inputValue);
+
             coercedValues[argumentName] = coercedValue;
           }
         } on TypeError catch (e) {
@@ -561,16 +561,12 @@ class GraphQL {
 
     if (fieldType is GraphQLScalarType) {
       try {
-        var validation = fieldType.validate(fieldName!, result);
+        final ret = fieldType.serialize(result);
 
-        if (!validation.successful) {
-          return null;
-        } else {
-          return validation.value;
-        }
+        return ret;
       } on TypeError {
         throw GraphQLException.fromMessage(
-            'Value of field "$fieldName" must be ${fieldType.valueType}, got $result instead.');
+            'Value of field "$fieldName" must be ${fieldType.valueType}, got $result (${result.runtimeType}) instead.');
       }
     }
 
