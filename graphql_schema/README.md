@@ -5,10 +5,7 @@
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angel_dart/discussion)
 [![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/graphql_dart/blob/master/graphql_schema/LICENSE)
 
-An implementation of GraphQL's type system in Dart. Supports any platform where Dart runs.
-The decisions made in the design of this library were done to make the experience
-as similar to the JavaScript reference implementation as possible, and to also
-correctly implement the official specification.
+An implementation of GraphQL's type system in Dart. Supports any platform where Dart runs. The decisions made in the design of this library were done to make the experience as similar to the JavaScript reference implementation as possible, and to also correctly implement the official specification.
 
 Contains functionality to build *all* GraphQL types:
 
@@ -31,8 +28,7 @@ Mostly analogous to `graphql-js`; many names are verbatim:
 
 ## Usage
 
-It's easy to define a schema with the
-[helper functions](#helpers):
+It's easy to define a schema with the [helper functions](#helpers):
 
 ```dart
 final GraphQLSchema todoSchema = GraphQLSchema(
@@ -46,8 +42,7 @@ All GraphQL types are generic, in order to leverage Dart's strong typing support
 
 ## Serialization
 
-GraphQL types can `serialize` and `deserialize` input data.
-The exact implementation of this depends on the type.
+GraphQL types can `serialize` and `deserialize` input data. The exact implementation of this depends on the type.
 
 ```dart
 var iso8601String = graphQLDate.serialize(DateTime.now());

@@ -44,6 +44,25 @@ jobs:
         working-directory: graphql_schema
         run: dart test
         
+      # Graphql Parser
+      - id: graphql_parser2_upgrade
+        name: graphql_parser2; Upgrade depedencies
+        working-directory: graphql_parser
+        run: dart pub upgrade
+
+      - name: graphql_parser2; Verify formatting
+        working-directory: graphql_parser
+        run: dart format --output=none --set-exit-if-changed .
+
+      # Consider passing '--fatal-infos' for slightly stricter analysis.
+      - name: graphql_parser2; Analyze project source
+        working-directory: graphql_parser
+        run: dart analyze
+
+      - name: graphql_parser2; Run tests
+        working-directory: graphql_parser
+        run: dart test
+
       # Graphql Server
       - id: graphql_server2_upgrade
         name: graphql_server2; Upgrade depedencies

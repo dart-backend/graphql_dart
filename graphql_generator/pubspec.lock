@@ -200,10 +200,10 @@ packages:
   graphql_schema2:
     dependency: "direct main"
     description:
-      name: graphql_schema2
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.1.0"
+      path: "../graphql_schema"
+      relative: true
+    source: path
+    version: "2.1.1"
   graphs:
     dependency: transitive
     description:
