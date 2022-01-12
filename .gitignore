@@ -55,7 +55,7 @@ fabric.properties
 
 .dart_tool
 .metals
-example
+.packages
 
 .vscode
 !.vscode/settings.json
