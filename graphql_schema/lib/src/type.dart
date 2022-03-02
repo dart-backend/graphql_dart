@@ -68,8 +68,7 @@ class GraphQLListType<Value, Serialized>
       'A list of items of type ${ofType.name ?? '(${ofType.description}).'}';
 
   @override
-  ValidationResult<List<Serialized>> validate(
-      String key, List input) {
+  ValidationResult<List<Serialized>> validate(String key, List input) {
     if (input is! List) {
       return ValidationResult._failure(['Expected "$key" to be a list.']);
     }
@@ -94,7 +93,8 @@ class GraphQLListType<Value, Serialized>
 
   @override
   List<Value> deserialize(List serialized) {
-    return serialized.map<Value>((v) => ofType.deserialize(v as Serialized))
+    return serialized
+        .map<Value>((v) => ofType.deserialize(v as Serialized))
         .toList();
   }
 

@@ -14,8 +14,8 @@ Map<String, dynamic> foldToStringDynamic(Map? map) {
 }
 
 class JsonPathArgument {
-  JsonPathArgument(this.path, this.definition, this.defaultValue,
-      this.variableValues)
+  JsonPathArgument(
+      this.path, this.definition, this.defaultValue, this.variableValues)
       : _spl = path.split('.') {
     if (_spl.isEmpty || _spl.length < 2 || _spl.first != r'$') {
       throw 'Bad json path $path';
@@ -219,12 +219,11 @@ class GraphQL {
         }
       }
 
-      final jp = getDirectiveValue('jsonpath', 'path',
-          variableDefinition, variableValues);
+      final jp = getDirectiveValue(
+          'jsonpath', 'path', variableDefinition, variableValues);
 
       if (jp != null) {
-        toSet = JsonPathArgument(jp, variableDefinition, toSet,
-            coercedValues);
+        toSet = JsonPathArgument(jp, variableDefinition, toSet, coercedValues);
       }
 
       coercedValues[variableName] = toSet;
@@ -390,7 +389,7 @@ class GraphQL {
       objectValue,
       Map<String, dynamic> variableValues,
       Map<String, dynamic> globalVariables,
-  {List<List> lazy = const []}) async {
+      {List<List> lazy = const []}) async {
     var groupedFieldSet =
         collectFields(document, objectType!, selectionSet, variableValues);
     var resultMap = <String, dynamic>{};
@@ -422,8 +421,9 @@ class GraphQL {
             field.field?.fieldName.alias?.name ?? field.field?.fieldName.name;
         FutureOr<dynamic> futureResponseValue;
 
-        if (fieldName == '__typename' && objectType.possibleTypes.isEmpty &&
-        objectType.interfaces.isEmpty) {
+        if (fieldName == '__typename' &&
+            objectType.possibleTypes.isEmpty &&
+            objectType.interfaces.isEmpty) {
           futureResponseValue = objectType.name;
         } else {
           final fieldType = objectType.fields
@@ -469,7 +469,7 @@ class GraphQL {
       GraphQLType fieldType,
       Map<String, dynamic> variableValues,
       Map<String, dynamic> globalVariables,
-  {List<List> lazy = const []}) async {
+      {List<List> lazy = const []}) async {
     var field = fields[0];
     var argumentValues =
         coerceArgumentValues(objectType, field, variableValues);
@@ -479,7 +479,8 @@ class GraphQL {
         fieldName,
         Map<String, dynamic>.from(globalVariables)..addAll(argumentValues));
     return completeValue(document, fieldName, fieldType, fields, resolvedValue,
-        variableValues, globalVariables, lazy: lazy);
+        variableValues, globalVariables,
+        lazy: lazy);
   }
 
   Map<String, dynamic> coerceArgumentValues(GraphQLObjectType objectType,
@@ -660,7 +661,8 @@ class GraphQL {
 
       var subSelectionSet = mergeSelectionSets(fields);
       return await executeSelectionSet(document, subSelectionSet, objectType,
-          result, variableValues, globalVariables, lazy: lazy);
+          result, variableValues, globalVariables,
+          lazy: lazy);
     }
 
     throw UnsupportedError('Unsupported type: $fieldType');
@@ -732,8 +734,7 @@ class GraphQL {
       final field = selection.field;
 
       if (field != null) {
-        if (getDirectiveValue('skip', 'if', field, variableValues) ==
-            true) {
+        if (getDirectiveValue('skip', 'if', field, variableValues) == true) {
           continue;
         }
         if (getDirectiveValue('include', 'if', field, variableValues) ==
@@ -788,8 +789,8 @@ class GraphQL {
     return groupedFields;
   }
 
-  dynamic getDirectiveValue(String name, String argumentName,
-      Directives holder, Map<String?, dynamic> variableValues) {
+  dynamic getDirectiveValue(String name, String argumentName, Directives holder,
+      Map<String?, dynamic> variableValues) {
     var directive = holder.directives.firstWhereOrNull((d) {
       var vv = d.value;
 

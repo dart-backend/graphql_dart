@@ -1,5 +1,32 @@
 # Change Log
 
+## 2.1.2
+* Fixed enum conversion
+* Implemented directives
+* Implemented jsonpath directive, example:
+```
+// you add the directive at the variable definition:
+mutation myQuery($createdId: Int! @jsonpath(path: "$.C0.create.id")) {
+  // this mutation will create some object and return the new id
+  C0: SomeNamespace {
+      create(name: "Some object") {
+        id
+      }
+  }
+  // this mutation uses the generated $createdId from the json path directive
+  C1: OtherNamespace {
+      update(id: 123, relationshipId: $createdId) {
+        id
+      }
+  }
+}
+// you need to declare the variable
+{
+  createdId: 0 // if the jsonpath directive can't resolve a value, 
+  // it will use this (0) instead
+}
+```
+
 ## 2.1.1
 
 * Fixed bug in enums

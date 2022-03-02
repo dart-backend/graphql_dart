@@ -42,8 +42,11 @@ class GraphQLSchema {
 
   final Iterable<GraphQLDirectiveType>? directiveTypes;
 
-  GraphQLSchema({this.queryType, this.mutationType, this.subscriptionType,
-  this.directiveTypes});
+  GraphQLSchema(
+      {this.queryType,
+      this.mutationType,
+      this.subscriptionType,
+      this.directiveTypes});
 }
 
 /// A shorthand for creating a [GraphQLSchema].
@@ -51,7 +54,7 @@ GraphQLSchema graphQLSchema(
         {required GraphQLObjectType queryType,
         GraphQLObjectType? mutationType,
         GraphQLObjectType? subscriptionType,
-          Iterable<GraphQLDirectiveType>? directiveTypes}) =>
+        Iterable<GraphQLDirectiveType>? directiveTypes}) =>
     GraphQLSchema(
         queryType: queryType,
         mutationType: mutationType,

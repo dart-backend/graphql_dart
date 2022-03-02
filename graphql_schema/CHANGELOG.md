@@ -1,5 +1,8 @@
 # Change Log
 
+## 2.1.2
+* Implemented directives
+
 ## 2.1.1
 
 * Fixed bug in enums

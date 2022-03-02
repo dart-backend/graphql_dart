@@ -187,9 +187,10 @@ enum DirectiveLocation {
 
 class GraphQLDirectiveType extends GraphQLInputObjectType {
   GraphQLDirectiveType(String name,
-      {String? description, required this.locations,
-        Iterable<GraphQLInputObjectField> inputFields = const []}) :
-  super(name, description: description, inputFields: inputFields);
+      {String? description,
+      required this.locations,
+      Iterable<GraphQLInputObjectField> inputFields = const []})
+      : super(name, description: description, inputFields: inputFields);
 
   final Set<DirectiveLocation> locations;
 }

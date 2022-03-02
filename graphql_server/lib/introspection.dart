@@ -37,7 +37,8 @@ GraphQLSchema reflectSchema(GraphQLSchema schema, List<GraphQLType?> allTypes) {
     field(
       'directives',
       listOf(directiveType),
-      resolve: (_, __) => schema.directiveTypes, // TODO: Actually fetch directives
+      resolve: (_, __) =>
+          schema.directiveTypes, // TODO: Actually fetch directives
     ),
   ]);
 
@@ -358,9 +359,11 @@ GraphQLObjectType _reflectInputValueType() {
 
 GraphQLObjectType? _directiveType;
 
-final GraphQLEnumType<String> _directiveLocationType =
-    enumTypeFromStrings('__DirectiveLocation',
-        DirectiveLocation.values.map((v) => v.name.snakeCase.toUpperCase()).toList());
+final GraphQLEnumType<String> _directiveLocationType = enumTypeFromStrings(
+    '__DirectiveLocation',
+    DirectiveLocation.values
+        .map((v) => v.name.snakeCase.toUpperCase())
+        .toList());
 
 GraphQLObjectType _reflectDirectiveType() {
   var inputValueType = _reflectInputValueType();
@@ -379,8 +382,10 @@ GraphQLObjectType _reflectDirectiveType() {
     field(
       'locations',
       listOf(_directiveLocationType.nonNullable()).nonNullable(),
-      resolve: (obj, _) => (obj as GraphQLDirectiveType).locations
-          .map((v) => v.name.snakeCase.toUpperCase()).toList(),
+      resolve: (obj, _) => (obj as GraphQLDirectiveType)
+          .locations
+          .map((v) => v.name.snakeCase.toUpperCase())
+          .toList(),
     ),
     field(
       'args',
