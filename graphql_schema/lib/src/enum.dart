@@ -51,6 +51,9 @@ class GraphQLEnumType<Value> extends GraphQLScalarType<Value, String>
   }
 
   @override
+  String? convert(value) => serialize(value);
+
+  @override
   Value deserialize(String serialized) {
     return values.firstWhere((v) => v.name == serialized).value;
   }

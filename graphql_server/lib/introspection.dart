@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart' show IterableExtension;
-import 'package:graphql_parser2/graphql_parser2.dart';
+import 'package:recase/recase.dart';
 import 'package:graphql_schema2/graphql_schema2.dart';
 
 /// Performs introspection over a GraphQL [schema], and returns a one, containing
@@ -36,8 +36,8 @@ GraphQLSchema reflectSchema(GraphQLSchema schema, List<GraphQLType?> allTypes) {
     ),
     field(
       'directives',
-      listOf(directiveType).nonNullable(),
-      resolve: (_, __) => [], // TODO: Actually fetch directives
+      listOf(directiveType),
+      resolve: (_, __) => schema.directiveTypes, // TODO: Actually fetch directives
     ),
   ]);
 
@@ -50,7 +50,6 @@ GraphQLSchema reflectSchema(GraphQLSchema schema, List<GraphQLType?> allTypes) {
     graphQLInt,
     directiveType,
     typeType,
-    directiveType,
     schemaType,
     _typeKindType,
     _directiveLocationType,
@@ -324,6 +323,16 @@ T? _fetchFromInputValue<T>(x, T Function(GraphQLFieldInput) ifInput,
   }
 }
 
+dynamic _def(dynamic f, dynamic Function(dynamic) serializer) {
+  final val = f.defaultValue;
+
+  if (val != null) {
+    return serializer(val)?.toString();
+  }
+
+  return null;
+}
+
 GraphQLObjectType _reflectInputValueType() {
   return _inputValueType ??= objectType('__InputValue', fields: [
     field(
@@ -342,7 +351,7 @@ GraphQLObjectType _reflectInputValueType() {
       'defaultValue',
       graphQLString,
       resolve: (obj, _) => _fetchFromInputValue(obj,
-          (f) => f.defaultValue?.toString(), (f) => f.defaultValue?.toString()),
+          (f) => _def(f, f.type.serialize), (f) => _def(f, f.type.serialize)),
     ),
   ]);
 }
@@ -350,40 +359,33 @@ GraphQLObjectType _reflectInputValueType() {
 GraphQLObjectType? _directiveType;
 
 final GraphQLEnumType<String> _directiveLocationType =
-    enumTypeFromStrings('__DirectiveLocation', [
-  'QUERY',
-  'MUTATION',
-  'FIELD',
-  'FRAGMENT_DEFINITION',
-  'FRAGMENT_SPREAD',
-  'INLINE_FRAGMENT'
-]);
+    enumTypeFromStrings('__DirectiveLocation',
+        DirectiveLocation.values.map((v) => v.name.snakeCase.toUpperCase()).toList());
 
 GraphQLObjectType _reflectDirectiveType() {
   var inputValueType = _reflectInputValueType();
 
-  // TODO: What actually is this???
   return _directiveType ??= objectType('__Directive', fields: [
     field(
       'name',
       graphQLString.nonNullable(),
-      resolve: (obj, _) => (obj as DirectiveContext).nameToken!.span!.text,
+      resolve: (obj, _) => (obj as GraphQLDirectiveType).name,
     ),
     field(
       'description',
       graphQLString,
-      resolve: (obj, _) => null,
+      resolve: (obj, _) => (obj as GraphQLDirectiveType).description,
     ),
     field(
       'locations',
       listOf(_directiveLocationType.nonNullable()).nonNullable(),
-      // TODO: Fetch directiveLocation
-      resolve: (obj, _) => <String>[],
+      resolve: (obj, _) => (obj as GraphQLDirectiveType).locations
+          .map((v) => v.name.snakeCase.toUpperCase()).toList(),
     ),
     field(
       'args',
       listOf(inputValueType.nonNullable()).nonNullable(),
-      resolve: (obj, _) => [],
+      resolve: (obj, _) => (obj as GraphQLDirectiveType).inputFields,
     ),
   ]);
 }
@@ -450,7 +452,7 @@ class CollectTypes {
 
   void _fetchAllTypesFromObject(GraphQLObjectType objectType) {
     if (traversedTypes.contains(objectType)) {
-      return null;
+      return;
     }
 
     traversedTypes.add(objectType);
@@ -474,11 +476,15 @@ class CollectTypes {
     for (var i in objectType.interfaces) {
       _fetchAllTypesFromObject(i);
     }
+
+    for (var i in objectType.possibleTypes) {
+      _fetchAllTypesFromObject(i);
+    }
   }
 
   void _fetchAllTypesFromType(GraphQLType? type) {
     if (traversedTypes.contains(type)) {
-      return null;
+      return;
     }
 
     /*

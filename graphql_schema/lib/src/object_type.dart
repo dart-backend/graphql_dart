@@ -174,6 +174,26 @@ Map<String, dynamic> _foldToStringDynamic(Map map) {
       <String, dynamic>{}, (out, k) => out..[k.toString()] = map[k]);
 }
 
+enum DirectiveLocation {
+  query,
+  mutation,
+  subscription,
+  field,
+  fragmentDefinition,
+  fragmentSpread,
+  inlineFragment,
+  variableDefinition
+}
+
+class GraphQLDirectiveType extends GraphQLInputObjectType {
+  GraphQLDirectiveType(String name,
+      {String? description, required this.locations,
+        Iterable<GraphQLInputObjectField> inputFields = const []}) :
+  super(name, description: description, inputFields: inputFields);
+
+  final Set<DirectiveLocation> locations;
+}
+
 /// A special [GraphQLType] that specifies the shape of an object that can only be used as an input to a [GraphQLField].
 ///
 /// GraphQL input object types are different from regular [GraphQLObjectType]s in that they do not support resolution,

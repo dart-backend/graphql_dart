@@ -297,7 +297,8 @@ class Parser {
         var type = parseType();
         if (type != null) {
           var defaultValue = parseDefaultValue();
-          return VariableDefinitionContext(variable, COLON, type, defaultValue);
+          return VariableDefinitionContext(variable, COLON, type, defaultValue)
+          ..directives.addAll(parseDirectives());
         } else {
           errors.add(
               SyntaxError('Missing type in variable definition.', COLON.span));

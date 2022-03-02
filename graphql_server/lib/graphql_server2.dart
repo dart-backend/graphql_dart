@@ -13,6 +13,29 @@ Map<String, dynamic> foldToStringDynamic(Map? map) {
       <String, dynamic>{}, (out, k) => out..[k.toString()] = map[k]);
 }
 
+class JsonPathArgument {
+  JsonPathArgument(this.path, this.definition, this.defaultValue,
+      this.variableValues)
+      : _spl = path.split('.') {
+    if (_spl.isEmpty || _spl.length < 2 || _spl.first != r'$') {
+      throw 'Bad json path $path';
+    }
+
+    _spl.removeAt(0);
+  }
+
+  final String path;
+  final Map<String, dynamic> variableValues;
+  final List<String> _spl;
+  final dynamic defaultValue;
+  Iterable<String> get splitted => _spl;
+  final VariableDefinitionContext definition;
+
+  void complete(dynamic value) {
+    variableValues[definition.variable.name] = value ?? defaultValue;
+  }
+}
+
 /// A Dart implementation of a GraphQL server.
 class GraphQL {
   /// Any custom types to include in introspection information.
@@ -141,7 +164,6 @@ class GraphQL {
   OperationDefinitionContext getOperation(
       DocumentContext document, String? operationName) {
     var ops = document.definitions.whereType<OperationDefinitionContext>();
-
     if (operationName == null) {
       return ops.length == 1
           ? ops.first
@@ -171,11 +193,11 @@ class GraphQL {
       //  continue;
       //}
       var value = variableValues[variableName];
+      dynamic toSet;
 
       if (value == null) {
         if (defaultValue != null) {
-          coercedValues[variableName] =
-              defaultValue.value.computeValue(variableValues);
+          toSet = defaultValue.value.computeValue(variableValues);
         } else if (!variableType.isNullable) {
           throw GraphQLException.fromSourceSpan(
               'Missing required variable "$variableName".',
@@ -193,12 +215,36 @@ class GraphQL {
                   ]))
               .toList());
         } else {
-          coercedValues[variableName] = type.deserialize(value);
+          toSet = type.deserialize(value);
         }
       }
+
+      final jp = getDirectiveValue('jsonpath', 'path',
+          variableDefinition, variableValues);
+
+      if (jp != null) {
+        toSet = JsonPathArgument(jp, variableDefinition, toSet,
+            coercedValues);
+      }
+
+      coercedValues[variableName] = toSet;
     }
 
     return coercedValues;
+  }
+
+  List<List> makeLazy(Map<String, dynamic> map) {
+    final lazy = <List>[];
+
+    for (final val in map.values) {
+      if (val is JsonPathArgument) {
+        lazy.add([...val.splitted, val]);
+      } else if (val is Map) {
+        makeLazy(map);
+      }
+    }
+
+    return lazy;
   }
 
   Future<Map<String, dynamic>> executeQuery(
@@ -210,8 +256,10 @@ class GraphQL {
       Map<String, dynamic> globalVariables) async {
     var queryType = schema.queryType;
     var selectionSet = query.selectionSet;
+
     return await executeSelectionSet(document, selectionSet, queryType,
-        initialValue, variableValues, globalVariables);
+        initialValue, variableValues, globalVariables,
+        lazy: makeLazy(variableValues));
   }
 
   Future<Map<String?, dynamic>> executeMutation(
@@ -230,7 +278,8 @@ class GraphQL {
 
     var selectionSet = mutation.selectionSet;
     return await executeSelectionSet(document, selectionSet, mutationType,
-        initialValue, variableValues, globalVariables);
+        initialValue, variableValues, globalVariables,
+        lazy: makeLazy(variableValues));
   }
 
   Future<Stream<Map<String, dynamic>>> subscribe(
@@ -307,7 +356,8 @@ class GraphQL {
     }
     try {
       var data = await executeSelectionSet(document, selectionSet,
-          subscriptionType, initialValue, variableValues, globalVariables);
+          subscriptionType, initialValue, variableValues, globalVariables,
+          lazy: makeLazy(variableValues));
       return {'data': data};
     } on GraphQLException catch (e) {
       return {
@@ -339,29 +389,49 @@ class GraphQL {
       GraphQLObjectType? objectType,
       objectValue,
       Map<String, dynamic> variableValues,
-      Map<String, dynamic> globalVariables) async {
+      Map<String, dynamic> globalVariables,
+  {List<List> lazy = const []}) async {
     var groupedFieldSet =
-        collectFields(document, objectType, selectionSet, variableValues);
+        collectFields(document, objectType!, selectionSet, variableValues);
     var resultMap = <String, dynamic>{};
-    var futureResultMap = <String, FutureOr<dynamic>>{};
 
     for (var responseKey in groupedFieldSet.keys) {
       if (responseKey == null) {
         continue;
       }
-      var fields = groupedFieldSet[responseKey] ?? [];
+
+      final nextLazy = <List>[];
+      final doneLazy = <List>[];
+
+      for (final l in lazy) {
+        if (l.first == responseKey) {
+          final arr = l..removeAt(0);
+
+          if (l.length > 2) {
+            nextLazy.add(arr);
+          } else {
+            doneLazy.add(arr);
+          }
+        }
+      }
+
+      final fields = groupedFieldSet[responseKey] ?? [];
+
       for (var field in fields) {
         var fieldName =
             field.field?.fieldName.alias?.name ?? field.field?.fieldName.name;
         FutureOr<dynamic> futureResponseValue;
 
-        if (fieldName == '__typename') {
-          futureResponseValue = objectType!.name;
+        if (fieldName == '__typename' && objectType.possibleTypes.isEmpty &&
+        objectType.interfaces.isEmpty) {
+          futureResponseValue = objectType.name;
         } else {
-          var fieldType = objectType!.fields
+          final fieldType = objectType.fields
               .firstWhereOrNull((f) => f.name == fieldName)
               ?.type;
+
           if (fieldType == null) continue;
+
           futureResponseValue = executeField(
               document,
               fieldName,
@@ -371,15 +441,22 @@ class GraphQL {
               fieldType,
               Map<String, dynamic>.from(globalVariables)
                 ..addAll(variableValues),
-              globalVariables);
+              globalVariables,
+              lazy: nextLazy);
         }
 
-        futureResultMap[responseKey] = futureResponseValue;
+        resultMap[responseKey] = await futureResponseValue;
+      }
+
+      final map = resultMap[responseKey];
+
+      for (final lz in doneLazy) {
+        final key = lz.first as String;
+
+        (lz.last as JsonPathArgument).complete(map[key]);
       }
     }
-    for (var f in futureResultMap.keys) {
-      resultMap[f] = await futureResultMap[f];
-    }
+
     return resultMap;
   }
 
@@ -391,7 +468,8 @@ class GraphQL {
       List<SelectionContext> fields,
       GraphQLType fieldType,
       Map<String, dynamic> variableValues,
-      Map<String, dynamic> globalVariables) async {
+      Map<String, dynamic> globalVariables,
+  {List<List> lazy = const []}) async {
     var field = fields[0];
     var argumentValues =
         coerceArgumentValues(objectType, field, variableValues);
@@ -401,7 +479,7 @@ class GraphQL {
         fieldName,
         Map<String, dynamic>.from(globalVariables)..addAll(argumentValues));
     return completeValue(document, fieldName, fieldType, fields, resolvedValue,
-        variableValues, globalVariables);
+        variableValues, globalVariables, lazy: lazy);
   }
 
   Map<String, dynamic> coerceArgumentValues(GraphQLObjectType objectType,
@@ -496,9 +574,9 @@ class GraphQL {
 
   Future<T?> resolveFieldValue<T>(GraphQLObjectType objectType, T objectValue,
       String? fieldName, Map<String, dynamic> argumentValues) async {
-    var field = objectType.fields.firstWhere((f) => f.name == fieldName);
+    final field = objectType.fields.firstWhere((f) => f.name == fieldName);
+    final fieldResolve = field.resolve;
 
-    var fieldResolve = field.resolve;
     if (objectValue is Map) {
       return objectValue[fieldName] as T;
     } else if (fieldResolve == null) {
@@ -519,7 +597,8 @@ class GraphQL {
       List<SelectionContext> fields,
       dynamic result,
       Map<String, dynamic> variableValues,
-      Map<String, dynamic> globalVariables) async {
+      Map<String, dynamic> globalVariables,
+      {List<List> lazy = const []}) async {
     if (fieldType is GraphQLNonNullableType) {
       var innerType = fieldType.ofType;
       var completedResult = await completeValue(document, fieldName, innerType,
@@ -581,7 +660,7 @@ class GraphQL {
 
       var subSelectionSet = mergeSelectionSets(fields);
       return await executeSelectionSet(document, subSelectionSet, objectType,
-          result, variableValues, globalVariables);
+          result, variableValues, globalVariables, lazy: lazy);
     }
 
     throw UnsupportedError('Unsupported type: $fieldType');
@@ -650,12 +729,17 @@ class GraphQL {
     visitedFragments ??= [];
 
     for (var selection in selectionSet.selections) {
-      if (getDirectiveValue('skip', 'if', selection, variableValues) == true) {
-        continue;
-      }
-      if (getDirectiveValue('include', 'if', selection, variableValues) ==
-          false) {
-        continue;
+      final field = selection.field;
+
+      if (field != null) {
+        if (getDirectiveValue('skip', 'if', field, variableValues) ==
+            true) {
+          continue;
+        }
+        if (getDirectiveValue('include', 'if', field, variableValues) ==
+            false) {
+          continue;
+        }
       }
 
       if (selection.field != null) {
@@ -705,14 +789,16 @@ class GraphQL {
   }
 
   dynamic getDirectiveValue(String name, String argumentName,
-      SelectionContext selection, Map<String?, dynamic> variableValues) {
-    if (selection.field == null) return null;
-    var directive = selection.field!.directives.firstWhereOrNull((d) {
+      Directives holder, Map<String?, dynamic> variableValues) {
+    var directive = holder.directives.firstWhereOrNull((d) {
       var vv = d.value;
+
       if (vv is VariableContext) {
         return vv.name == name;
+      } else if (vv == null) {
+        return d.nameToken?.text == name;
       } else {
-        return vv!.computeValue(variableValues as Map<String, dynamic>) == name;
+        return vv.computeValue(variableValues as Map<String, dynamic>) == name;
       }
     });
 

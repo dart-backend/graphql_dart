@@ -116,16 +116,16 @@ packages:
   graphql_parser2:
     dependency: "direct main"
     description:
-      name: graphql_parser2
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "../graphql_parser"
+      relative: true
+    source: path
     version: "2.1.0"
   graphql_schema2:
     dependency: "direct main"
     description:
-      name: graphql_schema2
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "../graphql_schema"
+      relative: true
+    source: path
     version: "2.1.0"
   http_multi_server:
     dependency: transitive

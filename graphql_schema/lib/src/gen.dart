@@ -5,13 +5,20 @@ GraphQLObjectType objectType(String name,
     {String? description,
     bool isInterface = false,
     Iterable<GraphQLObjectField> fields = const [],
-    Iterable<GraphQLObjectType> interfaces = const []}) {
+    Iterable<GraphQLObjectType> interfaces = const [],
+    Iterable<GraphQLObjectType> subs = const []}) {
   var obj = GraphQLObjectType(name, description, isInterface: isInterface)
     ..fields.addAll(fields);
 
   if (interfaces.isNotEmpty == true) {
     for (var i in interfaces) {
       obj.inheritFrom(i);
+    }
+  }
+
+  if (subs.isNotEmpty) {
+    for (final sub in subs) {
+      sub.inheritFrom(obj);
     }
   }
 

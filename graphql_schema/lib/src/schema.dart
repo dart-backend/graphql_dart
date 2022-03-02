@@ -40,18 +40,23 @@ class GraphQLSchema {
   /// subscriptions in its own way.
   final GraphQLObjectType? subscriptionType;
 
-  GraphQLSchema({this.queryType, this.mutationType, this.subscriptionType});
+  final Iterable<GraphQLDirectiveType>? directiveTypes;
+
+  GraphQLSchema({this.queryType, this.mutationType, this.subscriptionType,
+  this.directiveTypes});
 }
 
 /// A shorthand for creating a [GraphQLSchema].
 GraphQLSchema graphQLSchema(
         {required GraphQLObjectType queryType,
         GraphQLObjectType? mutationType,
-        GraphQLObjectType? subscriptionType}) =>
+        GraphQLObjectType? subscriptionType,
+          Iterable<GraphQLDirectiveType>? directiveTypes}) =>
     GraphQLSchema(
         queryType: queryType,
         mutationType: mutationType,
-        subscriptionType: subscriptionType);
+        subscriptionType: subscriptionType,
+        directiveTypes: directiveTypes);
 
 /// A default resolver that always returns `null`.
 Null resolveToNull(_, __) => null;
@@ -85,6 +90,9 @@ class GraphQLException implements Exception {
       'errors': errors.map((e) => e.toJson()).toList(),
     };
   }
+
+  @override
+  String toString() => toJson().toString();
 }
 
 /// One of an arbitrary number of errors that may occur during the execution of a GraphQL query.
