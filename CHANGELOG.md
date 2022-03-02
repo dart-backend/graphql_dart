@@ -1,4 +1,7 @@
-# 2.0.0
+# Change Log
+
+## 2.0.0
+
 * Migrated to support Dart SDK 2.12.x NNBD
 * Works with Angel3 Framework
 * Changed package `graphql_parser` to `graphql_parser2`
@@ -8,5 +11,6 @@
 * Changed package `data_loader` to `graphql_data_loader2`
 * Changed package `angel_graphql` to `angel3_graphql`
 
-# 1.0.0
+## 1.0.0
+
 * Works with Angel Framework
