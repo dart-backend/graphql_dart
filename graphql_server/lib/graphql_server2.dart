@@ -195,10 +195,13 @@ class GraphQL {
       var value = variableValues[variableName];
       dynamic toSet;
 
+      final jp = getDirectiveValue(
+          'jsonpath', 'path', variableDefinition, variableValues);
+
       if (value == null) {
         if (defaultValue != null) {
           toSet = defaultValue.value.computeValue(variableValues);
-        } else if (!variableType.isNullable) {
+        } else if (!variableType.isNullable && jp == null) {
           throw GraphQLException.fromSourceSpan(
               'Missing required variable "$variableName".',
               variableDefinition.span);
@@ -218,9 +221,6 @@ class GraphQL {
           toSet = type.deserialize(value);
         }
       }
-
-      final jp = getDirectiveValue(
-          'jsonpath', 'path', variableDefinition, variableValues);
 
       if (jp != null) {
         toSet = JsonPathArgument(jp, variableDefinition, toSet, coercedValues);
@@ -404,12 +404,13 @@ class GraphQL {
 
       for (final l in lazy) {
         if (l.first == responseKey) {
+          final key = l.elementAt(0);
           final arr = l..removeAt(0);
 
-          if (l.length > 2) {
+          if (l.length > 1) {
             nextLazy.add(arr);
           } else {
-            doneLazy.add(arr);
+            doneLazy.add([key, ...arr]);
           }
         }
       }
@@ -419,18 +420,18 @@ class GraphQL {
       for (var field in fields) {
         var fieldName =
             field.field?.fieldName.alias?.name ?? field.field?.fieldName.name;
-        FutureOr<dynamic> futureResponseValue;
+        FutureOr futureResponseValue;
 
-        if (fieldName == '__typename' &&
-            objectType.possibleTypes.isEmpty &&
-            objectType.interfaces.isEmpty) {
+        if (fieldName == '__typename') {
           futureResponseValue = objectType.name;
         } else {
           final fieldType = objectType.fields
               .firstWhereOrNull((f) => f.name == fieldName)
               ?.type;
 
-          if (fieldType == null) continue;
+          if (fieldType == null) {
+            continue;
+          }
 
           futureResponseValue = executeField(
               document,
@@ -442,19 +443,19 @@ class GraphQL {
               Map<String, dynamic>.from(globalVariables)
                 ..addAll(variableValues),
               globalVariables,
-              lazy: nextLazy);
+              lazy: nextLazy.toList());
         }
 
-        resultMap[responseKey] = await futureResponseValue;
+        final val = resultMap[responseKey] = await futureResponseValue;
+
+        for (final lz in doneLazy) {
+          if (lz.first as String == responseKey) {
+            (lz.last as JsonPathArgument).complete(val);
+          }
+        }
       }
 
-      final map = resultMap[responseKey];
-
-      for (final lz in doneLazy) {
-        final key = lz.first as String;
-
-        (lz.last as JsonPathArgument).complete(map[key]);
-      }
+      //final map = resultMap[responseKey];
     }
 
     return resultMap;
@@ -512,15 +513,16 @@ class GraphQL {
           continue;
         }
       } else {
+        final inputValue = argumentValue.value
+            .computeValue(variableValues as Map<String, dynamic>);
+
         try {
-          final inputValue = argumentValue.value
-              .computeValue(variableValues as Map<String, dynamic>);
           final validation = argumentType.validate(argumentName, inputValue);
 
           if (!validation.successful) {
             var errors = <GraphQLExceptionError>[
               GraphQLExceptionError(
-                'Type coercion error for value of argument "$argumentName" of field "$fieldName".',
+                'Type coercion error for value of argument "$argumentName" of field "$fieldName". ($inputValue)',
                 locations: [
                   GraphExceptionErrorLocation.fromSourceLocation(
                       argumentValue.value.span!.start)
@@ -558,7 +560,7 @@ class GraphQL {
 
           throw GraphQLException(<GraphQLExceptionError>[
             GraphQLExceptionError(
-              'Type coercion error for value of argument "$argumentName" of field "$fieldName".',
+              'Type coercion error for value of argument "$argumentName" of field "$fieldName". [$inputValue]',
               locations: locations,
             ),
             GraphQLExceptionError(

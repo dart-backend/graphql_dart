@@ -99,7 +99,8 @@ class GraphQLObjectType
 
       if (field == null) {
         errors.add(
-            'Unexpected field "$k" encountered in $key. Accepted values on type $name: ${fields.map((f) => f.name).toList()}');
+            'Unexpected field "$k" encountered in $key. Accepted values on type $name: ${fields
+                .map((f) => f.name).toList()}');
       } else {
         var v = input[k];
         var result = field.type.validate(k.toString(), field.type.convert(v));
