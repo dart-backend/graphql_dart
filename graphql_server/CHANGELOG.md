@@ -20,7 +20,7 @@ mutation myQuery($createdId: Int! @jsonpath(path: "$.C0.create.id")) {
       }
   }
 }
-// you need to declare the variable
+// you can optionally declare the variable
 {
   createdId: 0 // if the jsonpath directive can't resolve a value, 
   // it will use this (0) instead
