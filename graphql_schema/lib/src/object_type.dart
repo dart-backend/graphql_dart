@@ -34,8 +34,8 @@ class GraphQLObjectType
   List<GraphQLObjectType> get possibleTypes =>
       List<GraphQLObjectType>.unmodifiable(_possibleTypes);
 
-  GraphQLObjectType(this.name, this.description, {this.isInterface = false,
-  this.polymorphicName});
+  GraphQLObjectType(this.name, this.description,
+      {this.isInterface = false, this.polymorphicName});
 
   @override
   GraphQLType<Map<String, dynamic>, Map<String, dynamic>>

@@ -8,8 +8,8 @@ GraphQLObjectType objectType(String name,
     Iterable<GraphQLObjectType> interfaces = const [],
     Iterable<GraphQLObjectType> subs = const [],
     String? polymorphicName}) {
-  var obj = GraphQLObjectType(name, description, isInterface: isInterface,
-      polymorphicName: polymorphicName)
+  var obj = GraphQLObjectType(name, description,
+      isInterface: isInterface, polymorphicName: polymorphicName)
     ..fields.addAll(fields);
 
   if (interfaces.isNotEmpty == true) {
