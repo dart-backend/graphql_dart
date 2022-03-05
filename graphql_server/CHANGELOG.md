@@ -26,6 +26,9 @@ mutation myQuery($createdId: Int! @jsonpath(path: "$.C0.create.id")) {
   // it will use this (0) instead
 }
 ```
+* Added polymorphic names: you can add an alias to a type to use with `on` fragments.
+This is nice when you have a `__typename` that must be unique like `MyNestedType123` but 
+you would like to use a better name when on fragments: `...on MyType`  
 
 ## 2.1.1
 

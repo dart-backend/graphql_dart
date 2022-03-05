@@ -82,14 +82,17 @@ class GraphQL {
     }
   }
 
-  GraphQLType convertType(TypeContext ctx) {
+  GraphQLType convertType(TypeContext ctx, {bool usePolymorphicName = false,
+  GraphQLObjectType? parent}) {
     var listType = ctx.listType;
     var typeName = ctx.typeName;
     if (listType != null) {
       var convert = convertType(listType.innerType);
       return GraphQLListType(convert);
     } else if (typeName != null) {
-      switch (typeName.name) {
+      final name = typeName.name;
+
+      switch (name) {
         case 'Int':
           return graphQLInt;
         case 'Float':
@@ -104,9 +107,22 @@ class GraphQL {
         case 'DateTime':
           return graphQLDate;
         default:
-          return customTypes.firstWhere((t) => t.name == typeName.name,
-              orElse: () => throw ArgumentError(
-                  'Unknown GraphQL type: "${typeName.name}"'));
+          usePolymorphicName = usePolymorphicName && parent != null;
+
+          if (usePolymorphicName) {
+            final ret = customTypes.firstWhereOrNull((t) {
+              return t is GraphQLObjectType && t.polymorphicName == name &&
+                  parent.possibleTypes.contains(t);
+            });
+
+            if (ret != null) {
+              return ret;
+            }
+          }
+
+          return customTypes.firstWhere((t) {
+            return t.name == name;
+          }, orElse: () => throw ArgumentError('Unknown GraphQL type: "$name"'));
       }
     } else {
       throw ArgumentError('Invalid GraphQL type: "${ctx.span.text}"');
@@ -389,9 +405,10 @@ class GraphQL {
       objectValue,
       Map<String, dynamic> variableValues,
       Map<String, dynamic> globalVariables,
-      {List<List> lazy = const []}) async {
+      {List<List> lazy = const [], GraphQLObjectType? parentType,}) async {
     var groupedFieldSet =
-        collectFields(document, objectType!, selectionSet, variableValues);
+        collectFields(document, objectType!, selectionSet, variableValues,
+            parentType: parentType);
     var resultMap = <String, dynamic>{};
 
     for (var responseKey in groupedFieldSet.keys) {
@@ -661,10 +678,12 @@ class GraphQL {
         objectType = resolveAbstractType(fieldName, fieldType, result);
       }
 
+      //objectType = fieldType as GraphQLObjectType;
       var subSelectionSet = mergeSelectionSets(fields);
-      return await executeSelectionSet(document, subSelectionSet, objectType,
+      return await executeSelectionSet(document, subSelectionSet,
+          objectType,
           result, variableValues, globalVariables,
-          lazy: lazy);
+          lazy: lazy, parentType: fieldType as GraphQLObjectType);
     }
 
     throw UnsupportedError('Unsupported type: $fieldType');
@@ -686,7 +705,8 @@ class GraphQL {
       throw ArgumentError();
     }
 
-    var errors = <GraphQLExceptionError>[];
+    final errors = <GraphQLExceptionError>[];
+    final types = [];
 
     for (var t in possibleTypes) {
       try {
@@ -694,12 +714,20 @@ class GraphQL {
             t.validate(fieldName!, foldToStringDynamic(result as Map?));
 
         if (validation.successful) {
-          return t;
+          types.add(t);
+        } else {
+          errors.addAll(validation.errors.map((m) => GraphQLExceptionError(m)));
         }
-
-        errors.addAll(validation.errors.map((m) => GraphQLExceptionError(m)));
       } on GraphQLException catch (e) {
         errors.addAll(e.errors);
+      }
+    }
+
+    if (types.isNotEmpty) {
+      if (types.length == 1) {
+        return types.first;
+      } else if (type is GraphQLObjectType) {
+        return type;
       }
     }
 
@@ -728,7 +756,7 @@ class GraphQL {
       GraphQLObjectType? objectType,
       SelectionSetContext selectionSet,
       Map<String?, dynamic> variableValues,
-      {List? visitedFragments}) {
+      {List? visitedFragments, GraphQLObjectType? parentType}) {
     var groupedFields = <String?, List<SelectionContext>>{};
     visitedFragments ??= [];
 
@@ -774,7 +802,8 @@ class GraphQL {
         }
       } else if (selection.inlineFragment != null) {
         var fragmentType = selection.inlineFragment!.typeCondition;
-        if (!doesFragmentTypeApply(objectType, fragmentType)) continue;
+        if (!doesFragmentTypeApply(objectType, fragmentType,
+            parentType: parentType)) continue;
         var fragmentSelectionSet = selection.inlineFragment!.selectionSet;
         var fragmentGroupFieldSet = collectFields(
             document, objectType, fragmentSelectionSet, variableValues);
@@ -821,8 +850,10 @@ class GraphQL {
   }
 
   bool doesFragmentTypeApply(
-      GraphQLObjectType? objectType, TypeConditionContext fragmentType) {
-    var type = convertType(TypeContext(fragmentType.typeName, null));
+      GraphQLObjectType? objectType, TypeConditionContext fragmentType,
+  {GraphQLObjectType? parentType}) {
+    var type = convertType(TypeContext(fragmentType.typeName, null),
+    usePolymorphicName: true, parent: parentType ?? objectType);
     if (type is GraphQLObjectType && !type.isInterface) {
       for (var field in type.fields) {
         if (!objectType!.fields.any((f) => f.name == field.name)) return false;

@@ -8,6 +8,8 @@ class GraphQLObjectType
   @override
   final String name;
 
+  final String? polymorphicName;
+
   /// An optional description of this type; useful for tools like GraphiQL.
   @override
   final String? description;
@@ -32,7 +34,8 @@ class GraphQLObjectType
   List<GraphQLObjectType> get possibleTypes =>
       List<GraphQLObjectType>.unmodifiable(_possibleTypes);
 
-  GraphQLObjectType(this.name, this.description, {this.isInterface = false});
+  GraphQLObjectType(this.name, this.description, {this.isInterface = false,
+  this.polymorphicName});
 
   @override
   GraphQLType<Map<String, dynamic>, Map<String, dynamic>>

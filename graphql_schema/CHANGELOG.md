@@ -2,6 +2,7 @@
 
 ## 2.1.2
 * Implemented directives
+* Added polymorphic type names (basically type alias for polymorphism)
 
 ## 2.1.1
 
