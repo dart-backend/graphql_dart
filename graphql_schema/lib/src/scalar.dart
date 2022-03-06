@@ -4,34 +4,60 @@ part of graphql_schema.src.schema;
 final GraphQLScalarType<bool, bool> graphQLBoolean = _GraphQLBoolType();
 
 /// A UTF‐8 character sequence.
-final GraphQLScalarType<String, String> graphQLString = _GraphQLStringType._();
+final GraphQLScalarType<String, String> graphQLString = _GraphQLStringType();
 
 /// The ID scalar type represents a unique identifier, often used to re-fetch an object or as the key for a cache.
 ///
 /// The ID type is serialized in the same way as a String; however, defining it as an ID signifies that it is not intended to be human‐readable.
-final GraphQLScalarType<String, String> graphQLId = _GraphQLStringType._('ID');
+final GraphQLScalarType<String, String> graphQLId =
+    _GraphQLStringType(name: 'ID');
+
+final graphQLNonEmptyString =
+    GraphQLStringMinType(1, description: 'Non empty String');
+
+_GraphQLStringType graphQLStringMin(int min) => GraphQLStringMinType(min);
+
+_GraphQLStringType graphQLStringMax(int max) => GraphQLStringMaxType(max);
+
+_GraphQLStringType graphQLStringRange(int min, int max) =>
+    GraphQLStringRangeType(min, max);
 
 /// A [DateTime], serialized as an ISO-8601 string..
 final GraphQLScalarType<DateTime, String> graphQLDate = _GraphQLDateType._();
 
 /// A signed 32‐bit integer.
-final GraphQLScalarType<int, int> graphQLInt = _GraphQLNumType<int>(
-    'Int', 'A signed 64-bit integer.', (x) => x is int, 'an integer');
+final graphQLInt = GraphQLNumType<int>('Int');
+
+final graphQLPositiveInt =
+    GraphQLNumMinType<int>('Int', 1, description: 'Positive integer (>= 1)');
+
+final graphQLNonPositiveInt = GraphQLNumMaxType<int>('Int', 0,
+    description: 'Non positive integer (<= 0)');
+
+final graphQLNegativeInt =
+    GraphQLNumMaxType<int>('Int', -1, description: 'Negative integer (<= -1)');
+
+final graphQLNonNegativeInt = GraphQLNumMinType<int>('Int', 0,
+    description: 'Non negative integer (>= 0)');
+
+GraphQLNumMinType<int> graphQLIntMin(int min) => GraphQLNumMinType('Int', min);
+
+GraphQLNumMaxType<int> graphQLIntMax(int max) => GraphQLNumMaxType('Int', max);
+
+GraphQLNumRangedType<int> graphQLIntRange(int min, int max) =>
+    GraphQLNumRangedType('Int', min, max);
 
 /// A signed double-precision floating-point value.
-final GraphQLScalarType<double, double> graphQLFloat = _GraphQLNumType<double>(
-    'Float',
-    'A signed double-precision floating-point value.',
-    (x) => x is double,
-    'a float');
+final graphQLFloat = GraphQLNumType<double>(
+  'Float',
+  //'A signed double-precision floating-point value.'
+);
 
 abstract class GraphQLScalarType<Value, Serialized>
     extends GraphQLType<Value, Serialized>
     with _NonNullableMixin<Value, Serialized> {
   Type get valueType => Value;
 }
-
-typedef _NumVerifier = bool Function(dynamic x);
 
 class _GraphQLBoolType extends GraphQLScalarType<bool, bool> {
   @override
@@ -62,20 +88,18 @@ class _GraphQLBoolType extends GraphQLScalarType<bool, bool> {
   GraphQLType<bool, bool> coerceToInputObject() => this;
 }
 
-class _GraphQLNumType<T extends num> extends GraphQLScalarType<T, T> {
+class GraphQLNumType<T extends num> extends GraphQLScalarType<T, T> {
+  GraphQLNumType(this.name, {this.description = ''});
+
   @override
   final String name;
   @override
-  final String description;
-  final _NumVerifier verifier;
-  final String expected;
-
-  _GraphQLNumType(this.name, this.description, this.verifier, this.expected);
+  String description;
 
   @override
   ValidationResult<T> validate(String key, input) {
-    if (!verifier(input)) {
-      return ValidationResult._failure(['Expected "$key" to be $expected.']);
+    if (input is! T?) {
+      return ValidationResult._failure(['Expected "$key" to be $name.']);
     }
 
     return ValidationResult._ok(input);
@@ -95,14 +119,76 @@ class _GraphQLNumType<T extends num> extends GraphQLScalarType<T, T> {
   GraphQLType<T, T> coerceToInputObject() => this;
 }
 
+class GraphQLNumMinType<T extends num> extends GraphQLNumType<T> {
+  GraphQLNumMinType(String name, this.min, {String? description})
+      : super(name, description: description ?? '$name with minimum of $min');
+
+  final T min;
+
+  @override
+  ValidationResult<T> validate(String key, T input) {
+    var ret = super.validate(key, input);
+
+    if (ret.successful && input < min) {
+      ret = ValidationResult._failure(
+          ['Value ($input) can not be lower than $min']);
+    }
+
+    return ret;
+  }
+}
+
+class GraphQLNumMaxType<T extends num> extends GraphQLNumType<T> {
+  GraphQLNumMaxType(String name, this.max, {String? description})
+      : super(name, description: description ?? '$name with maximum of $max');
+
+  final T max;
+
+  @override
+  ValidationResult<T> validate(String key, T input) {
+    var ret = super.validate(key, input);
+
+    if (ret.successful && input > max) {
+      ret = ValidationResult._failure(
+          ['Value ($input) can not be greater than $max']);
+    }
+
+    return ret;
+  }
+}
+
+class GraphQLNumRangedType<T extends num> extends GraphQLNumType<T> {
+  GraphQLNumRangedType(String name, this.min, this.max, {String? description})
+      : super(name,
+            description: description ??
+                '$name between $min and $max. (>= $min && <= $max)');
+
+  final T min;
+  final T max;
+
+  @override
+  ValidationResult<T> validate(String key, T input) {
+    var ret = super.validate(key, input);
+
+    if (ret.successful && (input < min || input > max)) {
+      ret = ValidationResult._failure([
+        'Value ($input) must be between $min and $max. (>= $min && <= $max)'
+      ]);
+    }
+
+    return ret;
+  }
+}
+
 class _GraphQLStringType extends GraphQLScalarType<String, String> {
+  _GraphQLStringType(
+      {this.name = 'String', this.description = 'A character sequence.'});
+
   @override
   final String name;
 
-  _GraphQLStringType._([this.name = 'String']);
-
   @override
-  String get description => 'A character sequence.';
+  final String description;
 
   @override
   String serialize(String value) => value;
@@ -117,6 +203,74 @@ class _GraphQLStringType extends GraphQLScalarType<String, String> {
 
   @override
   GraphQLType<String, String> coerceToInputObject() => this;
+}
+
+class GraphQLStringMinType extends _GraphQLStringType {
+  GraphQLStringMinType(this.min, {String? description, String name = 'String'})
+      : super(
+            name: name,
+            description:
+                description ?? '$name with minimum of $min characters');
+
+  final int min;
+
+  @override
+  ValidationResult<String> validate(String key, String input) {
+    var ret = super.validate(key, input);
+
+    if (ret.successful && input.length < min) {
+      ret = ValidationResult._failure(
+          ['Value (${input.length} chars) can not be lower than $min']);
+    }
+
+    return ret;
+  }
+}
+
+class GraphQLStringMaxType extends _GraphQLStringType {
+  GraphQLStringMaxType(this.max, {String? description, String name = 'String'})
+      : super(
+            name: name,
+            description: description ?? '$name with max of $max characters');
+
+  final int max;
+
+  @override
+  ValidationResult<String> validate(String key, String input) {
+    var ret = super.validate(key, input);
+
+    if (ret.successful && input.length > max) {
+      ret = ValidationResult._failure(
+          ['Value (${input.length} chars) can not be greater than $max']);
+    }
+
+    return ret;
+  }
+}
+
+class GraphQLStringRangeType extends _GraphQLStringType {
+  GraphQLStringRangeType(this.min, this.max,
+      {String? description, String name = 'String'})
+      : super(
+            name: name,
+            description:
+                description ?? '$name with characters between $min and $max');
+
+  final int min;
+  final int max;
+
+  @override
+  ValidationResult<String> validate(String key, String input) {
+    var ret = super.validate(key, input);
+
+    if (ret.successful && (input.length < min || input.length > max)) {
+      ret = ValidationResult._failure([
+        'Value (${input.length} chars) must have between $min and $max chars'
+      ]);
+    }
+
+    return ret;
+  }
 }
 
 class _GraphQLDateType extends GraphQLScalarType<DateTime, String>

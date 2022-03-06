@@ -8,6 +8,8 @@ class GraphQLObjectType
   @override
   final String name;
 
+  final String? polymorphicName;
+
   /// An optional description of this type; useful for tools like GraphiQL.
   @override
   final String? description;
@@ -32,7 +34,8 @@ class GraphQLObjectType
   List<GraphQLObjectType> get possibleTypes =>
       List<GraphQLObjectType>.unmodifiable(_possibleTypes);
 
-  GraphQLObjectType(this.name, this.description, {this.isInterface = false});
+  GraphQLObjectType(this.name, this.description,
+      {this.isInterface = false, this.polymorphicName});
 
   @override
   GraphQLType<Map<String, dynamic>, Map<String, dynamic>>
@@ -172,6 +175,27 @@ class GraphQLObjectType
 Map<String, dynamic> _foldToStringDynamic(Map map) {
   return map.keys.fold<Map<String, dynamic>>(
       <String, dynamic>{}, (out, k) => out..[k.toString()] = map[k]);
+}
+
+enum DirectiveLocation {
+  query,
+  mutation,
+  subscription,
+  field,
+  fragmentDefinition,
+  fragmentSpread,
+  inlineFragment,
+  variableDefinition
+}
+
+class GraphQLDirectiveType extends GraphQLInputObjectType {
+  GraphQLDirectiveType(String name,
+      {String? description,
+      required this.locations,
+      Iterable<GraphQLInputObjectField> inputFields = const []})
+      : super(name, description: description, inputFields: inputFields);
+
+  final Set<DirectiveLocation> locations;
 }
 
 /// A special [GraphQLType] that specifies the shape of an object that can only be used as an input to a [GraphQLField].

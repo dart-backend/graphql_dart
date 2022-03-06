@@ -53,7 +53,7 @@ void main() {
 
     test('union type', () {
       expect(
-        new GraphQLUnionType('A', [
+        GraphQLUnionType('A', [
           objectType('B', fields: [
             field('b', graphQLString.nonNullable()),
           ]),
@@ -61,7 +61,7 @@ void main() {
             field('c', graphQLString.nonNullable()),
           ]),
         ]),
-        new GraphQLUnionType('A', [
+        GraphQLUnionType('A', [
           objectType('B', fields: [
             field('b', graphQLString.nonNullable()),
           ]),
@@ -72,7 +72,7 @@ void main() {
       );
 
       expect(
-        new GraphQLUnionType('A', [
+        GraphQLUnionType('A', [
           objectType('B', fields: [
             field('b', graphQLString.nonNullable()),
           ]),
@@ -80,7 +80,7 @@ void main() {
             field('c', graphQLString.nonNullable()),
           ]),
         ]),
-        isNot(new GraphQLUnionType('AA', [
+        isNot(GraphQLUnionType('AA', [
           objectType('B', fields: [
             field('b', graphQLString.nonNullable()),
           ]),
@@ -91,7 +91,7 @@ void main() {
       );
 
       expect(
-        new GraphQLUnionType('A', [
+        GraphQLUnionType('A', [
           objectType('BB', fields: [
             field('b', graphQLString.nonNullable()),
           ]),
@@ -99,7 +99,7 @@ void main() {
             field('c', graphQLString.nonNullable()),
           ]),
         ]),
-        isNot(new GraphQLUnionType('AA', [
+        isNot(GraphQLUnionType('AA', [
           objectType('BDD', fields: [
             field('b', graphQLString.nonNullable()),
           ]),

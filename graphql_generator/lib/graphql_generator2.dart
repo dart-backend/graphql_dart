@@ -136,7 +136,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
           b
             ..name = ReCase(clazz.name).camelCase + 'GraphQLType'
             ..docs.add('/// Auto-generated from [${clazz.name}].')
-            ..type = TypeReference((b) => b
+            ..style = TypeReference((b) => b
               ..symbol = 'GraphQLEnumType'
               ..types.add(refer('String')))
             ..modifier = FieldModifier.final$
@@ -218,7 +218,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
 
             fields.add(refer('field').call([
               literalString(ctx.resolveFieldName(field.name)!),
-              type ??= _inferType(clazz.name, field.name, field.type)
+              type ??= _inferType(clazz.name, field.name, field.style)
             ], named));
           }
           named['fields'] = literalList(fields);
@@ -226,7 +226,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
           b
             ..name = ctx.modelClassNameRecase.camelCase + 'GraphQLType'
             ..docs.add('/// Auto-generated from [${ctx.modelClassName}].')
-            ..type = refer('GraphQLObjectType')
+            ..style = refer('GraphQLObjectType')
             ..modifier = FieldModifier.final$
             ..assignment = refer('objectType').call(args, named).code;
         }));

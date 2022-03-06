@@ -23,7 +23,7 @@ abstract class GraphQLType<Value, Serialized> {
   Serialized? convert(value) => value as Serialized?;
 
   /// Performs type coercion against an [input] value, and returns a list of errors if the validation was unsuccessful.
-  ValidationResult<Serialized> validate(String key, Serialized input);
+  ValidationResult<Serialized> validate(String key, covariant dynamic input);
 
   /// Creates a non-nullable type that represents this type, and enforces that a field of this type is present in input data.
   GraphQLType<Value, Serialized> nonNullable();
@@ -33,6 +33,9 @@ abstract class GraphQLType<Value, Serialized> {
 
   @override
   String toString() => name!;
+
+  GraphQLListType<Value, Serialized> list() =>
+      GraphQLListType<Value, Serialized>(this);
 }
 
 /// Shorthand to create a [GraphQLListType].
@@ -65,8 +68,7 @@ class GraphQLListType<Value, Serialized>
       'A list of items of type ${ofType.name ?? '(${ofType.description}).'}';
 
   @override
-  ValidationResult<List<Serialized>> validate(
-      String key, List<Serialized> input) {
+  ValidationResult<List<Serialized>> validate(String key, List input) {
     if (input is! List) {
       return ValidationResult._failure(['Expected "$key" to be a list.']);
     }
@@ -90,8 +92,10 @@ class GraphQLListType<Value, Serialized>
   }
 
   @override
-  List<Value> deserialize(List<Serialized> serialized) {
-    return serialized.map<Value>(ofType.deserialize).toList();
+  List<Value> deserialize(List serialized) {
+    return serialized
+        .map<Value>((v) => ofType.deserialize(v as Serialized))
+        .toList();
   }
 
   @override

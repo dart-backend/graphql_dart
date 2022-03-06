@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.1.1
+
+* Implemented directives
+
 ## 2.1.0
 
 * Upgraded from `pendantic` to `lints` linter

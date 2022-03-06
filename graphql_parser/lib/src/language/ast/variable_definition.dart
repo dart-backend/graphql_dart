@@ -1,12 +1,8 @@
-import '../token.dart';
-import 'node.dart';
-import 'default_value.dart';
+import '../../../graphql_parser2.dart';
 import 'package:source_span/source_span.dart';
-import 'type.dart';
-import 'variable.dart';
 
 /// A single variable definition.
-class VariableDefinitionContext extends Node {
+class VariableDefinitionContext extends Node with Directives {
   /// The source token.
   final Token? colonToken;
 
@@ -23,7 +19,7 @@ class VariableDefinitionContext extends Node {
       [this.defaultValue]);
 
   /// Use [colonToken] instead.
-  @deprecated
+  @Deprecated('Use [colonToken] instead.')
   Token? get COLON => colonToken;
 
   @override
