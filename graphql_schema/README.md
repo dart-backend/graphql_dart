@@ -19,12 +19,7 @@ Contains functionality to build *all* GraphQL types:
 * `GraphQLInputObjectType`
 * `Date` - ISO-8601 Date string, deserializes to a Dart `DateTime` object
 
-Of course, for a full description of GraphQL's type system, see the official
-specification:
-<http://facebook.github.io/graphql/October2016/>
-
-Mostly analogous to `graphql-js`; many names are verbatim:
-<https://graphql.org/graphql-js/type/>
+Of course, for a full description of GraphQL's type system, see the official [GraphQL Specification](https://spec.graphql.org/). Mostly analogous to [graphql-js](https://graphql.org/graphql-js/type/); many names are verbatim.
 
 ## Usage
 
@@ -125,8 +120,7 @@ type Character {
 }
 ```
 
-The field `characters` accepts a parameter, `title`. To reproduce this in
-`package:graphql_schema2`, use `GraphQLFieldInput`:
+The field `characters` accepts a parameter, `title`. To reproduce this in `package:graphql_schema2`, use `GraphQLFieldInput`:
 
 ```dart
 final GraphQLObjectType queryType = objectType('AnimeQuery', fields: [
@@ -144,12 +138,9 @@ final GraphQLObjectType characterType = objectType('Character', fields: [
 ]);
 ```
 
-In the majority of cases where you use GraphQL, you will be delegate the
-actual fetching of data to a database object, or some asynchronous resolver
-function.
+In the majority of cases where you use GraphQL, you will be delegate the actual fetching of data to a database object, or some asynchronous resolver function.
 
-`package:graphql_schema2` includes this functionality in the `resolve` property,
-which is passed a context object and a `Map<String, dynamic>` of arguments.
+`package:graphql_schema2` includes this functionality in the `resolve` property, which is passed a context object and a `Map<String, dynamic>` of arguments.
 
 A hypothetical example of the above might be:
 

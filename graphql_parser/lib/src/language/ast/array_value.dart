@@ -13,11 +13,11 @@ class ListValueContext extends InputValueContext {
   ListValueContext(this.lBracketToken, this.rBracketToken);
 
   /// Use [lBracketToken] instead.
-  @deprecated
+  @Deprecated('Use [lBracketToken]')
   Token get LBRACKET => lBracketToken;
 
   /// Use [rBracketToken] instead.
-  @deprecated
+  @Deprecated('Use [rBracketToken]')
   Token get RBRACKET => rBracketToken;
 
   @override

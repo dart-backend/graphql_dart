@@ -18,7 +18,7 @@ T? mirrorsFieldResolver<T>(objectValue, String fieldName,
 ///
 /// This function is aware of the annotations from `package:angel_serialize`, and works seamlessly
 /// with them.
-@deprecated
+@Deprecated('No replacement yet')
 GraphQLType? convertDartType(Type type, [List<Type>? typeArguments]) {
   if (_cache[type] != null) {
     return _cache[type];
@@ -28,7 +28,7 @@ GraphQLType? convertDartType(Type type, [List<Type>? typeArguments]) {
 }
 
 /// Shorthand for [convertDartType], for when you know the result will be an object type.
-@deprecated
+@Deprecated('No replacement yet')
 GraphQLObjectType? convertDartClass(Type type, [List<Type>? typeArguments]) {
   return convertDartType(type, typeArguments) as GraphQLObjectType?;
 }
@@ -81,7 +81,7 @@ GraphQLType? _objectTypeFromDartType(Type type, [List<Type>? typeArguments]) {
   return objectTypeFromClassMirror(clazz);
 }
 
-@deprecated
+@Deprecated('No replacement yet')
 GraphQLObjectType? objectTypeFromClassMirror(ClassMirror mirror) {
   if (_cache[mirror.reflectedType] != null) {
     return _cache[mirror.reflectedType] as GraphQLObjectType?;
@@ -206,7 +206,7 @@ GraphQLObjectType? objectTypeFromClassMirror(ClassMirror mirror) {
   return result as GraphQLObjectType;
 }
 
-@deprecated
+@Deprecated('No replacement yet')
 GraphQLEnumType enumTypeFromClassMirror(ClassMirror mirror) {
   var values = <GraphQLEnumValue>[];
 
@@ -231,7 +231,7 @@ GraphQLEnumType enumTypeFromClassMirror(ClassMirror mirror) {
   );
 }
 
-@deprecated
+@Deprecated('No replacement yet')
 GraphQLObjectField fieldFromGetter(
     Symbol name, MethodMirror mirror, Exclude? exclude, ClassMirror clazz) {
   var type = _getProvidedType(mirror.metadata);

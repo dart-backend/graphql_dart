@@ -20,7 +20,7 @@ Add `graphql_parser2` as a dependency in your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  graphql_parser2: ^2.1.0
+  graphql_parser2: ^3.0.0
 ```
 
 ## Usage
@@ -29,8 +29,7 @@ The AST featured in this library was originally directly based off this ANTLR4 g
 <https://github.com/antlr/grammars-v4/blob/master/graphql/GraphQL.g4>
 
 It has since been updated to reflect upon the grammar in the official GraphQL
-specification (
-[June 2018](https://facebook.github.io/graphql/June2018/)).
+specification ([June 2018](https://facebook.github.io/graphql/June2018/)).
 
 ```dart
 import 'package:graphql_parser2/graphql_parser2.dart';

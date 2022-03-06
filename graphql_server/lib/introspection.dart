@@ -99,7 +99,9 @@ GraphQLObjectType? _reflectSchemaTypes() {
         resolve: (type, _) {
           if (type is GraphQLListType) {
             return type.ofType;
-          } else if (type is GraphQLNonNullableType) return type.ofType;
+          } else if (type is GraphQLNonNullableType) {
+            return type.ofType;
+          }
           return null;
         },
       ),
@@ -507,21 +509,21 @@ class CollectTypes {
      */
     if (type is GraphQLEnumType) {
       traversedTypes.add(type);
-      return null;
+      return;
     }
     if (type is GraphQLUnionType) {
       traversedTypes.add(type);
       for (var t in type.possibleTypes) {
         _fetchAllTypesFromType(t);
       }
-      return null;
+      return;
     }
     if (type is GraphQLInputObjectType) {
       traversedTypes.add(type);
       for (var v in type.inputFields) {
         _fetchAllTypesFromType(v.type);
       }
-      return null;
+      return;
     }
 
     /*
@@ -531,6 +533,6 @@ class CollectTypes {
       return _fetchAllTypesFromObject(type);
     }
 
-    return null;
+    return;
   }
 }

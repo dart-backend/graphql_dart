@@ -13,7 +13,7 @@ In your pubspec.yaml:
 
 ```yaml
 dependencies:
-  graphql_data_loader2: ^2.1.0
+  graphql_data_loader2: ^3.0.0
 ```
 
 ## Usage
