@@ -1,34 +1,36 @@
 # Change Log
 
-## 2.1.2
+## 3.0.0
+
 * Fixed enum conversion
 * Implemented directives
 * Implemented jsonpath directive, example:
-```
-// you add the directive at the variable definition:
-mutation myQuery($createdId: Int! @jsonpath(path: "$.C0.create.id")) {
-  // this mutation will create some object and return the new id
-  C0: SomeNamespace {
-      create(name: "Some object") {
-        id
-      }
+
+  ```graphql
+  // you add the directive at the variable definition:
+  mutation myQuery($createdId: Int! @jsonpath(path: "$.C0.create.id")) {
+    // this mutation will create some object and return the new id
+    C0: SomeNamespace {
+        create(name: "Some object") {
+          id
+        }
+    }
+    // this mutation uses the generated $createdId from the json path directive
+    C1: OtherNamespace {
+        update(id: 123, relationshipId: $createdId) {
+          id
+        }
+    }
   }
-  // this mutation uses the generated $createdId from the json path directive
-  C1: OtherNamespace {
-      update(id: 123, relationshipId: $createdId) {
-        id
-      }
+  // you can optionally declare the variable
+  {
+    createdId: 0 // if the jsonpath directive can't resolve a value, 
+    // it will use this (0) instead
   }
-}
-// you can optionally declare the variable
-{
-  createdId: 0 // if the jsonpath directive can't resolve a value, 
-  // it will use this (0) instead
-}
-```
-* Added polymorphic names: you can add an alias to a type to use with `on` fragments.
-This is nice when you have a `__typename` that must be unique like `MyNestedType123` but 
-you would like to use a better name when on fragments: `...on MyType`  
+  ```
+
+* Added polymorphic names: you can add an alias to a type to use with `on` fragments. This is nice when you have a `__typename` that must be unique like `MyNestedType123` but you would like to use a better name when on fragments: `...on MyType`  
+* Updated to min SDK 2.15.x
 
 ## 2.1.1
 

@@ -1,8 +1,9 @@
 # Change Log
 
-## 2.1.1
+## 3.0.0
 
 * Implemented directives
+* Updated to min SDK 2.15.x
 
 ## 2.1.0
 

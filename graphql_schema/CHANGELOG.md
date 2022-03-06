@@ -1,9 +1,11 @@
 # Change Log
 
-## 2.1.2
+## 3.0.0
+
 * Implemented directives
 * Added polymorphic type names (basically type alias for polymorphism)
-
+* Updated to min SDK 2.15.x
+  
 ## 2.1.1
 
 * Fixed bug in enums

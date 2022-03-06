@@ -14,7 +14,7 @@ import 'package:source_gen/source_gen.dart';
 
 /// Generates GraphQL schemas, statically.
 Builder graphQLBuilder(_) {
-  return SharedPartBuilder([_GraphQLGenerator()], 'graphql_generator');
+  return SharedPartBuilder([_GraphQLGenerator()], 'graphql_generator2');
 }
 
 var _docComment = RegExp(r'^/// ', multiLine: true);
@@ -136,7 +136,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
           b
             ..name = ReCase(clazz.name).camelCase + 'GraphQLType'
             ..docs.add('/// Auto-generated from [${clazz.name}].')
-            ..style = TypeReference((b) => b
+            ..type = TypeReference((b) => b
               ..symbol = 'GraphQLEnumType'
               ..types.add(refer('String')))
             ..modifier = FieldModifier.final$
@@ -218,7 +218,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
 
             fields.add(refer('field').call([
               literalString(ctx.resolveFieldName(field.name)!),
-              type ??= _inferType(clazz.name, field.name, field.style)
+              type ??= _inferType(clazz.name, field.name, field.type)
             ], named));
           }
           named['fields'] = literalList(fields);
@@ -226,7 +226,8 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
           b
             ..name = ctx.modelClassNameRecase.camelCase + 'GraphQLType'
             ..docs.add('/// Auto-generated from [${ctx.modelClassName}].')
-            ..style = refer('GraphQLObjectType')
+            //..style = refer('GraphQLObjectType')
+            ..type = refer('GraphQLObjectType')
             ..modifier = FieldModifier.final$
             ..assignment = refer('objectType').call(args, named).code;
         }));
