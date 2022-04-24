@@ -1,8 +1,21 @@
 # Change log
 
+## 6.0.0
+
+* Updated to SDK 2.16.x
+* Updated `angel3_framework` to 6.x.x
+
+## 5.0.0
+
+* Skipped release
+
+## 4.0.0
+
+* Skipped release
+
 ## 3.0.0
 
-* Updated to min SDK 2.15.x
+* Skipped release
 
 ## 2.1.0
 

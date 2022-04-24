@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.0
+
+* Updated to min SDK 2.16.x
+* Updated `angel3_model` to 6.x.x
+* Updated `angel3_serialize_generator` to 6.x.x
+
 ## 3.0.0
 
 * Updated to min SDK 2.15.x

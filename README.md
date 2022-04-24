@@ -2,12 +2,11 @@
 
 [![Logo](./img/angel_logo.png)](https://github.com/dukefirehawk/graphql_dart)
 
-[![version](https://img.shields.io/badge/pub-v2.0.0-brightgreen)](https://pub.dartlang.org/packages/angel3_graphql)
+![Pub Version (including pre-releases)](https://img.shields.io/pub/v/angel3_graphql?include_prereleases)
 [![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angel_dart/discussion)
-
 [![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/graphql_dart/LICENSE)
-
+[![melos](https://img.shields.io/badge/maintained%20with-melos-f700ff.svg?style=flat-square)](https://github.com/invertase/melos)
 
 A complete implementation of the official [GraphQL specification](https://graphql.github.io/graphql-spec/June2018/), in the Dart programming language.
 
@@ -15,11 +14,10 @@ The goal of this project is to provide to an alternative to REST API's for serve
 
 Included is `angel3_graphql`, a plugin which integrates with [Angel3](https://github.com/dukefirehawk/angel) framework to allow developers to build backend services with GraphQL and virtually any supported database in Dart.
 
-## Tutorial Demo (click to watch)
-[![Youtube thumbnail](video.png)](https://youtu.be/5x6S4kDODa8)
-
 ## Projects
+
 This mono repo is split into several sub-projects, each with its own detailed documentation and examples:
+
 * `graphql_parser2`: A recursive descent parser for the GraphQL language.
 * `graphql_schema2`: An implementation of GraphQL's type system.
 * `graphql_generator2`: Generates `graphql_schema2` object types from concrete Dart classes.

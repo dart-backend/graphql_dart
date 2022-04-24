@@ -1,0 +1,12 @@
+name: angel3
+
+packages:
+  - graphql_schema/**
+  - graphql_parser/**
+  - graphql_generator/**
+  - graphql_server/**
+  - graphql_data_loader/**
+  - angel_graphql/**
+
+#scripts:
+#  analyze: melos exec -- "dart analyze ."
