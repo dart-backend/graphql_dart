@@ -21,13 +21,13 @@ dev_dependencies:
   file: ^6.1.1
   logging: ^1.0.1
   lints: ^1.0.0
-dependency_overrides:
-  graphql_server2:
-    path: ../graphql_server
-  graphql_parser2:
-    path: ../graphql_parser
-  graphql_schema2:
-    path: ../graphql_schema
+# dependency_overrides:
+#   graphql_server2:
+#     path: ../graphql_server
+#   graphql_parser2:
+#     path: ../graphql_parser
+#   graphql_schema2:
+#     path: ../graphql_schema
 
 
 
