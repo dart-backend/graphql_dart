@@ -5,8 +5,7 @@
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angel_dart/discussion)
 [![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/graphql_dart/blob/master/graphql_server/LICENSE)
 
-Base package for implementing GraphQL servers.
-You might prefer [`package:angel3_graphql`](https://pub.dev/packages/angel3_graphql), the fastest way to implement GraphQL backends in Dart.
+Base package for implementing GraphQL servers. You might prefer [`package:angel3_graphql`](https://pub.dev/packages/angel3_graphql), the fastest way to implement GraphQL backends in Dart.
 
 `package:graphql_server2` does not require any specific framework, and thus can be used in any Dart project.
 

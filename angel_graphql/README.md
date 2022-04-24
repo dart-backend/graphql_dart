@@ -21,13 +21,12 @@ The goal of this project is to provide to server-side users of Dart an alternati
 
 ## Installation
 
-To install `package:angel3_graphql`, add the following to your
-`pubspec.yaml`:
+To install `package:angel3_graphql`, add the following to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-    angel3_framework: ^4.1.0
-    angel3_graphql: ^2.1.0
+    angel3_framework: ^6.0.0
+    angel3_graphql: ^6.0.0
 ```
 
 ## Usage

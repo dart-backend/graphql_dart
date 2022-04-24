@@ -1,5 +1,10 @@
 # Change Log
 
+## 4.0.0
+
+* Updated to SDK 2.16.x
+* Updated `angel3_serialise` to 6.x.x
+
 ## 3.0.0
 
 * Fixed enum conversion
@@ -30,7 +35,7 @@
   ```
 
 * Added polymorphic names: you can add an alias to a type to use with `on` fragments. This is nice when you have a `__typename` that must be unique like `MyNestedType123` but you would like to use a better name when on fragments: `...on MyType`  
-* Updated to min SDK 2.15.x
+* Updated to SDK 2.15.x
 
 ## 2.1.1
 
