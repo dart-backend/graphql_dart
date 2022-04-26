@@ -172,7 +172,7 @@ RequestHandler graphQLHttp(GraphQL graphQL,
       return e.toJson();
     } catch (e, st) {
       if (req.app?.logger != null) {
-        req.app!.logger!.severe(
+        req.app!.logger.severe(
             'An error occurred while processing GraphQL query at ${req.uri}.',
             e,
             st);

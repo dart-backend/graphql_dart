@@ -1,5 +1,9 @@
 # Change log
 
+## 6.0.1
+
+* Fixed null warning for logger
+
 ## 6.0.0
 
 * Updated to SDK 2.16.x
