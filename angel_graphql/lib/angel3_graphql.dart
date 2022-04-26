@@ -29,9 +29,9 @@ class GraphQLUploadType extends GraphQLScalarType<UploadedFile, UploadedFile> {
 
   @override
   ValidationResult<UploadedFile> validate(String key, UploadedFile input) {
-    if (input is! UploadedFile) {
-      return _Vr(false, errors: ['Expected "$key" to be a boolean.']);
-    }
+    //if (input is! UploadedFile) {
+    //  return _Vr(false, errors: ['Expected "$key" to be a boolean.']);
+    //}
     return _Vr(true, value: input, errors: []);
   }
 }
