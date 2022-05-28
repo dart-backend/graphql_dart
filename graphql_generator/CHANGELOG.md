@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.1.0
+
+* Updated to `analyzer` 4.x.x
+
 ## 4.0.0
 
 * Updated to min SDK 2.16.x
