@@ -1,12 +1,17 @@
 # Change log
 
+## 7.0.0
+
+* Updated to min SDK 2.17.x
+* Updated `angel3_framework` to 7.x.x
+
 ## 6.0.1
 
 * Fixed null warning for logger
 
 ## 6.0.0
 
-* Updated to SDK 2.16.x
+* Updated to min SDK 2.16.x
 * Updated `angel3_framework` to 6.x.x
 
 ## 5.0.0

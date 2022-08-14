@@ -2,89 +2,113 @@
 # See https://dart.dev/tools/pub/glossary#lockfile
 packages:
   angel3_auth:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: angel3_auth
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "6.0.0"
+      path: "packages/auth"
+      ref: "feature/v7"
+      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
+      url: "https://github.com/dukefirehawk/angel.git"
+    source: git
+    version: "7.0.0"
   angel3_client:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: angel3_client
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "6.0.0"
+      path: "packages/client"
+      ref: "feature/v7"
+      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
+      url: "https://github.com/dukefirehawk/angel.git"
+    source: git
+    version: "7.0.0"
   angel3_container:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: angel3_container
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "6.0.0"
+      path: "packages/container/angel_container"
+      ref: "feature/v7"
+      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
+      url: "https://github.com/dukefirehawk/angel.git"
+    source: git
+    version: "7.0.0"
   angel3_file_service:
     dependency: "direct main"
     description:
-      name: angel3_file_service
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "6.0.0"
+      path: "packages/file_service"
+      ref: "feature/v7"
+      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
+      url: "https://github.com/dukefirehawk/angel.git"
+    source: git
+    version: "7.0.0"
   angel3_framework:
     dependency: "direct main"
     description:
-      name: angel3_framework
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "6.0.0"
+      path: "packages/framework"
+      ref: "feature/v7"
+      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
+      url: "https://github.com/dukefirehawk/angel.git"
+    source: git
+    version: "7.0.0"
   angel3_http_exception:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: angel3_http_exception
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "6.0.1"
+      path: "packages/http_exception"
+      ref: "feature/v7"
+      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
+      url: "https://github.com/dukefirehawk/angel.git"
+    source: git
+    version: "7.0.0"
   angel3_mock_request:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: angel3_mock_request
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "6.0.0"
+      path: "packages/mock_request"
+      ref: "feature/v7"
+      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
+      url: "https://github.com/dukefirehawk/angel.git"
+    source: git
+    version: "7.0.0"
   angel3_model:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: angel3_model
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "6.0.0"
+      path: "packages/model"
+      ref: "feature/v7"
+      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
+      url: "https://github.com/dukefirehawk/angel.git"
+    source: git
+    version: "7.0.0"
   angel3_route:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: angel3_route
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "6.0.0"
+      path: "packages/route"
+      ref: "feature/v7"
+      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
+      url: "https://github.com/dukefirehawk/angel.git"
+    source: git
+    version: "7.0.0"
   angel3_serialize:
     dependency: "direct dev"
     description:
-      name: angel3_serialize
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "6.0.0"
+      path: "packages/serialize/angel_serialize"
+      ref: "feature/v7"
+      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
+      url: "https://github.com/dukefirehawk/angel.git"
+    source: git
+    version: "7.0.0"
   angel3_validate:
     dependency: "direct main"
     description:
-      name: angel3_validate
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "6.0.0"
+      path: "packages/validate"
+      ref: "feature/v7"
+      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
+      url: "https://github.com/dukefirehawk/angel.git"
+    source: git
+    version: "7.0.0"
   angel3_websocket:
     dependency: "direct main"
     description:
-      name: angel3_websocket
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "6.0.0"
+      path: "packages/websocket"
+      ref: "feature/v7"
+      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
+      url: "https://github.com/dukefirehawk/angel.git"
+    source: git
+    version: "7.0.0"
   async:
     dependency: transitive
     description:
@@ -98,35 +122,35 @@ packages:
       name: belatuk_code_buffer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.2"
+    version: "4.0.0"
   belatuk_combinator:
     dependency: transitive
     description:
       name: belatuk_combinator
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.1"
+    version: "4.0.0"
   belatuk_http_server:
     dependency: transitive
     description:
       name: belatuk_http_server
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.0"
+    version: "3.0.0"
   belatuk_json_serializer:
     dependency: transitive
     description:
       name: belatuk_json_serializer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.0.0"
+    version: "6.0.1"
   belatuk_merge_map:
     dependency: transitive
     description:
       name: belatuk_merge_map
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.2"
+    version: "4.0.0"
   charcode:
     dependency: transitive
     description:
@@ -158,31 +182,31 @@ packages:
   graphql_parser2:
     dependency: "direct main"
     description:
-      name: graphql_parser2
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.0.0"
+      path: "../graphql_parser"
+      relative: true
+    source: path
+    version: "5.0.0"
   graphql_schema2:
     dependency: "direct main"
     description:
-      name: graphql_schema2
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.0.0"
+      path: "../graphql_schema"
+      relative: true
+    source: path
+    version: "5.0.0"
   graphql_server2:
     dependency: "direct main"
     description:
-      name: graphql_server2
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.0.0"
+      path: "../graphql_server"
+      relative: true
+    source: path
+    version: "5.0.0"
   http:
     dependency: transitive
     description:
       name: http
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.13.4"
+    version: "0.13.5"
   http2:
     dependency: transitive
     description:
@@ -203,7 +227,7 @@ packages:
       name: lints
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.1"
+    version: "2.0.0"
   logging:
     dependency: "direct dev"
     description:
@@ -217,7 +241,7 @@ packages:
       name: matcher
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.12.11"
+    version: "0.12.12"
   meta:
     dependency: transitive
     description:
@@ -245,7 +269,7 @@ packages:
       name: pool
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.5.0"
+    version: "1.5.1"
   quiver:
     dependency: transitive
     description:
@@ -266,7 +290,7 @@ packages:
       name: source_span
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.9.0"
+    version: "1.9.1"
   stack_trace:
     dependency: transitive
     description:
@@ -294,7 +318,7 @@ packages:
       name: term_glyph
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.2.0"
+    version: "1.2.1"
   tuple:
     dependency: transitive
     description:
@@ -324,4 +348,4 @@ packages:
     source: hosted
     version: "2.2.0"
 sdks:
-  dart: ">=2.16.0 <3.0.0"
+  dart: ">=2.17.0 <3.0.0"
