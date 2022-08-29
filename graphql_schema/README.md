@@ -4,6 +4,7 @@
 [![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angel_dart/discussion)
 [![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/graphql_dart/blob/master/graphql_schema/LICENSE)
+[![melos](https://img.shields.io/badge/maintained%20with-melos-f700ff.svg?style=flat-square)](https://github.com/invertase/melos)
 
 An implementation of GraphQL's type system in Dart. Supports any platform where Dart runs. The decisions made in the design of this library were done to make the experience as similar to the JavaScript reference implementation as possible, and to also correctly implement the official specification.
 

@@ -21,11 +21,11 @@ dev_dependencies:
   lints: ^2.0.0
   test: ^1.21.0
 
-dependency_overrides:
-  graphql_parser2:
-    path: ../graphql_parser
-  graphql_schema2:
-    path: ../graphql_schema
+# dependency_overrides:
+#   graphql_parser2:
+#     path: ../graphql_parser
+#   graphql_schema2:
+#     path: ../graphql_schema
   # angel3_serialize:
   #   git: 
   #     url: https://github.com/dukefirehawk/angel.git

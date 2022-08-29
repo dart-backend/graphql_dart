@@ -91,7 +91,7 @@ packages:
       name: file
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.1.2"
+    version: "6.1.4"
   frontend_server_client:
     dependency: transitive
     description:
@@ -109,16 +109,16 @@ packages:
   graphql_parser2:
     dependency: "direct main"
     description:
-      path: "../graphql_parser"
-      relative: true
-    source: path
+      name: graphql_parser2
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "5.0.0"
   graphql_schema2:
     dependency: "direct main"
     description:
-      path: "../graphql_schema"
-      relative: true
-    source: path
+      name: graphql_schema2
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "5.0.0"
   http_multi_server:
     dependency: transitive

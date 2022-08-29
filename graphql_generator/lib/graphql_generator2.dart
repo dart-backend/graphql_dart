@@ -26,7 +26,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
   Future<String> generateForAnnotatedElement(
       Element element, ConstantReader annotation, BuildStep buildStep) async {
     if (element is ClassElement) {
-      var ctx = element.isEnum
+      var ctx = element is EnumElement
           ? null
           : await buildContext(
               element,
@@ -49,7 +49,9 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
     InterfaceType? search = clazz;
 
     while (search != null) {
-      if (_graphQLClassTypeChecker.hasAnnotationOf(search.element)) return true;
+      if (_graphQLClassTypeChecker.hasAnnotationOf(search.element2)) {
+        return true;
+      }
       search = search.superclass;
     }
 
@@ -60,7 +62,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
     // Firstly, check if it's a GraphQL class.
     if (type is InterfaceType && _isGraphQLClass(type)) {
       var c = type;
-      var name = serializableTypeChecker.hasAnnotationOf(c.element) &&
+      var name = serializableTypeChecker.hasAnnotationOf(c.element2) &&
               c.getDisplayString(withNullability: false).startsWith('_')
           ? c.getDisplayString(withNullability: false).substring(1)
           : c.getDisplayString(withNullability: false);
@@ -123,7 +125,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
     return Library((b) {
       // Generate a top-level xGraphQLType object
 
-      if (clazz.isEnum) {
+      if (clazz is EnumElement) {
         b.body.add(Field((b) {
           // enumTypeFromStrings(String name, List<String> values, {String description}
           var args = <Expression>[literalString(clazz.name)];
@@ -134,7 +136,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
           args.add(literalConstList(values.map(literalString).toList()));
 
           b
-            ..name = ReCase(clazz.name).camelCase + 'GraphQLType'
+            ..name = '${ReCase(clazz.name).camelCase}GraphQLType'
             ..docs.add('/// Auto-generated from [${clazz.name}].')
             ..type = TypeReference((b) => b
               ..symbol = 'GraphQLEnumType'
@@ -154,7 +156,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
 
           // Add interfaces
           var interfaces = clazz.interfaces.where(_isGraphQLClass).map((c) {
-            var name = serializableTypeChecker.hasAnnotationOf(c.element) &&
+            var name = serializableTypeChecker.hasAnnotationOf(c.element2) &&
                     c.getDisplayString(withNullability: false).startsWith('_')
                 ? c.getDisplayString(withNullability: false).substring(1)
                 : c.getDisplayString(withNullability: false);
@@ -171,7 +173,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
           InterfaceType? search = clazz.thisType; //.type;
           while (search != null &&
               !TypeChecker.fromRuntime(Object).isExactlyType(search)) {
-            for (var field in search.element.fields) {
+            for (var field in search.element2.fields) {
               if (!ctxFields.any((f) => f.name == field.name)) {
                 ctxFields.add(field);
               }
@@ -224,7 +226,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
           named['fields'] = literalList(fields);
 
           b
-            ..name = ctx.modelClassNameRecase.camelCase + 'GraphQLType'
+            ..name = '${ctx.modelClassNameRecase.camelCase}GraphQLType'
             ..docs.add('/// Auto-generated from [${ctx.modelClassName}].')
             //..style = refer('GraphQLObjectType')
             ..type = refer('GraphQLObjectType')

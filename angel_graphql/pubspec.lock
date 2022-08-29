@@ -158,23 +158,23 @@ packages:
   graphql_parser2:
     dependency: "direct main"
     description:
-      path: "../graphql_parser"
-      relative: true
-    source: path
+      name: graphql_parser2
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "5.0.0"
   graphql_schema2:
     dependency: "direct main"
     description:
-      path: "../graphql_schema"
-      relative: true
-    source: path
+      name: graphql_schema2
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "5.0.0"
   graphql_server2:
     dependency: "direct main"
     description:
-      path: "../graphql_server"
-      relative: true
-    source: path
+      name: graphql_server2
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "5.0.0"
   http:
     dependency: transitive

@@ -86,4 +86,7 @@ class GraphQLUnionType
       other.description == description &&
       const ListEquality<GraphQLObjectType>()
           .equals(other.possibleTypes, possibleTypes);
+
+  @override
+  int get hashCode => hash3(name, description, possibleTypes);
 }

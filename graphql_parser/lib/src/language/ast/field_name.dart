@@ -16,7 +16,7 @@ class FieldNameContext extends Node {
   }
 
   /// Use [nameToken] instead.
-  @deprecated
+  @Deprecated("Use [nameToken]")
   Token? get NAME => nameToken;
 
   /// The [String] value of the [nameToken], if any.

@@ -110,6 +110,9 @@ class GraphQLListType<Value, Serialized>
   bool operator ==(other) => other is GraphQLListType && other.ofType == ofType;
 
   @override
+  int get hashCode => ofType.hashCode;
+
+  @override
   GraphQLType<List<Value>, List<Serialized>> coerceToInputObject() =>
       GraphQLListType<Value, Serialized>(ofType.coerceToInputObject());
 }
@@ -169,6 +172,9 @@ class GraphQLNonNullableType<Value, Serialized>
   @override
   bool operator ==(other) =>
       other is GraphQLNonNullableType && other.ofType == ofType;
+
+  @override
+  int get hashCode => ofType.hashCode;
 
   @override
   GraphQLType<Value, Serialized> coerceToInputObject() {

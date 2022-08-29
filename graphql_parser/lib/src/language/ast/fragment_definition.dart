@@ -26,15 +26,15 @@ class FragmentDefinitionContext extends ExecutableDefinitionContext {
       this.typeCondition, this.selectionSet);
 
   /// Use [fragmentToken] instead.
-  @deprecated
+  @Deprecated("Use [fragmentToken]")
   Token? get FRAGMENT => fragmentToken;
 
   /// Use [nameToken] instead.
-  @deprecated
+  @Deprecated("Use [nameToken]")
   Token? get NAME => nameToken;
 
   /// Use [onToken] instead.
-  @deprecated
+  @Deprecated("Use [onToken]")
   Token? get ON => onToken;
 
   @override

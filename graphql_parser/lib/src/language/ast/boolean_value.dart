@@ -4,7 +4,7 @@ import '../token.dart';
 
 /// A GraphQL boolean value literal.
 class BooleanValueContext extends InputValueContext<bool> {
-  bool _valueCache = false;
+  bool localValueCache = false;
 
   /// The source token.
   final Token booleanToken;
@@ -14,10 +14,10 @@ class BooleanValueContext extends InputValueContext<bool> {
   }
 
   /// The [bool] value of this literal.
-  bool get booleanValue => _valueCache = booleanToken.text == 'true';
+  bool get booleanValue => localValueCache = booleanToken.text == 'true';
 
   /// Use [booleanToken] instead.
-  @deprecated
+  @Deprecated("Use [boolenToken]")
   Token get BOOLEAN => booleanToken;
 
   @override

@@ -70,7 +70,7 @@ packages:
       name: file
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.1.2"
+    version: "6.1.4"
   frontend_server_client:
     dependency: transitive
     description:
@@ -88,9 +88,9 @@ packages:
   graphql_schema2:
     dependency: "direct dev"
     description:
-      path: "../graphql_schema"
-      relative: true
-    source: path
+      name: graphql_schema2
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "5.0.0"
   http_multi_server:
     dependency: transitive
@@ -190,6 +190,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.1"
+  quiver:
+    dependency: transitive
+    description:
+      name: quiver
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.1.0"
   shelf:
     dependency: transitive
     description:

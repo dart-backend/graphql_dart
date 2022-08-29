@@ -112,7 +112,7 @@ packages:
       name: built_value
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "8.4.0"
+    version: "8.4.1"
   charcode:
     dependency: transitive
     description:
@@ -168,7 +168,7 @@ packages:
       name: file
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.1.2"
+    version: "6.1.4"
   fixnum:
     dependency: transitive
     description:
@@ -193,9 +193,9 @@ packages:
   graphql_schema2:
     dependency: "direct main"
     description:
-      path: "../graphql_schema"
-      relative: true
-    source: path
+      name: graphql_schema2
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "5.0.0"
   graphs:
     dependency: transitive
@@ -308,7 +308,7 @@ packages:
       name: pubspec_parse
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.2.0"
+    version: "1.2.1"
   quiver:
     dependency: transitive
     description:

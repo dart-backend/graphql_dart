@@ -10,9 +10,9 @@ dependencies:
   angel3_framework: ^7.0.0
   angel3_websocket: ^7.0.0
   angel3_validate: ^7.0.0
-  graphql_parser2: ^4.0.0
-  graphql_schema2: ^4.0.0
-  graphql_server2: ^4.0.0
+  graphql_parser2: ^5.0.0
+  graphql_schema2: ^5.0.0
+  graphql_server2: ^5.0.0
   http_parser: ^4.0.0
   web_socket_channel: ^2.1.0
   collection: ^1.16.0
@@ -21,13 +21,13 @@ dev_dependencies:
   file: ^6.1.1
   logging: ^1.0.1
   lints: ^2.0.0
-dependency_overrides:
-  graphql_server2:
-    path: ../graphql_server
-  graphql_parser2:
-    path: ../graphql_parser
-  graphql_schema2:
-    path: ../graphql_schema
+# dependency_overrides:
+#   graphql_server2:
+#     path: ../graphql_server
+#   graphql_parser2:
+#     path: ../graphql_parser
+#   graphql_schema2:
+#     path: ../graphql_schema
   # angel3_serialize:
   #   git: 
   #     url: https://github.com/dukefirehawk/angel.git
