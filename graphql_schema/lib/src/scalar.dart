@@ -1,25 +1,25 @@
 part of graphql_schema.src.schema;
 
 /// `true` or `false`.
-final GraphQLScalarType<bool, bool> graphQLBoolean = _GraphQLBoolType();
+final GraphQLScalarType<bool, bool> graphQLBoolean = GraphQLBoolType();
 
 /// A UTF‐8 character sequence.
-final GraphQLScalarType<String, String> graphQLString = _GraphQLStringType();
+final GraphQLScalarType<String, String> graphQLString = GraphQLStringType();
 
 /// The ID scalar type represents a unique identifier, often used to re-fetch an object or as the key for a cache.
 ///
 /// The ID type is serialized in the same way as a String; however, defining it as an ID signifies that it is not intended to be human‐readable.
 final GraphQLScalarType<String, String> graphQLId =
-    _GraphQLStringType(name: 'ID');
+    GraphQLStringType(name: 'ID');
 
 final graphQLNonEmptyString =
     GraphQLStringMinType(1, description: 'Non empty String');
 
-_GraphQLStringType graphQLStringMin(int min) => GraphQLStringMinType(min);
+GraphQLStringType graphQLStringMin(int min) => GraphQLStringMinType(min);
 
-_GraphQLStringType graphQLStringMax(int max) => GraphQLStringMaxType(max);
+GraphQLStringType graphQLStringMax(int max) => GraphQLStringMaxType(max);
 
-_GraphQLStringType graphQLStringRange(int min, int max) =>
+GraphQLStringType graphQLStringRange(int min, int max) =>
     GraphQLStringRangeType(min, max);
 
 /// A [DateTime], serialized as an ISO-8601 string..
@@ -59,7 +59,7 @@ abstract class GraphQLScalarType<Value, Serialized>
   Type get valueType => Value;
 }
 
-class _GraphQLBoolType extends GraphQLScalarType<bool, bool> {
+class GraphQLBoolType extends GraphQLScalarType<bool, bool> {
   @override
   bool serialize(bool value) {
     return value;
@@ -180,8 +180,8 @@ class GraphQLNumRangedType<T extends num> extends GraphQLNumType<T> {
   }
 }
 
-class _GraphQLStringType extends GraphQLScalarType<String, String> {
-  _GraphQLStringType(
+class GraphQLStringType extends GraphQLScalarType<String, String> {
+  GraphQLStringType(
       {this.name = 'String', this.description = 'A character sequence.'});
 
   @override
@@ -205,7 +205,7 @@ class _GraphQLStringType extends GraphQLScalarType<String, String> {
   GraphQLType<String, String> coerceToInputObject() => this;
 }
 
-class GraphQLStringMinType extends _GraphQLStringType {
+class GraphQLStringMinType extends GraphQLStringType {
   GraphQLStringMinType(this.min, {String? description, String name = 'String'})
       : super(
             name: name,
@@ -227,7 +227,7 @@ class GraphQLStringMinType extends _GraphQLStringType {
   }
 }
 
-class GraphQLStringMaxType extends _GraphQLStringType {
+class GraphQLStringMaxType extends GraphQLStringType {
   GraphQLStringMaxType(this.max, {String? description, String name = 'String'})
       : super(
             name: name,
@@ -248,7 +248,7 @@ class GraphQLStringMaxType extends _GraphQLStringType {
   }
 }
 
-class GraphQLStringRangeType extends _GraphQLStringType {
+class GraphQLStringRangeType extends GraphQLStringType {
   GraphQLStringRangeType(this.min, this.max,
       {String? description, String name = 'String'})
       : super(

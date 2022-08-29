@@ -65,9 +65,9 @@ class GraphQLObjectType
 
   @override
   ValidationResult<Map<String, dynamic>> validate(String key, Map input) {
-    if (input is! Map) {
-      return ValidationResult._failure(['Expected "$key" to be a Map.']);
-    }
+    //if (input is! Map) {
+    //  return ValidationResult._failure(['Expected "$key" to be a Map.']);
+    //}
 
     if (isInterface) {
       var errors = <String>[];
@@ -97,7 +97,7 @@ class GraphQLObjectType
       }
     }
 
-    input.keys.forEach((k) {
+    for (var k in input.keys) {
       var field = fields.firstWhereOrNull((f) => f.name == k);
 
       if (field == null) {
@@ -113,7 +113,7 @@ class GraphQLObjectType
           out[k] = v;
         }
       }
-    });
+    }
 
     if (errors.isNotEmpty) {
       return ValidationResult._failure(errors);
@@ -135,13 +135,13 @@ class GraphQLObjectType
   }
 
   @override
-  Map<String, dynamic> deserialize(Map value) {
-    return value.keys.fold<Map<String, dynamic>>({}, (out, k) {
+  Map<String, dynamic> deserialize(Map serialized) {
+    return serialized.keys.fold<Map<String, dynamic>>({}, (out, k) {
       var field = fields.firstWhereOrNull((f) => f.name == k);
       if (field == null) {
         throw UnsupportedError('Unexpected field "$k" encountered in map.');
       }
-      return out..[k.toString()] = field.deserialize(value[k]);
+      return out..[k.toString()] = field.deserialize(serialized[k]);
     });
   }
 
@@ -170,6 +170,9 @@ class GraphQLObjectType
         const ListEquality<GraphQLObjectType>()
             .equals(other.possibleTypes, possibleTypes);
   }
+
+  @override
+  int get hashCode => hash4(name, name, isInterface, fields);
 }
 
 Map<String, dynamic> _foldToStringDynamic(Map map) {
@@ -225,9 +228,9 @@ class GraphQLInputObjectType
 
   @override
   ValidationResult<Map<String, dynamic>> validate(String key, Map input) {
-    if (input is! Map) {
-      return ValidationResult._failure(['Expected "$key" to be a Map.']);
-    }
+    //if (input is! Map) {
+    //  return ValidationResult._failure(['Expected "$key" to be a Map.']);
+    //}
 
     var out = {};
     var errors = <String>[];
@@ -241,7 +244,7 @@ class GraphQLInputObjectType
       }
     }
 
-    input.keys.forEach((k) {
+    for (var k in input.keys) {
       var field = inputFields.firstWhereOrNull((f) => f.name == k);
 
       if (field == null) {
@@ -257,7 +260,7 @@ class GraphQLInputObjectType
           out[k] = v;
         }
       }
-    });
+    }
 
     if (errors.isNotEmpty) {
       return ValidationResult._failure(errors);
@@ -279,13 +282,13 @@ class GraphQLInputObjectType
   }
 
   @override
-  Map<String, dynamic> deserialize(Map value) {
-    return value.keys.fold<Map<String, dynamic>>({}, (out, k) {
+  Map<String, dynamic> deserialize(Map serialized) {
+    return serialized.keys.fold<Map<String, dynamic>>({}, (out, k) {
       var field = inputFields.firstWhereOrNull((f) => f.name == k);
       if (field == null) {
         throw UnsupportedError('Unexpected field "$k" encountered in map.');
       }
-      return out..[k.toString()] = field.type.deserialize(value[k]);
+      return out..[k.toString()] = field.type.deserialize(serialized[k]);
     });
   }
 
@@ -297,6 +300,9 @@ class GraphQLInputObjectType
         const ListEquality<GraphQLInputObjectField>()
             .equals(other.inputFields, inputFields);
   }
+
+  @override
+  int get hashCode => hash4(name, name, description, inputFields);
 
   @override
   GraphQLType<Map<String, dynamic>, Map<String, dynamic>>
@@ -327,4 +333,7 @@ class GraphQLInputObjectField<Value, Serialized> {
       other.type == type &&
       other.description == description &&
       other.defaultValue == defaultValue;
+
+  @override
+  int get hashCode => hash4(name, type, description, defaultValue);
 }

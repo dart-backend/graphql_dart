@@ -49,4 +49,7 @@ class GraphQLFieldInput<Value, Serialized> {
       other.defaultValue == other.defaultValue &&
       other.defaultsToNull == defaultsToNull &&
       other.description == description;
+
+  @override
+  int get hashCode => hash4(name, type, description, defaultValue);
 }

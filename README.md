@@ -24,3 +24,7 @@ This mono repo is split into several sub-projects, each with its own detailed do
 * `graphql_data_loader2` - A Dart port of [`graphql/dataloader`](https://github.com/graphql/dataloader).
 * `graphql_server2`: Base functionality for implementing GraphQL servers in Dart. Has no dependency on any framework except `graphql_parser2` and `graphql_schema2` packages.
 * `angel3_graphql` - An implementation of `graphql_server2` in handling GraphQL via HTTP and WebSockets for [Angel3](https://github.com/dukefirehawk/angel) framework.
+
+## Donation & Support
+
+If you like this project and interested in supporting its development, you can make a donation via [paypal](https://paypal.me/dukefirehawk?country.x=MY&locale.x=en_US) service.

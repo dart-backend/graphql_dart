@@ -1,34 +1,90 @@
 name: angel3_graphql
-version: 6.0.1
+version: 7.0.0
 description: The fastest and easiest way to get a GraphQL backend in Dart, using Angel3.
 homepage: https://angel3-framework.web.app/
 repository: https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql
 environment:
-  sdk: '>=2.16.0 <3.0.0'
+  sdk: '>=2.17.0 <3.0.0'
 dependencies:
-  angel3_file_service: ^6.0.0
-  angel3_framework: ^6.0.0
-  angel3_websocket: ^6.0.0
-  angel3_validate: ^6.0.0
+  angel3_file_service: ^7.0.0
+  angel3_framework: ^7.0.0
+  angel3_websocket: ^7.0.0
+  angel3_validate: ^7.0.0
   graphql_parser2: ^4.0.0
   graphql_schema2: ^4.0.0
   graphql_server2: ^4.0.0
   http_parser: ^4.0.0
   web_socket_channel: ^2.1.0
-  collection: ^1.15.0
+  collection: ^1.16.0
 dev_dependencies:
-  angel3_serialize: ^6.0.0
+  angel3_serialize: ^7.0.0
   file: ^6.1.1
   logging: ^1.0.1
-  lints: ^1.0.0
-# dependency_overrides:
-#   graphql_server2:
-#     path: ../graphql_server
-#   graphql_parser2:
-#     path: ../graphql_parser
-#   graphql_schema2:
-#     path: ../graphql_schema
-
-
-
- 
+  lints: ^2.0.0
+dependency_overrides:
+  graphql_server2:
+    path: ../graphql_server
+  graphql_parser2:
+    path: ../graphql_parser
+  graphql_schema2:
+    path: ../graphql_schema
+  # angel3_serialize:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/serialize/angel_serialize
+  # angel3_model:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/model
+  # angel3_validate:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/validate
+  # angel3_websocket:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/websocket
+  # angel3_file_service:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/file_service
+  # angel3_framework:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/framework
+  # angel3_route:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/route
+  # angel3_mock_request:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/mock_request
+  # angel3_http_exception:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/http_exception
+  # angel3_container:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/container/angel_container
+  # angel3_client:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/client
+  # angel3_auth:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/auth

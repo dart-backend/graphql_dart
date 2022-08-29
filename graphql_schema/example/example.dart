@@ -30,7 +30,9 @@ void main() {
     print('This is valid data!!!');
   } else {
     print('Invalid data.');
-    validation.errors.forEach((s) => print('  * $s'));
+    for (var s in validation.errors) {
+      print('  * $s');
+    }
   }
 
   // Serialization

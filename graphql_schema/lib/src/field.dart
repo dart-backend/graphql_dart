@@ -60,4 +60,7 @@ class GraphQLObjectField<Value, Serialized> {
       other.type == type &&
       other.resolve == resolve &&
       const ListEquality<GraphQLFieldInput>().equals(other.inputs, inputs);
+
+  @override
+  int get hashCode => hash4(name, deprecationReason, type, resolve);
 }
