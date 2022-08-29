@@ -28,75 +28,63 @@ dependency_overrides:
     path: ../graphql_parser
   graphql_schema2:
     path: ../graphql_schema
-  angel3_serialize:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: feature/v7
-      path: packages/serialize/angel_serialize
-  angel3_model:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: feature/v7
-      path: packages/model
-  angel3_validate:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: feature/v7
-      path: packages/validate
-  angel3_websocket:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: feature/v7
-      path: packages/websocket
-  angel3_file_service:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: feature/v7
-      path: packages/file_service
-  angel3_framework:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: feature/v7
-      path: packages/framework
-  angel3_route:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: feature/v7
-      path: packages/route
-  angel3_mock_request:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: feature/v7
-      path: packages/mock_request
-  angel3_http_exception:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: feature/v7
-      path: packages/http_exception
-  angel3_container:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: feature/v7
-      path: packages/container/angel_container
-  angel3_client:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: feature/v7
-      path: packages/client
-  angel3_auth:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: feature/v7
-      path: packages/auth
-
-
-
-
-
-
-
-
-
-
-
- 
+  # angel3_serialize:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/serialize/angel_serialize
+  # angel3_model:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/model
+  # angel3_validate:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/validate
+  # angel3_websocket:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/websocket
+  # angel3_file_service:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/file_service
+  # angel3_framework:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/framework
+  # angel3_route:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/route
+  # angel3_mock_request:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/mock_request
+  # angel3_http_exception:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/http_exception
+  # angel3_container:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/container/angel_container
+  # angel3_client:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/client
+  # angel3_auth:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/auth

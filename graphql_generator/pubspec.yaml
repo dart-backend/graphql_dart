@@ -22,19 +22,19 @@ dev_dependencies:
 dependency_overrides:
   graphql_schema2:
     path: ../graphql_schema
-  angel3_serialize:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: feature/v7
-      path: packages/serialize/angel_serialize
-  angel3_serialize_generator:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: feature/v7
-      path: packages/serialize/angel_serialize_generator
-  angel3_model:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: feature/v7
-      path: packages/model
+  # angel3_serialize:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/serialize/angel_serialize
+  # angel3_serialize_generator:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/serialize/angel_serialize_generator
+  # angel3_model:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/model
 

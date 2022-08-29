@@ -9,8 +9,8 @@ environment:
 
 dependencies:
   angel3_serialize: ^7.0.0
-  graphql_schema2: ^4.0.0
-  graphql_parser2: ^4.0.0
+  graphql_schema2: ^5.0.0
+  graphql_parser2: ^5.0.0
   collection: ^1.16.0
   meta: ^1.4.0
   recase: ^4.0.0
@@ -26,13 +26,13 @@ dependency_overrides:
     path: ../graphql_parser
   graphql_schema2:
     path: ../graphql_schema
-  angel3_serialize:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: feature/v7
-      path: packages/serialize/angel_serialize
-  angel3_model:
-    git: 
-      url: https://github.com/dukefirehawk/angel.git
-      ref: feature/v7
-      path: packages/model
+  # angel3_serialize:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/serialize/angel_serialize
+  # angel3_model:
+  #   git: 
+  #     url: https://github.com/dukefirehawk/angel.git
+  #     ref: feature/v7
+  #     path: packages/model

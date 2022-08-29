@@ -18,29 +18,23 @@ packages:
   angel3_model:
     dependency: "direct main"
     description:
-      path: "packages/model"
-      ref: "feature/v7"
-      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
-      url: "https://github.com/dukefirehawk/angel.git"
-    source: git
+      name: angel3_model
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "7.0.0"
   angel3_serialize:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "packages/serialize/angel_serialize"
-      ref: "feature/v7"
-      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
-      url: "https://github.com/dukefirehawk/angel.git"
-    source: git
+      name: angel3_serialize
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "7.0.0"
   angel3_serialize_generator:
     dependency: "direct main"
     description:
-      path: "packages/serialize/angel_serialize_generator"
-      ref: "feature/v7"
-      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
-      url: "https://github.com/dukefirehawk/angel.git"
-    source: git
+      name: angel3_serialize_generator
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "7.0.0"
   args:
     dependency: transitive

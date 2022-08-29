@@ -1,12 +1,16 @@
 # Change Log
 
+## 5.0.0
+
+* Require dart >= 2.17.x
+
 ## 4.1.0
 
 * Updated to `analyzer` 4.x.x
 
 ## 4.0.0
 
-* Updated to min SDK 2.16.x
+* Require dart >= 2.16.x
 * Updated `angel3_model` to 6.x.x
 * Updated `angel3_serialize_generator` to 6.x.x
 

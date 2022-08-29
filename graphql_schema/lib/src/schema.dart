@@ -3,9 +3,8 @@ library graphql_schema.src.schema;
 import 'dart:async';
 
 import 'package:collection/collection.dart';
-//import 'package:meta/meta.dart';
+import 'package:quiver/core.dart';
 import 'package:source_span/source_span.dart';
-import 'package:collection/collection.dart' show IterableExtension;
 
 part 'argument.dart';
 

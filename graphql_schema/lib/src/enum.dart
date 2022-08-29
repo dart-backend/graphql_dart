@@ -81,6 +81,9 @@ class GraphQLEnumType<Value> extends GraphQLScalarType<Value, String>
       const ListEquality<GraphQLEnumValue>().equals(other.values, values);
 
   @override
+  int get hashCode => hash3(name, description, values);
+
+  @override
   GraphQLType<Value, String> coerceToInputObject() => this;
 }
 
@@ -113,4 +116,7 @@ class GraphQLEnumValue<Value> {
       other.value == value &&
       other.description == description &&
       other.deprecationReason == deprecationReason;
+
+  @override
+  int get hashCode => hash4(name, value, description, deprecationReason);
 }

@@ -1,8 +1,12 @@
 # Change Log
 
+## 5.0.0
+
+* Require dart >=  2.17.x
+
 ## 4.0.0
 
-* Updated to SDK 2.16.x
+* Require dart >= 2.16.x
 
 ## 3.0.0
 

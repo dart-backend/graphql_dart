@@ -2,112 +2,88 @@
 # See https://dart.dev/tools/pub/glossary#lockfile
 packages:
   angel3_auth:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "packages/auth"
-      ref: "feature/v7"
-      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
-      url: "https://github.com/dukefirehawk/angel.git"
-    source: git
+      name: angel3_auth
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "7.0.0"
   angel3_client:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "packages/client"
-      ref: "feature/v7"
-      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
-      url: "https://github.com/dukefirehawk/angel.git"
-    source: git
+      name: angel3_client
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "7.0.0"
   angel3_container:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "packages/container/angel_container"
-      ref: "feature/v7"
-      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
-      url: "https://github.com/dukefirehawk/angel.git"
-    source: git
+      name: angel3_container
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "7.0.0"
   angel3_file_service:
     dependency: "direct main"
     description:
-      path: "packages/file_service"
-      ref: "feature/v7"
-      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
-      url: "https://github.com/dukefirehawk/angel.git"
-    source: git
+      name: angel3_file_service
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "7.0.0"
   angel3_framework:
     dependency: "direct main"
     description:
-      path: "packages/framework"
-      ref: "feature/v7"
-      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
-      url: "https://github.com/dukefirehawk/angel.git"
-    source: git
+      name: angel3_framework
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "7.0.0"
   angel3_http_exception:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "packages/http_exception"
-      ref: "feature/v7"
-      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
-      url: "https://github.com/dukefirehawk/angel.git"
-    source: git
+      name: angel3_http_exception
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "7.0.0"
   angel3_mock_request:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "packages/mock_request"
-      ref: "feature/v7"
-      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
-      url: "https://github.com/dukefirehawk/angel.git"
-    source: git
+      name: angel3_mock_request
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "7.0.0"
   angel3_model:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "packages/model"
-      ref: "feature/v7"
-      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
-      url: "https://github.com/dukefirehawk/angel.git"
-    source: git
+      name: angel3_model
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "7.0.0"
   angel3_route:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "packages/route"
-      ref: "feature/v7"
-      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
-      url: "https://github.com/dukefirehawk/angel.git"
-    source: git
+      name: angel3_route
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "7.0.0"
   angel3_serialize:
     dependency: "direct dev"
     description:
-      path: "packages/serialize/angel_serialize"
-      ref: "feature/v7"
-      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
-      url: "https://github.com/dukefirehawk/angel.git"
-    source: git
+      name: angel3_serialize
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "7.0.0"
   angel3_validate:
     dependency: "direct main"
     description:
-      path: "packages/validate"
-      ref: "feature/v7"
-      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
-      url: "https://github.com/dukefirehawk/angel.git"
-    source: git
+      name: angel3_validate
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "7.0.0"
   angel3_websocket:
     dependency: "direct main"
     description:
-      path: "packages/websocket"
-      ref: "feature/v7"
-      resolved-ref: "3f4ff925dcacb045792d474462a4f174b79fbe3c"
-      url: "https://github.com/dukefirehawk/angel.git"
-    source: git
+      name: angel3_websocket
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "7.0.0"
   async:
     dependency: transitive
@@ -178,7 +154,7 @@ packages:
       name: file
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.1.2"
+    version: "6.1.4"
   graphql_parser2:
     dependency: "direct main"
     description:
