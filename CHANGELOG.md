@@ -1,13 +1,17 @@
 # Change Log
 
+## 5.0.0
+
+* Require dart >= 2.17.x
+  
 ## 4.0.0
 
-* Updated to SDK 2.16.x
+* Require dart >= 2.16.x
 * Updated to `angel3_framework` 6.x.x
 
 ## 3.0.0
 
-* Updated to SDK 2.15.x
+* Require dart >= 2.15.x
 
 ## 2.0.0
 
