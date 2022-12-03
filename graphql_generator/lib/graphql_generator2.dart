@@ -49,7 +49,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
     InterfaceType? search = clazz;
 
     while (search != null) {
-      if (_graphQLClassTypeChecker.hasAnnotationOf(search.element2)) {
+      if (_graphQLClassTypeChecker.hasAnnotationOf(search.element)) {
         return true;
       }
       search = search.superclass;
@@ -62,7 +62,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
     // Firstly, check if it's a GraphQL class.
     if (type is InterfaceType && _isGraphQLClass(type)) {
       var c = type;
-      var name = serializableTypeChecker.hasAnnotationOf(c.element2) &&
+      var name = serializableTypeChecker.hasAnnotationOf(c.element) &&
               c.getDisplayString(withNullability: false).startsWith('_')
           ? c.getDisplayString(withNullability: false).substring(1)
           : c.getDisplayString(withNullability: false);
@@ -156,7 +156,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
 
           // Add interfaces
           var interfaces = clazz.interfaces.where(_isGraphQLClass).map((c) {
-            var name = serializableTypeChecker.hasAnnotationOf(c.element2) &&
+            var name = serializableTypeChecker.hasAnnotationOf(c.element) &&
                     c.getDisplayString(withNullability: false).startsWith('_')
                 ? c.getDisplayString(withNullability: false).substring(1)
                 : c.getDisplayString(withNullability: false);
@@ -173,7 +173,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
           InterfaceType? search = clazz.thisType; //.type;
           while (search != null &&
               !TypeChecker.fromRuntime(Object).isExactlyType(search)) {
-            for (var field in search.element2.fields) {
+            for (var field in search.element.fields) {
               if (!ctxFields.any((f) => f.name == field.name)) {
                 ctxFields.add(field);
               }
