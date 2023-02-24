@@ -257,8 +257,8 @@ class GraphQL {
     for (final val in map.values) {
       if (val is JsonPathArgument) {
         lazy.add([...val.splitted, val]);
-      } else if (val is Map) {
-        makeLazy(map);
+      } else if (val is Map<String, dynamic>) {
+        makeLazy(val);
       }
     }
 
