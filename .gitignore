@@ -43,3 +43,4 @@ fabric.properties
 
 .vscode
 !.vscode/settings.json
+.DS_Store
