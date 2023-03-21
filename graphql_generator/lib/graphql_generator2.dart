@@ -24,21 +24,32 @@ var _graphQLClassTypeChecker = TypeChecker.fromRuntime(GraphQLClass);
 class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
   @override
   Future<String> generateForAnnotatedElement(
-      Element element, ConstantReader annotation, BuildStep buildStep) async {
+    Element element,
+    ConstantReader annotation,
+    BuildStep buildStep,
+  ) async {
     if (element is ClassElement) {
-      var ctx = element is EnumElement
-          ? null
-          : await buildContext(
-              element,
-              annotation,
-              buildStep,
-              buildStep.resolver,
-              serializableTypeChecker.hasAnnotationOf(element));
-      var lib = buildSchemaLibrary(element, ctx, annotation);
+      var ctx = await buildContext(
+        element,
+        annotation,
+        buildStep,
+        buildStep.resolver,
+        serializableTypeChecker.hasAnnotationOf(element),
+      );
+
+      var lib = _buildClassSchemaLibrary(element, ctx, annotation);
+
       return lib.accept(DartEmitter()).toString();
-    } else {
-      throw UnsupportedError('@GraphQLClass() is only supported on classes.');
     }
+
+    if (element is EnumElement) {
+      var lib = _buildEnumSchemaLibrary(element, annotation);
+
+      return lib.accept(DartEmitter()).toString();
+    }
+
+    throw UnsupportedError(
+        '@GraphQLClass() is only supported on classes or enums.');
   }
 
   bool isInterface(ClassElement clazz) {
@@ -52,6 +63,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
       if (_graphQLClassTypeChecker.hasAnnotationOf(search.element)) {
         return true;
       }
+
       search = search.superclass;
     }
 
@@ -67,6 +79,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
           ? c.getDisplayString(withNullability: false).substring(1)
           : c.getDisplayString(withNullability: false);
       var rc = ReCase(name);
+
       return refer('${rc.camelCase}GraphQLType');
     }
 
@@ -97,6 +110,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
         TypeChecker.fromRuntime(Iterable).isAssignableFromType(type)) {
       var arg = type.typeArguments[0];
       var inner = _inferType(className, name, arg);
+
       return refer('listOf').call([inner]);
     }
 
@@ -111,129 +125,149 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
     if (docString == null && _graphQLDoc.hasAnnotationOf(element)) {
       var ann = _graphQLDoc.firstAnnotationOf(element);
       var cr = ConstantReader(ann);
+
       docString = cr.peek('description')?.stringValue;
     }
 
     if (docString != null) {
       named['description'] = literalString(
-          docString.replaceAll(_docComment, '').replaceAll('\n', '\\n'));
+        docString.replaceAll(_docComment, '').replaceAll('\n', '\\n'),
+      );
     }
   }
 
-  Library buildSchemaLibrary(
-      ClassElement clazz, BuildContext? ctx, ConstantReader ann) {
+  Library _buildEnumSchemaLibrary(EnumElement clazz, ConstantReader ann) {
+    return Library((b) {
+      // Generate a top-level xGraphQLType object
+      b.body.add(Field((b) {
+        // enumTypeFromStrings(String name, List<String> values, {String description}
+        var args = <Expression>[literalString(clazz.name)];
+        var values =
+            clazz.fields.where((f) => f.isEnumConstant).map((f) => f.name);
+        var named = <String, Expression>{};
+
+        _applyDescription(named, clazz, clazz.documentationComment);
+
+        args.add(literalConstList(values.map(literalString).toList()));
+
+        b
+          ..name = '${ReCase(clazz.name).camelCase}GraphQLType'
+          ..docs.add('/// Auto-generated from [${clazz.name}].')
+          ..type = TypeReference((b) => b
+            ..symbol = 'GraphQLEnumType'
+            ..types.add(refer('String')))
+          ..modifier = FieldModifier.final$
+          ..assignment = refer('enumTypeFromStrings').call(args, named).code;
+      }));
+    });
+  }
+
+  Library _buildClassSchemaLibrary(
+    ClassElement clazz,
+    BuildContext? ctx,
+    ConstantReader ann,
+  ) {
     return Library((b) {
       // Generate a top-level xGraphQLType object
 
-      if (clazz is EnumElement) {
-        b.body.add(Field((b) {
-          // enumTypeFromStrings(String name, List<String> values, {String description}
-          var args = <Expression>[literalString(clazz.name)];
-          var values =
-              clazz.fields.where((f) => f.isEnumConstant).map((f) => f.name);
+      b.body.add(Field((b) {
+        var args = <Expression>[literalString(ctx!.modelClassName!)];
+        var named = <String, Expression>{
+          'isInterface': literalBool(isInterface(clazz))
+        };
+
+        // Add documentation
+        _applyDescription(named, clazz, clazz.documentationComment);
+
+        // Add interfaces
+        var interfaces = clazz.interfaces.where(_isGraphQLClass).map((c) {
+          var name = serializableTypeChecker.hasAnnotationOf(c.element) &&
+                  c.getDisplayString(withNullability: false).startsWith('_')
+              ? c.getDisplayString(withNullability: false).substring(1)
+              : c.getDisplayString(withNullability: false);
+          var rc = ReCase(name);
+
+          return refer('${rc.camelCase}GraphQLType');
+        });
+
+        named['interfaces'] = literalList(interfaces);
+
+        // Add fields
+        var ctxFields = ctx.fields.toList();
+
+        // Also incorporate parent fields.
+        //TODO: To be reviewed later
+        InterfaceType? search = clazz.thisType; //.type;
+
+        while (search != null &&
+            !TypeChecker.fromRuntime(Object).isExactlyType(search)) {
+          for (var field in search.element.fields) {
+            if (!ctxFields.any((f) => f.name == field.name)) {
+              ctxFields.add(field);
+            }
+          }
+
+          search = search.superclass;
+        }
+
+        var fields = <Expression>[];
+
+        for (var field in ctxFields) {
           var named = <String, Expression>{};
-          _applyDescription(named, clazz, clazz.documentationComment);
-          args.add(literalConstList(values.map(literalString).toList()));
+          var originalField =
+              clazz.fields.firstWhereOrNull((f) => f.name == field.name);
 
-          b
-            ..name = '${ReCase(clazz.name).camelCase}GraphQLType'
-            ..docs.add('/// Auto-generated from [${clazz.name}].')
-            ..type = TypeReference((b) => b
-              ..symbol = 'GraphQLEnumType'
-              ..types.add(refer('String')))
-            ..modifier = FieldModifier.final$
-            ..assignment = refer('enumTypeFromStrings').call(args, named).code;
-        }));
-      } else {
-        b.body.add(Field((b) {
-          var args = <Expression>[literalString(ctx!.modelClassName!)];
-          var named = <String, Expression>{
-            'isInterface': literalBool(isInterface(clazz))
-          };
+          // Check if it is deprecated.
+          var depEl = originalField?.getter ?? originalField ?? field;
+          var depAnn =
+              TypeChecker.fromRuntime(Deprecated).firstAnnotationOf(depEl);
 
-          // Add documentation
-          _applyDescription(named, clazz, clazz.documentationComment);
+          if (depAnn != null) {
+            var dep = ConstantReader(depAnn);
+            var reason = dep.peek('messages')?.stringValue ??
+                dep.peek('expires')?.stringValue ??
+                'Expires: ${deprecated.message}.';
 
-          // Add interfaces
-          var interfaces = clazz.interfaces.where(_isGraphQLClass).map((c) {
-            var name = serializableTypeChecker.hasAnnotationOf(c.element) &&
-                    c.getDisplayString(withNullability: false).startsWith('_')
-                ? c.getDisplayString(withNullability: false).substring(1)
-                : c.getDisplayString(withNullability: false);
-            var rc = ReCase(name);
-            return refer('${rc.camelCase}GraphQLType');
-          });
-          named['interfaces'] = literalList(interfaces);
-
-          // Add fields
-          var ctxFields = ctx.fields.toList();
-
-          // Also incorporate parent fields.
-          //TODO: To be reviewed later
-          InterfaceType? search = clazz.thisType; //.type;
-          while (search != null &&
-              !TypeChecker.fromRuntime(Object).isExactlyType(search)) {
-            for (var field in search.element.fields) {
-              if (!ctxFields.any((f) => f.name == field.name)) {
-                ctxFields.add(field);
-              }
-            }
-
-            search = search.superclass;
+            named['deprecationReason'] = literalString(reason);
           }
 
-          var fields = <Expression>[];
-          for (var field in ctxFields) {
-            var named = <String, Expression>{};
-            var originalField =
-                clazz.fields.firstWhereOrNull((f) => f.name == field.name);
+          // Description finder...
+          _applyDescription(
+              named,
+              originalField?.getter ?? originalField ?? field,
+              originalField?.getter?.documentationComment ??
+                  originalField?.documentationComment);
 
-            // Check if it is deprecated.
-            var depEl = originalField?.getter ?? originalField ?? field;
-            var depAnn =
-                TypeChecker.fromRuntime(Deprecated).firstAnnotationOf(depEl);
-            if (depAnn != null) {
-              var dep = ConstantReader(depAnn);
-              var reason = dep.peek('messages')?.stringValue ??
-                  dep.peek('expires')?.stringValue ??
-                  'Expires: ${deprecated.message}.';
-              named['deprecationReason'] = literalString(reason);
+          // Pick the type.
+          var doc = _graphQLDoc.firstAnnotationOf(depEl);
+
+          Expression? type;
+
+          if (doc != null) {
+            var cr = ConstantReader(doc);
+            var typeName = cr.peek('typeName')?.symbolValue;
+
+            if (typeName != null) {
+              type = refer(MirrorSystem.getName(typeName));
             }
-
-            // Description finder...
-            _applyDescription(
-                named,
-                originalField?.getter ?? originalField ?? field,
-                originalField?.getter?.documentationComment ??
-                    originalField?.documentationComment);
-
-            // Pick the type.
-            var doc = _graphQLDoc.firstAnnotationOf(depEl);
-            Expression? type;
-            if (doc != null) {
-              var cr = ConstantReader(doc);
-              var typeName = cr.peek('typeName')?.symbolValue;
-              if (typeName != null) {
-                type = refer(MirrorSystem.getName(typeName));
-              }
-            }
-
-            fields.add(refer('field').call([
-              literalString(ctx.resolveFieldName(field.name)!),
-              type ??= _inferType(clazz.name, field.name, field.type)
-            ], named));
           }
-          named['fields'] = literalList(fields);
 
-          b
-            ..name = '${ctx.modelClassNameRecase.camelCase}GraphQLType'
-            ..docs.add('/// Auto-generated from [${ctx.modelClassName}].')
-            //..style = refer('GraphQLObjectType')
-            ..type = refer('GraphQLObjectType')
-            ..modifier = FieldModifier.final$
-            ..assignment = refer('objectType').call(args, named).code;
-        }));
-      }
+          fields.add(refer('field').call([
+            literalString(ctx.resolveFieldName(field.name)!),
+            type ??= _inferType(clazz.name, field.name, field.type)
+          ], named));
+        }
+
+        named['fields'] = literalList(fields);
+
+        b
+          ..name = '${ctx.modelClassNameRecase.camelCase}GraphQLType'
+          ..docs.add('/// Auto-generated from [${ctx.modelClassName}].')
+          //..style = refer('GraphQLObjectType')
+          ..type = refer('GraphQLObjectType')
+          ..modifier = FieldModifier.final$
+          ..assignment = refer('objectType').call(args, named).code;
+      }));
     });
   }
 }
