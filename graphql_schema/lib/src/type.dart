@@ -117,7 +117,7 @@ class GraphQLListType<Value, Serialized>
       GraphQLListType<Value, Serialized>(ofType.coerceToInputObject());
 }
 
-abstract class _NonNullableMixin<Value, Serialized>
+abstract mixin class _NonNullableMixin<Value, Serialized>
     implements GraphQLType<Value, Serialized> {
   GraphQLType<Value, Serialized>? _nonNullableCache;
 

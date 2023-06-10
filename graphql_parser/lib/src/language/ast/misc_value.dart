@@ -28,10 +28,6 @@ class EnumValueContext extends InputValueContext<String> {
 
   EnumValueContext(this.nameToken);
 
-  // Use [nameToken] instead.
-  //@deprecated
-  //Token get NAME => nameToken;
-
   @override
   FileSpan? get span => nameToken.span;
 
@@ -51,10 +47,6 @@ class ObjectValueContext extends InputValueContext<Map<String?, dynamic>> {
 
   /// Use [lBraceToken] instead.
   Token get LBRACE => lBraceToken;
-
-  /// Use [rBraceToken] instead.
-  @deprecated
-  Token get RBRACE => rBraceToken;
 
   @override
   FileSpan get span {
@@ -90,14 +82,6 @@ class ObjectFieldContext extends Node {
   final InputValueContext value;
 
   ObjectFieldContext(this.nameToken, this.colonToken, this.value);
-
-  /// Use [nameToken] instead.
-  @deprecated
-  Token get NAME => nameToken;
-
-  /// Use [colonToken] instead.
-  @deprecated
-  Token get COLON => colonToken;
 
   @override
   FileSpan get span =>
