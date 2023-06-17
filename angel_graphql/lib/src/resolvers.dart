@@ -22,9 +22,9 @@ Map<String, dynamic>? _getQuery(Map<String, dynamic> arguments) {
 GraphQLFieldResolver<List<Value>, Serialized>
     resolveViaServiceIndex<Value, Serialized>(Service<dynamic, Value> service) {
   return (_, arguments) async {
-    var _requestInfo = _fetchRequestInfo(arguments);
+    var requestInfo = _fetchRequestInfo(arguments);
     var params = {'query': _getQuery(arguments), 'provider': Providers.graphQL}
-      ..addAll(_requestInfo);
+      ..addAll(requestInfo);
 
     return await service.index(params);
   };
@@ -38,9 +38,9 @@ GraphQLFieldResolver<Value, Serialized>
     resolveViaServiceFindOne<Value, Serialized>(
         Service<dynamic, Value> service) {
   return (_, arguments) async {
-    var _requestInfo = _fetchRequestInfo(arguments);
+    var requestInfo = _fetchRequestInfo(arguments);
     var params = {'query': _getQuery(arguments), 'provider': Providers.graphQL}
-      ..addAll(_requestInfo);
+      ..addAll(requestInfo);
     return await service.findOne(params);
   };
 }
@@ -56,9 +56,9 @@ GraphQLFieldResolver<Value, Serialized>
     resolveViaServiceRead<Value, Serialized>(Service<dynamic, Value> service,
         {String idField = 'id'}) {
   return (_, arguments) async {
-    var _requestInfo = _fetchRequestInfo(arguments);
+    var requestInfo = _fetchRequestInfo(arguments);
     var params = {'query': _getQuery(arguments), 'provider': Providers.graphQL}
-      ..addAll(_requestInfo);
+      ..addAll(requestInfo);
     var id = arguments.remove(idField);
     return await service.read(id, params);
   };
@@ -75,9 +75,9 @@ GraphQLFieldResolver<Value?, Serialized>
     resolveViaServiceCreate<Value, Serialized>(
         Service<dynamic, Value?> service) {
   return (_, arguments) async {
-    var _requestInfo = _fetchRequestInfo(arguments);
+    var requestInfo = _fetchRequestInfo(arguments);
     var params = {'query': _getQuery(arguments), 'provider': Providers.graphQL}
-      ..addAll(_requestInfo);
+      ..addAll(requestInfo);
     return await service.create(arguments['data'] as Value?, params);
   };
 }
@@ -94,9 +94,9 @@ GraphQLFieldResolver<Value?, Serialized>
     resolveViaServiceModify<Value, Serialized>(Service<dynamic, Value?> service,
         {String idField = 'id'}) {
   return (_, arguments) async {
-    var _requestInfo = _fetchRequestInfo(arguments);
+    var requestInfo = _fetchRequestInfo(arguments);
     var params = {'query': _getQuery(arguments), 'provider': Providers.graphQL}
-      ..addAll(_requestInfo);
+      ..addAll(requestInfo);
     var id = arguments.remove(idField);
     return await service.modify(id, arguments['data'] as Value?, params);
   };
@@ -117,9 +117,9 @@ GraphQLFieldResolver<Value?, Serialized>
     resolveViaServiceUpdate<Value, Serialized>(Service<dynamic, Value?> service,
         {String idField = 'id'}) {
   return (_, arguments) async {
-    var _requestInfo = _fetchRequestInfo(arguments);
+    var requestInfo = _fetchRequestInfo(arguments);
     var params = {'query': _getQuery(arguments), 'provider': Providers.graphQL}
-      ..addAll(_requestInfo);
+      ..addAll(requestInfo);
     var id = arguments.remove(idField);
     return await service.update(id, arguments['data'] as Value?, params);
   };
@@ -136,9 +136,9 @@ GraphQLFieldResolver<Value, Serialized>
     resolveViaServiceRemove<Value, Serialized>(Service<dynamic, Value> service,
         {String idField = 'id'}) {
   return (_, arguments) async {
-    var _requestInfo = _fetchRequestInfo(arguments);
+    var requestInfo = _fetchRequestInfo(arguments);
     var params = {'query': _getQuery(arguments), 'provider': Providers.graphQL}
-      ..addAll(_requestInfo);
+      ..addAll(requestInfo);
     var id = arguments.remove(idField);
     return await service.remove(id, params);
   };

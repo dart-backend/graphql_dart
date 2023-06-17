@@ -6,18 +6,15 @@
 [![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/graphql_dart/blob/master/graphql_generator/LICENSE)
 [![melos](https://img.shields.io/badge/maintained%20with-melos-f700ff.svg?style=flat-square)](https://github.com/invertase/melos)
 
-Generates `package:graphql_schema2` schemas for
-annotated class.
+Generates `package:graphql_schema2` schemas for annotated class.
 
 Replaces `convertDartType` from `package:graphql_server2`.
 
 ## Usage
 
-Usage is very simple. You just need a `@graphQLClass` or `@GraphQLClass()` annotation
-on any class you want to generate an object type for.
+Usage is very simple. You just need a `@graphQLClass` or `@GraphQLClass()` annotation on any class you want to generate an object type for.
 
-Individual fields can have a `@GraphQLDocumentation()` annotation, to provide information
-like descriptions, deprecation reasons, etc.
+Individual fields can have a `@GraphQLDocumentation()` annotation, to provide information like descriptions, deprecation reasons, etc.
 
 ```dart
 @graphQLClass
