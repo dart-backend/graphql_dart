@@ -1,5 +1,4 @@
 import 'package:graphql_parser2/graphql_parser2.dart';
-import 'package:matcher/matcher.dart';
 import 'package:test/test.dart';
 import 'argument_test.dart';
 import 'common.dart';

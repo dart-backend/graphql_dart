@@ -13,14 +13,6 @@ class VariableDefinitionsContext extends Node {
 
   VariableDefinitionsContext(this.lParenToken, this.rParenToken);
 
-  /// Use [lParenToken] instead.
-  @deprecated
-  Token? get LPAREN => lParenToken;
-
-  /// Use [rParenToken] instead.
-  @deprecated
-  Token? get RPAREN => rParenToken;
-
   @override
   FileSpan get span {
     var out = variableDefinitions.fold<FileSpan?>(

@@ -22,14 +22,6 @@ class InlineFragmentContext extends Node {
   InlineFragmentContext(
       this.ellipsisToken, this.onToken, this.typeCondition, this.selectionSet);
 
-  /// Use [ellipsisToken] instead.
-  @deprecated
-  Token get ELLIPSIS => ellipsisToken;
-
-  /// Use [onToken] instead.
-  @deprecated
-  Token get ON => onToken;
-
   @override
   FileSpan get span {
     var out =

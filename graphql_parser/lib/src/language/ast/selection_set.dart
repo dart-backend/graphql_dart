@@ -18,14 +18,6 @@ class SelectionSetContext extends Node {
   factory SelectionSetContext.merged(List<SelectionContext> selections) =
       _MergedSelectionSetContext;
 
-  /// Use [lBraceToken] instead.
-  @deprecated
-  Token? get LBRACE => lBraceToken;
-
-  /// Use [rBraceToken] instead.
-  @deprecated
-  Token? get RBRACE => rBraceToken;
-
   @override
   FileSpan? get span {
     var out = selections.fold<FileSpan?>(
@@ -35,6 +27,7 @@ class SelectionSetContext extends Node {
 }
 
 class _MergedSelectionSetContext extends SelectionSetContext {
+  @override
   final List<SelectionContext> selections;
 
   _MergedSelectionSetContext(this.selections) : super(null, null);

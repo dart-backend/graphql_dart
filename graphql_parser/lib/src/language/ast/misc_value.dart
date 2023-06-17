@@ -4,7 +4,7 @@ import 'input_value.dart';
 import 'node.dart';
 
 /// A GraphQL `null` literal.
-class NullValueContext extends InputValueContext<Null> {
+class NullValueContext extends InputValueContext {
   /// The source token.
   final Token nullToken;
 

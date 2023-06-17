@@ -18,10 +18,6 @@ class StringValueContext extends InputValueContext<String> {
   @override
   FileSpan? get span => stringToken.span;
 
-  /// Use [stringToken] instead.
-  @deprecated
-  Token get STRING => stringToken;
-
   /// The [String] value of the [stringToken].
   String get stringValue {
     String text;

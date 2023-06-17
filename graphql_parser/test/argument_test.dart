@@ -1,5 +1,4 @@
 import 'package:graphql_parser2/graphql_parser2.dart';
-import 'package:matcher/matcher.dart';
 import 'package:test/test.dart';
 
 import 'common.dart';
@@ -38,7 +37,7 @@ Matcher isArgumentList(List<Matcher> arguments) => _IsArgumentList(arguments);
 
 class _IsArgument extends Matcher {
   final String name;
-  final value;
+  final dynamic value;
 
   _IsArgument(this.name, this.value);
 

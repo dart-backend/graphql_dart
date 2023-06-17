@@ -22,10 +22,6 @@ class TypeContext extends Node {
     assert(typeName != null || listType != null);
   }
 
-  /// Use [exclamationToken] instead.
-  @deprecated
-  Token? get EXCLAMATION => exclamationToken;
-
   @override
   FileSpan get span {
     var out = typeName?.span ?? listType!.span;

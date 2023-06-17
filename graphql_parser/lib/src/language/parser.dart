@@ -450,10 +450,6 @@ class Parser {
     }
   }
 
-  /// Use [parseInputValue] instead.
-  @deprecated
-  InputValueContext? parseValueOrVariable() => parseInputValue();
-
   VariableContext? parseVariable() {
     if (next(TokenType.DOLLAR) && current != null) {
       var DOLLAR = current!;
@@ -501,10 +497,6 @@ class Parser {
       return null;
     }
   }
-
-  /// Use [parseInputValue] instead.
-  @deprecated
-  InputValueContext? parseValue() => parseInputValue();
 
   InputValueContext? parseInputValue() {
     return (parseVariable() ??

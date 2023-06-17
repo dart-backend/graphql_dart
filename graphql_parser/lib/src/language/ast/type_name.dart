@@ -9,10 +9,6 @@ class TypeNameContext extends Node {
 
   TypeNameContext(this.nameToken);
 
-  /// Use [nameToken] instead.
-  @deprecated
-  Token? get NAME => nameToken;
-
   /// The [String] value of the [nameToken].
   String? get name => nameToken!.text;
 

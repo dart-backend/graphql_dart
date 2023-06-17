@@ -31,14 +31,6 @@ class OperationDefinitionContext extends ExecutableDefinitionContext {
   /// The [String] value of the [nameToken].
   String? get name => nameToken?.text;
 
-  /// Use [nameToken] instead.
-  @deprecated
-  Token? get NAME => nameToken;
-
-  /// Use [typeToken] instead.
-  @deprecated
-  Token? get TYPE => typeToken;
-
   OperationDefinitionContext(this.typeToken, this.nameToken,
       this.variableDefinitions, this.selectionSet) {
     assert(typeToken == null ||
