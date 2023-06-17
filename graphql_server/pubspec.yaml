@@ -1,38 +1,28 @@
 name: graphql_server2
-version: 5.0.0
+version: 6.0.0
 description: Base package for implementing GraphQL servers. You might prefer `package:angel3_graphql`, the fastest way to implement GraphQL backends in Dart.
 homepage: https://angel3-framework.web.app/
 repository: https://github.com/dukefirehawk/graphql_dart/tree/master/graphql_server
 
 environment:
-  sdk: '>=2.17.0 <3.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
-  angel3_serialize: ^7.0.0
-  graphql_schema2: ^5.0.0
-  graphql_parser2: ^5.0.0
-  collection: ^1.16.0
-  meta: ^1.4.0
-  recase: ^4.0.0
+  angel3_serialize: ^8.0.0
+  graphql_schema2: ^6.0.0
+  graphql_parser2: ^6.0.0
+  collection: ^1.17.0
+  meta: ^1.9.0
+  recase: ^4.1.0
   stream_channel: ^2.1.0
   tuple: ^2.0.0
 
 dev_dependencies:
-  lints: ^2.0.0
-  test: ^1.21.0
+  lints: ^2.1.0
+  test: ^1.24.0
 
-# dependency_overrides:
-#   graphql_parser2:
-#     path: ../graphql_parser
-#   graphql_schema2:
-#     path: ../graphql_schema
-  # angel3_serialize:
-  #   git: 
-  #     url: https://github.com/dukefirehawk/angel.git
-  #     ref: feature/v7
-  #     path: packages/serialize/angel_serialize
-  # angel3_model:
-  #   git: 
-  #     url: https://github.com/dukefirehawk/angel.git
-  #     ref: feature/v7
-  #     path: packages/model
+dependency_overrides:
+  graphql_parser2:
+    path: ../graphql_parser
+  graphql_schema2:
+    path: ../graphql_schema

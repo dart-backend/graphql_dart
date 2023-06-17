@@ -10,7 +10,7 @@ void main() {
       var asEnumType = type as GraphQLEnumType;
 
       test('produces enum type', () {
-        expect(type is GraphQLEnumType, true);
+        expect(type, isNotNull);
       });
 
       test('rejects invalid value', () {

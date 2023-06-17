@@ -13,18 +13,6 @@ class ListTypeContext extends Node {
 
   ListTypeContext(this.lBracketToken, this.innerType, this.rBracketToken);
 
-  /// Use [innerType] instead.
-  @deprecated
-  TypeContext get type => innerType;
-
-  /// Use [lBracketToken] instead.
-  @deprecated
-  Token? get LBRACKET => lBracketToken;
-
-  /// Use [rBracketToken] instead.
-  @deprecated
-  Token? get RBRACKET => rBracketToken;
-
   @override
   FileSpan get span =>
       lBracketToken.span!.expand(innerType.span).expand(rBracketToken.span!);
