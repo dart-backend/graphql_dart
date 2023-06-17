@@ -25,6 +25,29 @@ This mono repo is split into several sub-projects, each with its own detailed do
 * `graphql_server2`: Base functionality for implementing GraphQL servers in Dart. Has no dependency on any framework except `graphql_parser2` and `graphql_schema2` packages.
 * `angel3_graphql` - An implementation of `graphql_server2` in handling GraphQL via HTTP and WebSockets for [Angel3](https://github.com/dukefirehawk/angel) framework.
 
+### Development Setup
+
+1. Fork `graphql_dart` repository
+
+2. Clone the project to local and create a new branch
+
+   ```bash
+   git clone https://github.com/<your_repo_name>/graphql_dart.git
+   git checkout -b feature/<your_branch_name>
+   ```
+
+3. Download and install [Dart 3](https://dart.dev/get-dart)
+
+4. Install `melos`
+
+   ```bash
+   dart pub global activate melos
+   ```
+
+5. Run `melos exec "dart pub upgrade"` to update all the packages
+
+6. Make changes to the packages
+
 ## Donation & Support
 
 If you like this project and interested in supporting its development, you can make a donation via [paypal](https://paypal.me/dukefirehawk?country.x=MY&locale.x=en_US) service.
