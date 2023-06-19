@@ -1,5 +1,10 @@
 # Change log
 
+## 8.0.0
+
+* Require dart >= 3.0.x
+* Updated `angel3_framework` to 8.x.x
+
 ## 7.0.0
 
 * Require dart >= 2.17.x

@@ -228,9 +228,10 @@ packages:
   graphql_schema2:
     dependency: "direct main"
     description:
-      path: "../graphql_schema"
-      relative: true
-    source: path
+      name: graphql_schema2
+      sha256: b7267999d31f9a89eb025cbaf8398d7730cd2d0a0bc9e310ff039b58f7089f5b
+      url: "https://pub.dev"
+    source: hosted
     version: "6.0.0"
   graphs:
     dependency: transitive

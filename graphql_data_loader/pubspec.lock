@@ -101,10 +101,10 @@ packages:
     dependency: "direct dev"
     description:
       name: graphql_schema2
-      sha256: "58756760bf50336ba0048c8c41cdabfef208c3da2c136e25d528ff54ce440158"
+      sha256: b7267999d31f9a89eb025cbaf8398d7730cd2d0a0bc9e310ff039b58f7089f5b
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.0"
+    version: "6.0.0"
   http_multi_server:
     dependency: transitive
     description:

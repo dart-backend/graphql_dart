@@ -10,7 +10,7 @@ class SelectionSetContext extends Node {
   final Token? lBraceToken, rBraceToken;
 
   /// The selections to be applied.
-  final List<SelectionContext> selections = [];
+  List<SelectionContext> selections = [];
 
   SelectionSetContext(this.lBraceToken, this.rBraceToken);
 
@@ -27,10 +27,13 @@ class SelectionSetContext extends Node {
 }
 
 class _MergedSelectionSetContext extends SelectionSetContext {
-  @override
-  final List<SelectionContext> selections;
+  //@override
+  //final List<SelectionContext> selections;
 
-  _MergedSelectionSetContext(this.selections) : super(null, null);
+  _MergedSelectionSetContext(List<SelectionContext> selections)
+      : super(null, null) {
+    super.selections = selections;
+  }
 
   @override
   FileSpan? get span =>
