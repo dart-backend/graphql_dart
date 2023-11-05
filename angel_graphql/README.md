@@ -1,6 +1,6 @@
 # Angel3 Graphql
 
-![Logo](https://github.com/angel-dart/graphql/raw/master/img/angel_logo.png)
+![Logo](https://github.com/angel-dart/graphql/raw/master/img/angel3_logo.png)
 
 ![Pub Version (including pre-releases)](https://img.shields.io/pub/v/angel3_graphql?include_prereleases)
 [![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
@@ -26,8 +26,8 @@ To install `package:angel3_graphql`, add the following to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-    angel3_framework: ^7.0.0
-    angel3_graphql: ^7.0.0
+    angel3_framework: ^8.0.0
+    angel3_graphql: ^8.0.0
 ```
 
 ## Usage

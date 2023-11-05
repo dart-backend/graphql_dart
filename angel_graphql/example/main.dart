@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use
+import 'package:angel3_container/mirrors.dart';
 import 'package:angel3_framework/angel3_framework.dart';
 import 'package:angel3_framework/http.dart';
 import 'package:angel3_graphql/angel3_graphql.dart';
@@ -9,8 +10,9 @@ import 'package:graphql_server2/mirrors.dart';
 import 'package:logging/logging.dart';
 
 void main() async {
-  var logger = Logger('angel_graphql');
+  var logger = Logger('angel3_graphql');
   var app = Angel(
+      reflector: MirrorsReflector(),
       logger: logger
         ..onRecord.listen((rec) {
           print(rec);
