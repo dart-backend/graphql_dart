@@ -1,6 +1,6 @@
 # GraphQL for Dart
 
-[![Logo](./img/angel_logo.png)](https://github.com/dukefirehawk/graphql_dart)
+[![Logo](./img/angel3_logo.png)](https://github.com/dukefirehawk/graphql_dart)
 
 ![Pub Version (including pre-releases)](https://img.shields.io/pub/v/angel3_graphql?include_prereleases)
 [![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)

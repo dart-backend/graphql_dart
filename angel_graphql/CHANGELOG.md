@@ -1,5 +1,9 @@
 # Change log
 
+## 8.0.1
+
+* Fixed reflector error in the examples
+
 ## 8.0.0
 
 * Require dart >= 3.0.x

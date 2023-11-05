@@ -1,6 +1,7 @@
 // Inspired by:
 // https://www.apollographql.com/docs/apollo-server/features/subscriptions/#subscriptions-example
 
+import 'package:angel3_container/mirrors.dart';
 import 'package:angel3_file_service/angel3_file_service.dart';
 import 'package:angel3_framework/angel3_framework.dart';
 import 'package:angel3_framework/http.dart';
@@ -11,8 +12,8 @@ import 'package:graphql_server2/graphql_server2.dart';
 import 'package:logging/logging.dart';
 
 void main() async {
-  var logger = Logger('angel_graphql');
-  var app = Angel(logger: logger);
+  var logger = Logger('angel3_graphql');
+  var app = Angel(reflector: MirrorsReflector(), logger: logger);
   var http = AngelHttp(app);
   app.logger.onRecord.listen((rec) {
     print(rec);
