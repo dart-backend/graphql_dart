@@ -1,6 +1,6 @@
 # Angel3 Graphql
 
-![Logo](https://github.com/dukefirehawk/graphql_dart/tree/master/img/angel3_logo.png)
+![Logo](../img/angel3_logo.png)
 
 ![Pub Version (including pre-releases)](https://img.shields.io/pub/v/angel3_graphql?include_prereleases)
 [![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
