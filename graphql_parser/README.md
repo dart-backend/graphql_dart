@@ -21,7 +21,7 @@ Add `graphql_parser2` as a dependency in your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  graphql_parser2: ^3.0.0
+  graphql_parser2: ^6.0.0
 ```
 
 ## Usage

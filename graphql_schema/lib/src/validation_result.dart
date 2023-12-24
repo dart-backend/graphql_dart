@@ -1,4 +1,4 @@
-part of graphql_schema.src.schema;
+part of 'schema.dart';
 
 /// Represents the result of asserting an input [value] against a [GraphQLType].
 

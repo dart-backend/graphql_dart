@@ -1,4 +1,4 @@
-part of graphql_schema.src.schema;
+part of 'schema.dart';
 
 /// Shorthand for generating a [GraphQLObjectType].
 GraphQLObjectType objectType(String name,

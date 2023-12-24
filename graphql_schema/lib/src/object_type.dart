@@ -1,4 +1,4 @@
-part of graphql_schema.src.schema;
+part of 'schema.dart';
 
 /// A [GraphQLType] that specifies the shape of structured data, with multiple fields that can be resolved independently of one another.
 class GraphQLObjectType
@@ -192,11 +192,8 @@ enum DirectiveLocation {
 }
 
 class GraphQLDirectiveType extends GraphQLInputObjectType {
-  GraphQLDirectiveType(String name,
-      {String? description,
-      required this.locations,
-      Iterable<GraphQLInputObjectField> inputFields = const []})
-      : super(name, description: description, inputFields: inputFields);
+  GraphQLDirectiveType(super.name,
+      {super.description, required this.locations, super.inputFields});
 
   final Set<DirectiveLocation> locations;
 }

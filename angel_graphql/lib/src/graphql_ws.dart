@@ -50,9 +50,9 @@ class _GraphQLWSServer extends stw.Server {
   final RequestContext req;
   final ResponseContext res;
 
-  _GraphQLWSServer(stw.RemoteClient client, this.graphQL, this.req, this.res,
+  _GraphQLWSServer(super.client, this.graphQL, this.req, this.res,
       Duration? keepAliveInterval)
-      : super(client, keepAliveInterval: keepAliveInterval);
+      : super(keepAliveInterval: keepAliveInterval);
 
   @override
   bool onConnect(stw.RemoteClient client, [Map? connectionParams]) => true;

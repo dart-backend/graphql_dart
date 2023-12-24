@@ -1,4 +1,4 @@
-part of graphql_schema.src.schema;
+part of 'schema.dart';
 
 /// Typedef for a function that resolves the value of a [GraphQLObjectField], whether asynchronously or not.
 typedef GraphQLFieldResolver<Value, Serialized> = FutureOr<Value> Function(

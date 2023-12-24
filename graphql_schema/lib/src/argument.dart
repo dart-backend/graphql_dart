@@ -1,4 +1,4 @@
-part of graphql_schema.src.schema;
+part of 'schema.dart';
 
 /// An input to a GraphQL field. This is analogous to a function parameter in Dart.
 class GraphQLFieldInput<Value, Serialized> {

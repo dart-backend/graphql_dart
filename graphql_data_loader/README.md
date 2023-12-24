@@ -14,7 +14,7 @@ In your pubspec.yaml:
 
 ```yaml
 dependencies:
-  graphql_data_loader2: ^4.0.0
+  graphql_data_loader2: ^6.0.0
 ```
 
 ## Usage

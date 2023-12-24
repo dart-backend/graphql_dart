@@ -1,4 +1,4 @@
-part of graphql_schema.src.schema;
+part of 'schema.dart';
 
 /// Shorthand for building a [GraphQLEnumType].
 GraphQLEnumType enumType<Value>(String name, Map<String, Value> values,

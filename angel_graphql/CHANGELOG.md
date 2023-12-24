@@ -1,5 +1,10 @@
 # Change log
 
+## 8.1.0
+
+* Updated `lints` to 3.0.0
+* Fixed linter warnings
+
 ## 8.0.1
 
 * Fixed reflector error in the examples

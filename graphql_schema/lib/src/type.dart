@@ -1,4 +1,4 @@
-part of graphql_schema.src.schema;
+part of 'schema.dart';
 
 /// Strictly dictates the structure of some input data in a GraphQL query.
 ///

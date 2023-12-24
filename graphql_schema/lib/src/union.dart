@@ -1,4 +1,4 @@
-part of graphql_schema.src.schema;
+part of 'schema.dart';
 
 /// A special [GraphQLType] that indicates that an input value may be valid against one or more [possibleTypes].
 ///

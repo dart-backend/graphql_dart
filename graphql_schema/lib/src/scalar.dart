@@ -1,4 +1,4 @@
-part of graphql_schema.src.schema;
+part of 'schema.dart';
 
 /// `true` or `false`.
 final GraphQLScalarType<bool, bool> graphQLBoolean = GraphQLBoolType();
@@ -120,8 +120,8 @@ class GraphQLNumType<T extends num> extends GraphQLScalarType<T, T> {
 }
 
 class GraphQLNumMinType<T extends num> extends GraphQLNumType<T> {
-  GraphQLNumMinType(String name, this.min, {String? description})
-      : super(name, description: description ?? '$name with minimum of $min');
+  GraphQLNumMinType(super.name, this.min, {String? description})
+      : super(description: description ?? '$name with minimum of $min');
 
   final T min;
 
@@ -139,8 +139,8 @@ class GraphQLNumMinType<T extends num> extends GraphQLNumType<T> {
 }
 
 class GraphQLNumMaxType<T extends num> extends GraphQLNumType<T> {
-  GraphQLNumMaxType(String name, this.max, {String? description})
-      : super(name, description: description ?? '$name with maximum of $max');
+  GraphQLNumMaxType(super.name, this.max, {String? description})
+      : super(description: description ?? '$name with maximum of $max');
 
   final T max;
 
@@ -158,8 +158,8 @@ class GraphQLNumMaxType<T extends num> extends GraphQLNumType<T> {
 }
 
 class GraphQLNumRangedType<T extends num> extends GraphQLNumType<T> {
-  GraphQLNumRangedType(String name, this.min, this.max, {String? description})
-      : super(name,
+  GraphQLNumRangedType(super.name, this.min, this.max, {String? description})
+      : super(
             description: description ??
                 '$name between $min and $max. (>= $min && <= $max)');
 
@@ -206,9 +206,8 @@ class GraphQLStringType extends GraphQLScalarType<String, String> {
 }
 
 class GraphQLStringMinType extends GraphQLStringType {
-  GraphQLStringMinType(this.min, {String? description, String name = 'String'})
+  GraphQLStringMinType(this.min, {String? description, super.name})
       : super(
-            name: name,
             description:
                 description ?? '$name with minimum of $min characters');
 
@@ -228,10 +227,8 @@ class GraphQLStringMinType extends GraphQLStringType {
 }
 
 class GraphQLStringMaxType extends GraphQLStringType {
-  GraphQLStringMaxType(this.max, {String? description, String name = 'String'})
-      : super(
-            name: name,
-            description: description ?? '$name with max of $max characters');
+  GraphQLStringMaxType(this.max, {String? description, super.name})
+      : super(description: description ?? '$name with max of $max characters');
 
   final int max;
 
@@ -249,10 +246,8 @@ class GraphQLStringMaxType extends GraphQLStringType {
 }
 
 class GraphQLStringRangeType extends GraphQLStringType {
-  GraphQLStringRangeType(this.min, this.max,
-      {String? description, String name = 'String'})
+  GraphQLStringRangeType(this.min, this.max, {String? description, super.name})
       : super(
-            name: name,
             description:
                 description ?? '$name with characters between $min and $max');
 
