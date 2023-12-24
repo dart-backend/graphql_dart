@@ -2,7 +2,7 @@ name: graphql_parser2
 version: 6.1.0
 description: Parses GraphQL queries and schemas. Also includes classes for the GraphQL AST.
 homepage: https://angel3-framework.web.app/
-repository: https://github.com/dukefirehawk/graphql_dart/tree/master/graphql_parser
+repository: https://github.com/dukefirehawk/graphql_dart/tree/master/packages/graphql_parser
 environment:
   sdk: '>=3.0.0 <4.0.0'
 dependencies:

@@ -2,7 +2,7 @@ name: graphql_data_loader2
 version: 6.1.0
 description: Batch and cache database lookups. Works well with GraphQL. Ported from JS.
 homepage: https://angel3-framework.web.app/
-repository: https://github.com/dukefirehawk/graphql_dart/tree/master/graphql_data_loader
+repository: https://github.com/dukefirehawk/graphql_dart/tree/master/packages/graphql_data_loader
 environment:
   sdk: '>=3.0.0 <4.0.0'
 dev_dependencies:
