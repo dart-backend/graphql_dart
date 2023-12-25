@@ -1,5 +1,9 @@
 # Change Log
 
+## 6.0.1
+
+* Updated repository link
+
 ## 6.0.0
 
 * Require dart >= 3.0.x

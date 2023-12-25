@@ -4,6 +4,7 @@
 
 * Updated `lints` to 3.0.0
 * Fixed linter warnings
+* Updated repository link
 
 ## 6.0.0
 

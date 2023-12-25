@@ -1,13 +1,11 @@
 # Change Log
 
-## 6.2.0
-
-* Updated `lints` to 3.0.0
-* Fixed linter warnings
-
 ## 6.1.0
 
-* Upgraded to `analyzer` 6.2.x
+* Upgraded to `analyzer` 6.3.x
+* Updated `lints` to 3.0.0
+* Fixed linter warnings
+* Updated repository link
 
 ## 6.0.0
 

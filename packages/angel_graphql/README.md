@@ -5,7 +5,7 @@
 ![Pub Version (including pre-releases)](https://img.shields.io/pub/v/angel3_graphql?include_prereleases)
 [![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angel_dart/discussion)
-[![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/graphql_dart/blob/master/packages/angel_graphql/LICENSE)
+[![License](https://img.shields.io/github/license/dart-backend/graphql_dart)](https://github.com/dart-backend/graphql_dart/blob/master/packages/angel_graphql/LICENSE)
 [![melos](https://img.shields.io/badge/maintained%20with-melos-f700ff.svg?style=flat-square)](https://github.com/invertase/melos)
 
 - [Angel3 Graphql](#angel3-graphql)
@@ -114,7 +114,7 @@ Now you're ready to build a GraphQL API!
 
 ## Subscriptions
 
-Example: [`Source code`](https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql/example/subscription.dart)
+Example: [`Source code`](https://github.com/dart-backend/graphql_dart/tree/master/angel_graphql/example/subscription.dart)
 
 In GraphQL, as of the June 2018 spec, clients can subscribe to streams of events from the server. In your schema, all you need to do is return a `Stream` from a `resolve` callback, rather than a plain object:
 
