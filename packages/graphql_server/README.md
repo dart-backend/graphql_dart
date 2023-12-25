@@ -3,7 +3,7 @@
 ![Pub Version (including pre-releases)](https://img.shields.io/pub/v/graphql_server2?include_prereleases)
 [![Null Safety](https://img.shields.io/badge/null-safety-brightgreen)](https://dart.dev/null-safety)
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angel_dart/discussion)
-[![License](https://img.shields.io/github/license/dukefirehawk/graphql_dart)](https://github.com/dukefirehawk/graphql_dart/blob/master/packages/graphql_server/LICENSE)
+[![License](https://img.shields.io/github/license/dart-backend/graphql_dart)](https://github.com/dart-backend/graphql_dart/blob/master/packages/graphql_server/LICENSE)
 
 Base package for implementing GraphQL servers. You might prefer [`package:angel3_graphql`](https://pub.dev/packages/angel3_graphql), the fastest way to implement GraphQL backends in Dart.
 
@@ -29,7 +29,7 @@ try {
 
 Consult the API reference for more: [`API Document`](https://pub.dev/documentation/graphql_server2/latest/graphql_server2/GraphQL/parseAndExecute.html)
 
-If you're looking for functionality like `graphQLHttp` in `graphql-js`, that is not included in this package, because it is typically specific to the framework/platform you are using. The `graphQLHttp` implementation in `package:angel3_graphql` is a good example: [`graphQLHttp source code`](https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql/lib/src/graphql_http.dart)
+If you're looking for functionality like `graphQLHttp` in `graphql-js`, that is not included in this package, because it is typically specific to the framework/platform you are using. The `graphQLHttp` implementation in `package:angel3_graphql` is a good example: [`graphQLHttp source code`](https://github.com/dart-backend/graphql_dart/tree/master/angel_graphql/lib/src/graphql_http.dart)
 
 ## Subscriptions
 
@@ -84,7 +84,7 @@ await server.done;
 ```
 
 See `graphQLWS` in `package:angel3_graphql` for a good example: [`graphQLWS source code`](
-https://github.com/dukefirehawk/graphql_dart/tree/master/angel_graphql/lib/src/graphql_ws.dart)
+https://github.com/dart-backend/graphql_dart/tree/master/angel_graphql/lib/src/graphql_ws.dart)
 
 ## Introspection
 
