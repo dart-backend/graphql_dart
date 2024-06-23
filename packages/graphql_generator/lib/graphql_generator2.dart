@@ -75,9 +75,9 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
     if (type is InterfaceType && _isGraphQLClass(type)) {
       var c = type;
       var name = serializableTypeChecker.hasAnnotationOf(c.element) &&
-              c.getDisplayString(withNullability: false).startsWith('_')
-          ? c.getDisplayString(withNullability: false).substring(1)
-          : c.getDisplayString(withNullability: false);
+              c.getDisplayString().startsWith('_')
+          ? c.getDisplayString().substring(1)
+          : c.getDisplayString();
       var rc = ReCase(name);
 
       return refer('${rc.camelCase}GraphQLType');
@@ -182,9 +182,9 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
         // Add interfaces
         var interfaces = clazz.interfaces.where(_isGraphQLClass).map((c) {
           var name = serializableTypeChecker.hasAnnotationOf(c.element) &&
-                  c.getDisplayString(withNullability: false).startsWith('_')
-              ? c.getDisplayString(withNullability: false).substring(1)
-              : c.getDisplayString(withNullability: false);
+                  c.getDisplayString().startsWith('_')
+              ? c.getDisplayString().substring(1)
+              : c.getDisplayString();
           var rc = ReCase(name);
 
           return refer('${rc.camelCase}GraphQLType');

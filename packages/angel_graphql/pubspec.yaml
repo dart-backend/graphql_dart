@@ -15,7 +15,7 @@ dependencies:
   graphql_schema2: ^6.0.0
   graphql_server2: ^6.0.0
   http_parser: ^4.0.0
-  web_socket_channel: '>=2.1.0 <2.4.1'
+  web_socket_channel: ^3.0.0
   collection: ^1.17.0
 dev_dependencies:
   angel3_serialize: ^8.0.0
