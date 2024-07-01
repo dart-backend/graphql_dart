@@ -42,10 +42,10 @@ packages:
     dependency: "direct main"
     description:
       name: angel3_serialize_generator
-      sha256: "6d993a38084214e53c71e785f214f853b9241d8ce3a2cdea6616ab036e5957ab"
+      sha256: c0ffa45b3e2e2d8c50873b906e14095d9ae1a17a9b65e3c4cd105af3b68801a3
       url: "https://pub.dev"
     source: hosted
-    version: "8.3.0"
+    version: "8.3.1"
   args:
     dependency: transitive
     description:
