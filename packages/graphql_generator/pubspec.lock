@@ -234,10 +234,10 @@ packages:
     dependency: "direct main"
     description:
       name: graphql_schema2
-      sha256: "4aa4550ed5823e45c1020f4232eee566fb47182316157d18389658feaa6f25ca"
+      sha256: a8f17e9e54659cec870ce350af9d8ffc6fc1722b6b14db62b6415a9db9d5add6
       url: "https://pub.dev"
     source: hosted
-    version: "6.1.0"
+    version: "6.2.0"
   graphs:
     dependency: transitive
     description:
