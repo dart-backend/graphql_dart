@@ -1,4 +1,4 @@
-library graphql_parser.language.parser;
+library;
 
 import 'ast/ast.dart';
 import 'syntax_error.dart';

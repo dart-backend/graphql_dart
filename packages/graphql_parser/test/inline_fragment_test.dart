@@ -68,9 +68,13 @@ class _IsInlineFragment extends Matcher {
     if (fragment == null) return false;
     if (fragment.typeCondition.typeName.name != name) return false;
     if (directives != null &&
-        !directives!.matches(fragment.directives, matchState)) return false;
+        !directives!.matches(fragment.directives, matchState)) {
+      return false;
+    }
     if (selectionSet != null &&
-        !selectionSet!.matches(fragment.selectionSet, matchState)) return false;
+        !selectionSet!.matches(fragment.selectionSet, matchState)) {
+      return false;
+    }
     return true;
   }
 }
