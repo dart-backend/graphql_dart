@@ -1,5 +1,5 @@
 name: graphql_schema2
-version: 6.2.0
+version: 6.3.0
 description: An implementation of GraphQL's type system in Dart. Basis of graphql_server2.
 homepage: https://angel3-framework.web.app/
 repository: https://github.com/dart-backend/graphql_dart/tree/master/packages/graphql_schema
