@@ -808,7 +808,9 @@ class GraphQL {
       } else if (selection.inlineFragment != null) {
         var fragmentType = selection.inlineFragment!.typeCondition;
         if (!doesFragmentTypeApply(objectType, fragmentType,
-            parentType: parentType)) continue;
+            parentType: parentType)) {
+          continue;
+        }
         var fragmentSelectionSet = selection.inlineFragment!.selectionSet;
         var fragmentGroupFieldSet = collectFields(
             document, objectType, fragmentSelectionSet, variableValues);

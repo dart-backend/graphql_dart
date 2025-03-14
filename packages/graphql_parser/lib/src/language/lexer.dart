@@ -50,7 +50,9 @@ List<Token> scan(String text, {sourceUrl}) {
     if (scanner.scan(_comment) ||
         scanner.scan(_whitespace) ||
         scanner.scan(',') ||
-        scanner.scan('\ufeff')) continue;
+        scanner.scan('\ufeff')) {
+      continue;
+    }
 
     for (var pattern in _patterns.keys) {
       if (scanner.matches(pattern)) {

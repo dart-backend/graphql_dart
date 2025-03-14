@@ -58,7 +58,9 @@ class OperationMessage {
     // https://github.com/apollographql/subscriptions-transport-ws/issues/551
     if (map.containsKey('query') ||
         map.containsKey('operationName') ||
-        map.containsKey('variables')) payload = Map.from(map);
+        map.containsKey('variables')) {
+      payload = Map.from(map);
+    }
     return OperationMessage(type, id: id as String?, payload: payload);
   }
 

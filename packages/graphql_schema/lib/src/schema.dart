@@ -1,4 +1,4 @@
-library graphql_schema.src.schema;
+library;
 
 import 'dart:async';
 

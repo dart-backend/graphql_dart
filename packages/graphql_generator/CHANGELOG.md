@@ -1,5 +1,11 @@
 # Change Log
 
+## 6.3.0
+
+* Require Dart >= 3.6
+* Updated `lints` to 5.0.0
+* Upgraded to `analyzer` 7.0.0
+
 ## 6.2.1
 
 * Upgraded to `analyzer` 6.5.x

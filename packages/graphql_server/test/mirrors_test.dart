@@ -18,15 +18,15 @@ void main() {
       });
 
       test('accepts valid value', () {
-        expect(asEnumType.validate('@root', 'SPANISH').successful, true);
+        expect(asEnumType.validate('@root', 'spanish').successful, true);
       });
 
       test('deserializes to concrete value', () {
-        expect(asEnumType.deserialize('ITALIAN'), RomanceLanguage.ITALIAN);
+        expect(asEnumType.deserialize('italian'), RomanceLanguage.italian);
       });
 
       test('serializes to concrete value', () {
-        expect(asEnumType.serialize(RomanceLanguage.FRANCE), 'FRANCE');
+        expect(asEnumType.serialize(RomanceLanguage.france), 'france');
       });
 
       /* TODO: Required fixing
@@ -48,7 +48,7 @@ void main() {
 
 @graphQLClass
 enum RomanceLanguage {
-  SPANISH,
-  FRANCE,
-  ITALIAN,
+  spanish,
+  france,
+  italian,
 }

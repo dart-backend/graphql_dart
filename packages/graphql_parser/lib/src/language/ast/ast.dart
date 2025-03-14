@@ -1,4 +1,4 @@
-library graphql_parser.language.ast;
+library;
 
 export 'alias.dart';
 export 'array_value.dart';
