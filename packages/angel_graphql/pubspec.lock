@@ -197,26 +197,26 @@ packages:
     dependency: "direct main"
     description:
       name: graphql_parser2
-      sha256: "08e693c8a103f046c1b65c1b16e96bbc3220e906fc86f7c6590a12b3eaf97130"
+      sha256: "13fa2f8adeac639b98a57cf06da11a238886b0ed01925a9fb3a9c34079043fd4"
       url: "https://pub.dev"
     source: hosted
-    version: "6.2.0"
+    version: "6.3.0"
   graphql_schema2:
     dependency: "direct main"
     description:
       name: graphql_schema2
-      sha256: a8f17e9e54659cec870ce350af9d8ffc6fc1722b6b14db62b6415a9db9d5add6
+      sha256: "5937c58731eeb6cfae06a0329659b5f1e167268f47e76bcc116aafc05944b0a7"
       url: "https://pub.dev"
     source: hosted
-    version: "6.2.0"
+    version: "6.3.0"
   graphql_server2:
     dependency: "direct main"
     description:
       name: graphql_server2
-      sha256: ff189305fb404ab63b8b6ce583f6073ff405b29e3b1cb54018b629f8c4011b5c
+      sha256: "948d6c1e779742da4e1a10ee83ca55c132669652941eefc36897ed0b352dbcec"
       url: "https://pub.dev"
     source: hosted
-    version: "6.2.0"
+    version: "6.3.0"
   http:
     dependency: transitive
     description:
