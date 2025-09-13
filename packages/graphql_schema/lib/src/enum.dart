@@ -1,27 +1,31 @@
 part of 'schema.dart';
 
 /// Shorthand for building a [GraphQLEnumType].
-GraphQLEnumType enumType<Value>(String name, Map<String, Value> values,
-    {String? description}) {
+GraphQLEnumType enumType<Value>(
+  String name,
+  Map<String, Value> values, {
+  String? description,
+}) {
   final len = values.keys.length;
 
-  return GraphQLEnumType<Value>(
-      name,
-      [
-        for (var i = 0; i < len; i++)
-          GraphQLEnumValue(
-              values.keys.elementAt(i), values.values.elementAt(i)),
-      ],
-      description: description);
+  return GraphQLEnumType<Value>(name, [
+    for (var i = 0; i < len; i++)
+      GraphQLEnumValue(values.keys.elementAt(i), values.values.elementAt(i)),
+  ], description: description);
 }
 
 /// Shorthand for building a [GraphQLEnumType] where all the possible values
 /// are mapped to Dart strings.
-GraphQLEnumType<String> enumTypeFromStrings(String name, List<String> values,
-    {String? description}) {
+GraphQLEnumType<String> enumTypeFromStrings(
+  String name,
+  List<String> values, {
+  String? description,
+}) {
   return GraphQLEnumType<String>(
-      name, values.map((s) => GraphQLEnumValue(s, s)).toList(),
-      description: description);
+    name,
+    values.map((s) => GraphQLEnumValue(s, s)).toList(),
+    description: description,
+  );
 }
 
 /// A [GraphQLType] with only a predetermined number of possible values.
@@ -66,8 +70,9 @@ class GraphQLEnumType<Value> extends GraphQLScalarType<Value, String>
       //      ['The enum "$name" does not accept null values.']);
       //}
 
-      return ValidationResult<String>._failure(
-          ['"$input" is not a valid value for the enum "$name".']);
+      return ValidationResult<String>._failure([
+        '"$input" is not a valid value for the enum "$name".',
+      ]);
     }
 
     return ValidationResult<String>._ok(input);
@@ -103,8 +108,12 @@ class GraphQLEnumValue<Value> {
   /// The reason, if any, that this value was deprecated, if it indeed is deprecated.
   final String? deprecationReason;
 
-  GraphQLEnumValue(this.name, this.value,
-      {this.description, this.deprecationReason});
+  GraphQLEnumValue(
+    this.name,
+    this.value, {
+    this.description,
+    this.deprecationReason,
+  });
 
   /// Returns `true` if this value has a [deprecationReason].
   bool get isDeprecated => deprecationReason != null;

@@ -16,7 +16,9 @@ class VariableDefinitionsContext extends Node {
   @override
   FileSpan get span {
     var out = variableDefinitions.fold<FileSpan?>(
-        lParenToken!.span, (o, v) => o!.expand(v.span))!;
+      lParenToken!.span,
+      (o, v) => o!.expand(v.span),
+    )!;
     return out.expand(rParenToken!.span!);
   }
 }

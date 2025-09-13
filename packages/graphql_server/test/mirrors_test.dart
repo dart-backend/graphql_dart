@@ -47,8 +47,4 @@ void main() {
 }
 
 @graphQLClass
-enum RomanceLanguage {
-  spanish,
-  france,
-  italian,
-}
+enum RomanceLanguage { spanish, france, italian }

@@ -5,20 +5,27 @@ import 'package:http_parser/http_parser.dart';
 ///
 /// By default, the interface expects your backend to be mounted at `/graphql`; this is configurable
 /// via [graphQLEndpoint].
-RequestHandler graphiQL(
-    {String graphQLEndpoint = '/graphql', String? subscriptionsEndpoint}) {
+RequestHandler graphiQL({
+  String graphQLEndpoint = '/graphql',
+  String? subscriptionsEndpoint,
+}) {
   return (req, res) {
     res
       ..contentType = MediaType('text', 'html')
-      ..write(renderGraphiql(
+      ..write(
+        renderGraphiql(
           graphqlEndpoint: graphQLEndpoint,
-          subscriptionsEndpoint: subscriptionsEndpoint))
+          subscriptionsEndpoint: subscriptionsEndpoint,
+        ),
+      )
       ..close();
   };
 }
 
-String renderGraphiql(
-    {String graphqlEndpoint = '/graphql', String? subscriptionsEndpoint}) {
+String renderGraphiql({
+  String graphqlEndpoint = '/graphql',
+  String? subscriptionsEndpoint,
+}) {
   var subscriptionsScripts = '',
       subscriptionsFetcher = '',
       fetcherName = 'graphQLFetcher';
@@ -29,7 +36,8 @@ String renderGraphiql(
   <script src="//unpkg.com/subscriptions-transport-ws@0.8.3/browser/client.js"></script>
   <script src="//unpkg.com/graphiql-subscriptions-fetcher@0.0.2/browser/client.js"></script>
   ''';
-    subscriptionsFetcher = '''
+    subscriptionsFetcher =
+        '''
   let subscriptionsClient = window.SubscriptionsTransportWs.SubscriptionClient('$subscriptionsEndpoint', {
     reconnect: true
   });

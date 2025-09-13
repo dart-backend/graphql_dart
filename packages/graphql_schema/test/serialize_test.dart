@@ -40,8 +40,10 @@ void main() {
 
     var today = DateTime.now();
     var tomorrow = today.add(Duration(days: 1));
-    expect(listOf(graphQLDate).serialize([today, tomorrow]),
-        [today.toIso8601String(), tomorrow.toIso8601String()]);
+    expect(listOf(graphQLDate).serialize([today, tomorrow]), [
+      today.toIso8601String(),
+      tomorrow.toIso8601String(),
+    ]);
   });
 
   group('input object', () {
@@ -54,8 +56,10 @@ void main() {
     );
 
     test('serializes valid input', () {
-      expect(
-          type.serialize({'bar': 'a', 'baz': 2.0}), {'bar': 'a', 'baz': 2.0});
+      expect(type.serialize({'bar': 'a', 'baz': 2.0}), {
+        'bar': 'a',
+        'baz': 2.0,
+      });
     });
   });
 
@@ -64,40 +68,35 @@ void main() {
 
     var pikachu = {'species': 'Pikachu', 'catch_date': catchDate};
 
-    expect(pokemonType.serialize(pikachu),
-        {'species': 'Pikachu', 'catch_date': catchDate.toIso8601String()});
+    expect(pokemonType.serialize(pikachu), {
+      'species': 'Pikachu',
+      'catch_date': catchDate.toIso8601String(),
+    });
   });
 
   test('union type lets any of its types serialize', () {
-    var typeType = enumTypeFromStrings('Type', [
-      'FIRE',
-      'WATER',
-      'GRASS',
-    ]);
+    var typeType = enumTypeFromStrings('Type', ['FIRE', 'WATER', 'GRASS']);
 
-    var pokemonType = objectType('Pokémon', fields: [
-      field(
-        'name',
-        graphQLString.nonNullable(),
-      ),
-      field(
-        'type',
-        typeType,
-      ),
-    ]);
+    var pokemonType = objectType(
+      'Pokémon',
+      fields: [
+        field('name', graphQLString.nonNullable()),
+        field('type', typeType),
+      ],
+    );
 
     var digimonType = objectType(
       'Digimon',
-      fields: [
-        field('size', graphQLFloat.nonNullable()),
-      ],
+      fields: [field('size', graphQLFloat.nonNullable())],
     );
 
     var u = GraphQLUnionType('Monster', [pokemonType, digimonType]);
 
     expect(u.serialize({'size': 10.0}), {'size': 10.0});
-    expect(u.serialize({'name': 'Charmander', 'type': 'FIRE'}),
-        {'name': 'Charmander', 'type': 'FIRE'});
+    expect(u.serialize({'name': 'Charmander', 'type': 'FIRE'}), {
+      'name': 'Charmander',
+      'type': 'FIRE',
+    });
   });
 
   test('nested object', () {
@@ -111,7 +110,7 @@ void main() {
 
     var region = pokemonRegionType.serialize({
       'trainer': trainer,
-      'pokemon_species': [pikachu, charizard]
+      'pokemon_species': [pikachu, charizard],
     });
     print(region);
 
@@ -119,15 +118,16 @@ void main() {
       'trainer': trainer,
       'pokemon_species': [
         {'species': 'Pikachu', 'catch_date': pikachuDate.toIso8601String()},
-        {'species': 'Charizard', 'catch_date': charizardDate.toIso8601String()}
-      ]
+        {'species': 'Charizard', 'catch_date': charizardDate.toIso8601String()},
+      ],
     });
 
     expect(
-        () => pokemonRegionType.serialize({
-              'trainer': trainer,
-              'DIGIMON_species': [pikachu, charizard]
-            }),
-        throwsUnsupportedError);
+      () => pokemonRegionType.serialize({
+        'trainer': trainer,
+        'DIGIMON_species': [pikachu, charizard],
+      }),
+      throwsUnsupportedError,
+    );
   });
 }

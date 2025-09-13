@@ -9,11 +9,14 @@ final GraphQLScalarType<String, String> graphQLString = GraphQLStringType();
 /// The ID scalar type represents a unique identifier, often used to re-fetch an object or as the key for a cache.
 ///
 /// The ID type is serialized in the same way as a String; however, defining it as an ID signifies that it is not intended to be human‐readable.
-final GraphQLScalarType<String, String> graphQLId =
-    GraphQLStringType(name: 'ID');
+final GraphQLScalarType<String, String> graphQLId = GraphQLStringType(
+  name: 'ID',
+);
 
-final graphQLNonEmptyString =
-    GraphQLStringMinType(1, description: 'Non empty String');
+final graphQLNonEmptyString = GraphQLStringMinType(
+  1,
+  description: 'Non empty String',
+);
 
 GraphQLStringType graphQLStringMin(int min) => GraphQLStringMinType(min);
 
@@ -28,17 +31,29 @@ final GraphQLScalarType<DateTime, String> graphQLDate = _GraphQLDateType._();
 /// A signed 32‐bit integer.
 final graphQLInt = GraphQLNumType<int>('Int');
 
-final graphQLPositiveInt =
-    GraphQLNumMinType<int>('Int', 1, description: 'Positive integer (>= 1)');
+final graphQLPositiveInt = GraphQLNumMinType<int>(
+  'Int',
+  1,
+  description: 'Positive integer (>= 1)',
+);
 
-final graphQLNonPositiveInt = GraphQLNumMaxType<int>('Int', 0,
-    description: 'Non positive integer (<= 0)');
+final graphQLNonPositiveInt = GraphQLNumMaxType<int>(
+  'Int',
+  0,
+  description: 'Non positive integer (<= 0)',
+);
 
-final graphQLNegativeInt =
-    GraphQLNumMaxType<int>('Int', -1, description: 'Negative integer (<= -1)');
+final graphQLNegativeInt = GraphQLNumMaxType<int>(
+  'Int',
+  -1,
+  description: 'Negative integer (<= -1)',
+);
 
-final graphQLNonNegativeInt = GraphQLNumMinType<int>('Int', 0,
-    description: 'Non negative integer (>= 0)');
+final graphQLNonNegativeInt = GraphQLNumMinType<int>(
+  'Int',
+  0,
+  description: 'Non negative integer (>= 0)',
+);
 
 GraphQLNumMinType<int> graphQLIntMin(int min) => GraphQLNumMinType('Int', min);
 
@@ -121,7 +136,7 @@ class GraphQLNumType<T extends num> extends GraphQLScalarType<T, T> {
 
 class GraphQLNumMinType<T extends num> extends GraphQLNumType<T> {
   GraphQLNumMinType(super.name, this.min, {String? description})
-      : super(description: description ?? '$name with minimum of $min');
+    : super(description: description ?? '$name with minimum of $min');
 
   final T min;
 
@@ -130,8 +145,9 @@ class GraphQLNumMinType<T extends num> extends GraphQLNumType<T> {
     var ret = super.validate(key, input);
 
     if (ret.successful && input < min) {
-      ret = ValidationResult._failure(
-          ['Value ($input) can not be lower than $min']);
+      ret = ValidationResult._failure([
+        'Value ($input) can not be lower than $min',
+      ]);
     }
 
     return ret;
@@ -140,7 +156,7 @@ class GraphQLNumMinType<T extends num> extends GraphQLNumType<T> {
 
 class GraphQLNumMaxType<T extends num> extends GraphQLNumType<T> {
   GraphQLNumMaxType(super.name, this.max, {String? description})
-      : super(description: description ?? '$name with maximum of $max');
+    : super(description: description ?? '$name with maximum of $max');
 
   final T max;
 
@@ -149,8 +165,9 @@ class GraphQLNumMaxType<T extends num> extends GraphQLNumType<T> {
     var ret = super.validate(key, input);
 
     if (ret.successful && input > max) {
-      ret = ValidationResult._failure(
-          ['Value ($input) can not be greater than $max']);
+      ret = ValidationResult._failure([
+        'Value ($input) can not be greater than $max',
+      ]);
     }
 
     return ret;
@@ -159,9 +176,10 @@ class GraphQLNumMaxType<T extends num> extends GraphQLNumType<T> {
 
 class GraphQLNumRangedType<T extends num> extends GraphQLNumType<T> {
   GraphQLNumRangedType(super.name, this.min, this.max, {String? description})
-      : super(
-            description: description ??
-                '$name between $min and $max. (>= $min && <= $max)');
+    : super(
+        description:
+            description ?? '$name between $min and $max. (>= $min && <= $max)',
+      );
 
   final T min;
   final T max;
@@ -172,7 +190,7 @@ class GraphQLNumRangedType<T extends num> extends GraphQLNumType<T> {
 
     if (ret.successful && (input < min || input > max)) {
       ret = ValidationResult._failure([
-        'Value ($input) must be between $min and $max. (>= $min && <= $max)'
+        'Value ($input) must be between $min and $max. (>= $min && <= $max)',
       ]);
     }
 
@@ -181,8 +199,10 @@ class GraphQLNumRangedType<T extends num> extends GraphQLNumType<T> {
 }
 
 class GraphQLStringType extends GraphQLScalarType<String, String> {
-  GraphQLStringType(
-      {this.name = 'String', this.description = 'A character sequence.'});
+  GraphQLStringType({
+    this.name = 'String',
+    this.description = 'A character sequence.',
+  });
 
   @override
   final String name;
@@ -207,9 +227,9 @@ class GraphQLStringType extends GraphQLScalarType<String, String> {
 
 class GraphQLStringMinType extends GraphQLStringType {
   GraphQLStringMinType(this.min, {String? description, super.name})
-      : super(
-            description:
-                description ?? '$name with minimum of $min characters');
+    : super(
+        description: description ?? '$name with minimum of $min characters',
+      );
 
   final int min;
 
@@ -218,8 +238,9 @@ class GraphQLStringMinType extends GraphQLStringType {
     var ret = super.validate(key, input);
 
     if (ret.successful && input.length < min) {
-      ret = ValidationResult._failure(
-          ['Value (${input.length} chars) can not be lower than $min']);
+      ret = ValidationResult._failure([
+        'Value (${input.length} chars) can not be lower than $min',
+      ]);
     }
 
     return ret;
@@ -228,7 +249,7 @@ class GraphQLStringMinType extends GraphQLStringType {
 
 class GraphQLStringMaxType extends GraphQLStringType {
   GraphQLStringMaxType(this.max, {String? description, super.name})
-      : super(description: description ?? '$name with max of $max characters');
+    : super(description: description ?? '$name with max of $max characters');
 
   final int max;
 
@@ -237,8 +258,9 @@ class GraphQLStringMaxType extends GraphQLStringType {
     var ret = super.validate(key, input);
 
     if (ret.successful && input.length > max) {
-      ret = ValidationResult._failure(
-          ['Value (${input.length} chars) can not be greater than $max']);
+      ret = ValidationResult._failure([
+        'Value (${input.length} chars) can not be greater than $max',
+      ]);
     }
 
     return ret;
@@ -247,9 +269,10 @@ class GraphQLStringMaxType extends GraphQLStringType {
 
 class GraphQLStringRangeType extends GraphQLStringType {
   GraphQLStringRangeType(this.min, this.max, {String? description, super.name})
-      : super(
-            description:
-                description ?? '$name with characters between $min and $max');
+    : super(
+        description:
+            description ?? '$name with characters between $min and $max',
+      );
 
   final int min;
   final int max;
@@ -260,7 +283,7 @@ class GraphQLStringRangeType extends GraphQLStringType {
 
     if (ret.successful && (input.length < min || input.length > max)) {
       ret = ValidationResult._failure([
-        'Value (${input.length} chars) must have between $min and $max chars'
+        'Value (${input.length} chars) must have between $min and $max chars',
       ]);
     }
 
@@ -287,8 +310,9 @@ class _GraphQLDateType extends GraphQLScalarType<DateTime, String>
   @override
   ValidationResult<String> validate(String key, input) {
     if (input is! String) {
-      return ValidationResult<String>._failure(
-          ['$key must be an ISO 8601-formatted date string.']);
+      return ValidationResult<String>._failure([
+        '$key must be an ISO 8601-formatted date string.',
+      ]);
     }
     // else if (input == null) return ValidationResult<String>._ok(input);
 
@@ -296,8 +320,9 @@ class _GraphQLDateType extends GraphQLScalarType<DateTime, String>
       DateTime.parse(input);
       return ValidationResult<String>._ok(input);
     } on FormatException {
-      return ValidationResult<String>._failure(
-          ['$key must be an ISO 8601-formatted date string.']);
+      return ValidationResult<String>._failure([
+        '$key must be an ISO 8601-formatted date string.',
+      ]);
     }
   }
 

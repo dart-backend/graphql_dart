@@ -21,9 +21,7 @@ void main() {
 
   test('dedupe', () async {
     var loader = DataLoader<int, Map<int, List<int>>>((ids) {
-      return ids.map(
-        (i) => {i: ids.toList()},
-      );
+      return ids.map((i) => {i: ids.toList()});
     });
 
     var zero = loader.load(0);
@@ -32,23 +30,20 @@ void main() {
     var anotherZero = loader.load(0);
     var batch = await Future.wait([zero, one, two, anotherZero]);
 
-    expect(
-      batch,
-      [
-        {
-          0: [0, 1, 2]
-        },
-        {
-          1: [0, 1, 2]
-        },
-        {
-          2: [0, 1, 2]
-        },
-        {
-          0: [0, 1, 2]
-        },
-      ],
-    );
+    expect(batch, [
+      {
+        0: [0, 1, 2],
+      },
+      {
+        1: [0, 1, 2],
+      },
+      {
+        2: [0, 1, 2],
+      },
+      {
+        0: [0, 1, 2],
+      },
+    ]);
   });
 
   group('cache', () {

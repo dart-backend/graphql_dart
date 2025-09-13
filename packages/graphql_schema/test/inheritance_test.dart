@@ -6,27 +6,21 @@ void main() {
     var a = objectType(
       'A',
       isInterface: true,
-      fields: [
-        field('text', graphQLString.nonNullable()),
-      ],
+      fields: [field('text', graphQLString.nonNullable())],
     );
 
     var b = objectType(
       'B',
       isInterface: true,
       interfaces: [a],
-      fields: [
-        field('text', graphQLString.nonNullable()),
-      ],
+      fields: [field('text', graphQLString.nonNullable())],
     );
 
     var c = objectType(
       'C',
       isInterface: true,
       interfaces: [b],
-      fields: [
-        field('text', graphQLString.nonNullable()),
-      ],
+      fields: [field('text', graphQLString.nonNullable())],
     );
 
     test('child implements parent', () {

@@ -20,12 +20,17 @@ class InlineFragmentContext extends Node {
   final SelectionSetContext selectionSet;
 
   InlineFragmentContext(
-      this.ellipsisToken, this.onToken, this.typeCondition, this.selectionSet);
+    this.ellipsisToken,
+    this.onToken,
+    this.typeCondition,
+    this.selectionSet,
+  );
 
   @override
   FileSpan get span {
-    var out =
-        ellipsisToken.span!.expand(onToken.span!).expand(typeCondition.span!);
+    var out = ellipsisToken.span!
+        .expand(onToken.span!)
+        .expand(typeCondition.span!);
     out = directives.fold<FileSpan>(out, (o, d) => o.expand(d.span));
 
     return out.expand(selectionSet.span!);

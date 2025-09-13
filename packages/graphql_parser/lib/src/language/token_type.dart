@@ -21,7 +21,6 @@ enum TokenType {
   // QUERY,
   // NULL
   // BOOLEAN,
-
   NUMBER,
   STRING,
   BLOCK_STRING,

@@ -1,13 +1,14 @@
 import 'package:graphql_parser2/graphql_parser2.dart';
 
-final String text = '''
+final String text =
+    '''
 {
   project(name: "GraphQL") {
     tagline
   }
 }
   '''
-    .trim();
+        .trim();
 
 void main() {
   var tokens = scan(text);

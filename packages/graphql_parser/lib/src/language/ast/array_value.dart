@@ -23,7 +23,9 @@ class ListValueContext extends InputValueContext {
   @override
   FileSpan get span {
     var out = values.fold<FileSpan?>(
-        lBracketToken.span, (o, v) => o!.expand(v.span!))!;
+      lBracketToken.span,
+      (o, v) => o!.expand(v.span!),
+    )!;
     return out.expand(rBracketToken.span!);
   }
 

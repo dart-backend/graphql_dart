@@ -20,27 +20,37 @@ RequestHandler graphQLWS(GraphQL graphQL, {Duration? keepAliveInterval}) {
     if (req is HttpRequestContext) {
       if (WebSocketTransformer.isUpgradeRequest(req.rawRequest!)) {
         await res.detach();
-        var socket = await WebSocketTransformer.upgrade(req.rawRequest!,
-            protocolSelector: (protocols) {
-          if (protocols.contains('graphql-ws')) {
-            return 'graphql-ws';
-          } else {
-            throw AngelHttpException.badRequest(
-                message: 'Only the "graphql-ws" protocol is allowed.');
-          }
-        });
+        var socket = await WebSocketTransformer.upgrade(
+          req.rawRequest!,
+          protocolSelector: (protocols) {
+            if (protocols.contains('graphql-ws')) {
+              return 'graphql-ws';
+            } else {
+              throw AngelHttpException.badRequest(
+                message: 'Only the "graphql-ws" protocol is allowed.',
+              );
+            }
+          },
+        );
         var channel = IOWebSocketChannel(socket);
         var client = stw.RemoteClient(channel.cast<String>());
-        var server =
-            _GraphQLWSServer(client, graphQL, req, res, keepAliveInterval);
+        var server = _GraphQLWSServer(
+          client,
+          graphQL,
+          req,
+          res,
+          keepAliveInterval,
+        );
         await server.done;
       } else {
         throw AngelHttpException.badRequest(
-            message: 'The `graphQLWS` endpoint only accepts WebSockets.');
+          message: 'The `graphQLWS` endpoint only accepts WebSockets.',
+        );
       }
     } else {
       throw AngelHttpException.badRequest(
-          message: 'The `graphQLWS` endpoint only accepts HTTP/1.1 requests.');
+        message: 'The `graphQLWS` endpoint only accepts HTTP/1.1 requests.',
+      );
     }
   };
 }
@@ -50,16 +60,24 @@ class _GraphQLWSServer extends stw.Server {
   final RequestContext req;
   final ResponseContext res;
 
-  _GraphQLWSServer(super.client, this.graphQL, this.req, this.res,
-      Duration? keepAliveInterval)
-      : super(keepAliveInterval: keepAliveInterval);
+  _GraphQLWSServer(
+    super.client,
+    this.graphQL,
+    this.req,
+    this.res,
+    Duration? keepAliveInterval,
+  ) : super(keepAliveInterval: keepAliveInterval);
 
   @override
   bool onConnect(stw.RemoteClient client, [Map? connectionParams]) => true;
 
   @override
-  Future<stw.GraphQLResult> onOperation(String? id, String query,
-      [Map<String, dynamic>? variables, String? operationName]) async {
+  Future<stw.GraphQLResult> onOperation(
+    String? id,
+    String query, [
+    Map<String, dynamic>? variables,
+    String? operationName,
+  ]) async {
     try {
       var globalVariables = <String, dynamic>{
         '__requestctx': req,

@@ -5,8 +5,11 @@ import 'package:graphql_schema2/graphql_schema2.dart';
 import 'package:recase/recase.dart';
 
 /// Uses `dart:mirrors` to read field names from items. If they are Maps, performs a regular lookup.
-T? mirrorsFieldResolver<T>(objectValue, String fieldName,
-    [Map<String, dynamic>? objectValues]) {
+T? mirrorsFieldResolver<T>(
+  objectValue,
+  String fieldName, [
+  Map<String, dynamic>? objectValues,
+]) {
   if (objectValue is Map) {
     return objectValue[fieldName] as T?;
   } else {
@@ -44,7 +47,8 @@ GraphQLType? _objectTypeFromDartType(Type type, [List<Type>? typeArguments]) {
     return graphQLFloat;
   } else if (type == num) {
     throw UnsupportedError(
-        'Cannot convert `num` to a GraphQL type. Choose `int` or `float` instead.');
+      'Cannot convert `num` to a GraphQL type. Choose `int` or `float` instead.',
+    );
   } else if (type == Null) {
     throw UnsupportedError('Cannot convert `Null` to a GraphQL type.');
   } else if (type == String) {
@@ -54,11 +58,14 @@ GraphQLType? _objectTypeFromDartType(Type type, [List<Type>? typeArguments]) {
   }
 
   var mirror = reflectType(
-      type, typeArguments?.isNotEmpty == true ? typeArguments : null);
+    type,
+    typeArguments?.isNotEmpty == true ? typeArguments : null,
+  );
 
   if (mirror is! ClassMirror) {
     throw StateError(
-        '$type is not a class, and therefore cannot be converted into a GraphQL object type.');
+      '$type is not a class, and therefore cannot be converted into a GraphQL object type.',
+    );
   }
 
   var clazz = mirror;
@@ -71,7 +78,8 @@ GraphQLType? _objectTypeFromDartType(Type type, [List<Type>? typeArguments]) {
     }
 
     throw ArgumentError(
-        'Cannot convert ${clazz.reflectedType}, an iterable WITHOUT a type argument, into a GraphQL type.');
+      'Cannot convert ${clazz.reflectedType}, an iterable WITHOUT a type argument, into a GraphQL type.',
+    );
   }
 
   if (clazz.isEnum) {
@@ -95,7 +103,8 @@ GraphQLObjectType? objectTypeFromClassMirror(ClassMirror mirror) {
     for (var name in map.keys) {
       var methodMirror = map[name]!;
       var exclude = _getExclude(name, methodMirror);
-      var canAdd = name != #hashCode &&
+      var canAdd =
+          name != #hashCode &&
           name != #runtimeType &&
           !methodMirror.isPrivate &&
           exclude?.canSerialize != true;
@@ -168,7 +177,7 @@ GraphQLObjectType? objectTypeFromClassMirror(ClassMirror mirror) {
     dynamic,
     Null,
     Type,
-    Symbol
+    Symbol,
   ];
 
   void walk(ClassMirror parent) {
@@ -233,7 +242,11 @@ GraphQLEnumType enumTypeFromClassMirror(ClassMirror mirror) {
 
 @Deprecated('No replacement yet')
 GraphQLObjectField fieldFromGetter(
-    Symbol name, MethodMirror mirror, Exclude? exclude, ClassMirror clazz) {
+  Symbol name,
+  MethodMirror mirror,
+  Exclude? exclude,
+  ClassMirror clazz,
+) {
   var type = _getProvidedType(mirror.metadata);
   var wasProvided = type != null;
 
@@ -241,8 +254,10 @@ GraphQLObjectField fieldFromGetter(
     var returnType = mirror.returnType;
 
     if (!clazz.isAssignableTo(returnType)) {
-      type = convertDartType(returnType.reflectedType,
-          mirror.returnType.typeArguments.map((t) => t.reflectedType).toList());
+      type = convertDartType(
+        returnType.reflectedType,
+        mirror.returnType.typeArguments.map((t) => t.reflectedType).toList(),
+      );
     }
   }
 
@@ -281,7 +296,10 @@ Exclude? _getExclude(Symbol name, MethodMirror mirror) {
 }
 
 String? _getSerializedName(
-    Symbol name, MethodMirror mirror, ClassMirror clazz) {
+  Symbol name,
+  MethodMirror mirror,
+  ClassMirror clazz,
+) {
   // First search for an @Alias()
   for (var obj in mirror.metadata) {
     if (obj.reflectee is SerializableField) {

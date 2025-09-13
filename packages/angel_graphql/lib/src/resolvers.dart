@@ -20,7 +20,7 @@ Map<String, dynamic>? _getQuery(Map<String, dynamic> arguments) {
 /// The arguments passed to the resolver will be forwarded to the service, and the
 /// service will receive [Providers.graphql].
 GraphQLFieldResolver<List<Value>, Serialized>
-    resolveViaServiceIndex<Value, Serialized>(Service<dynamic, Value> service) {
+resolveViaServiceIndex<Value, Serialized>(Service<dynamic, Value> service) {
   return (_, arguments) async {
     var requestInfo = _fetchRequestInfo(arguments);
     var params = {'query': _getQuery(arguments), 'provider': Providers.graphQL}
@@ -35,8 +35,7 @@ GraphQLFieldResolver<List<Value>, Serialized>
 /// The arguments passed to the resolver will be forwarded to the service, and the
 /// service will receive [Providers.graphql].
 GraphQLFieldResolver<Value, Serialized>
-    resolveViaServiceFindOne<Value, Serialized>(
-        Service<dynamic, Value> service) {
+resolveViaServiceFindOne<Value, Serialized>(Service<dynamic, Value> service) {
   return (_, arguments) async {
     var requestInfo = _fetchRequestInfo(arguments);
     var params = {'query': _getQuery(arguments), 'provider': Providers.graphQL}
@@ -52,9 +51,10 @@ GraphQLFieldResolver<Value, Serialized>
 ///
 /// The arguments passed to the resolver will be forwarded to the service, and the
 /// service will receive [Providers.graphql].
-GraphQLFieldResolver<Value, Serialized>
-    resolveViaServiceRead<Value, Serialized>(Service<dynamic, Value> service,
-        {String idField = 'id'}) {
+GraphQLFieldResolver<Value, Serialized> resolveViaServiceRead<
+  Value,
+  Serialized
+>(Service<dynamic, Value> service, {String idField = 'id'}) {
   return (_, arguments) async {
     var requestInfo = _fetchRequestInfo(arguments);
     var params = {'query': _getQuery(arguments), 'provider': Providers.graphQL}
@@ -72,8 +72,7 @@ GraphQLFieldResolver<Value, Serialized>
 /// The arguments passed to the resolver will be forwarded to the service, and the
 /// service will receive [Providers.graphql].
 GraphQLFieldResolver<Value?, Serialized>
-    resolveViaServiceCreate<Value, Serialized>(
-        Service<dynamic, Value?> service) {
+resolveViaServiceCreate<Value, Serialized>(Service<dynamic, Value?> service) {
   return (_, arguments) async {
     var requestInfo = _fetchRequestInfo(arguments);
     var params = {'query': _getQuery(arguments), 'provider': Providers.graphQL}
@@ -90,9 +89,10 @@ GraphQLFieldResolver<Value?, Serialized>
 ///
 /// The arguments passed to the resolver will be forwarded to the service, and the
 /// service will receive [Providers.graphql].
-GraphQLFieldResolver<Value?, Serialized>
-    resolveViaServiceModify<Value, Serialized>(Service<dynamic, Value?> service,
-        {String idField = 'id'}) {
+GraphQLFieldResolver<Value?, Serialized> resolveViaServiceModify<
+  Value,
+  Serialized
+>(Service<dynamic, Value?> service, {String idField = 'id'}) {
   return (_, arguments) async {
     var requestInfo = _fetchRequestInfo(arguments);
     var params = {'query': _getQuery(arguments), 'provider': Providers.graphQL}
@@ -113,9 +113,10 @@ GraphQLFieldResolver<Value?, Serialized>
 ///
 /// Keep in mind that `update` **overwrites** existing contents.
 /// To avoid this, use [resolveViaServiceModify] instead.
-GraphQLFieldResolver<Value?, Serialized>
-    resolveViaServiceUpdate<Value, Serialized>(Service<dynamic, Value?> service,
-        {String idField = 'id'}) {
+GraphQLFieldResolver<Value?, Serialized> resolveViaServiceUpdate<
+  Value,
+  Serialized
+>(Service<dynamic, Value?> service, {String idField = 'id'}) {
   return (_, arguments) async {
     var requestInfo = _fetchRequestInfo(arguments);
     var params = {'query': _getQuery(arguments), 'provider': Providers.graphQL}
@@ -132,9 +133,10 @@ GraphQLFieldResolver<Value?, Serialized>
 ///
 /// The arguments passed to the resolver will be forwarded to the service, and the
 /// service will receive [Providers.graphql].
-GraphQLFieldResolver<Value, Serialized>
-    resolveViaServiceRemove<Value, Serialized>(Service<dynamic, Value> service,
-        {String idField = 'id'}) {
+GraphQLFieldResolver<Value, Serialized> resolveViaServiceRemove<
+  Value,
+  Serialized
+>(Service<dynamic, Value> service, {String idField = 'id'}) {
   return (_, arguments) async {
     var requestInfo = _fetchRequestInfo(arguments);
     var params = {'query': _getQuery(arguments), 'provider': Providers.graphQL}

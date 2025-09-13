@@ -23,9 +23,9 @@ class NumberValueContext extends InputValueContext<num> {
     }
   }
 
-// Use [numberToken] instead.
-//  @deprecated
-//  Token get NUMBER => numberToken;
+  // Use [numberToken] instead.
+  //  @deprecated
+  //  Token get NUMBER => numberToken;
 
   @override
   FileSpan? get span => numberToken.span;

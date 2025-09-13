@@ -11,13 +11,16 @@ void main() {
 
   test('with directives', () {
     expect(
-        '... foo @bar @baz: 2 @quux(one: 1)',
-        isFragmentSpread('foo',
-            directives: isDirectiveList([
-              isDirective('bar'),
-              isDirective('baz', valueOrVariable: equals(2)),
-              isDirective('quux', argument: isArgument('one', 1))
-            ])));
+      '... foo @bar @baz: 2 @quux(one: 1)',
+      isFragmentSpread(
+        'foo',
+        directives: isDirectiveList([
+          isDirective('bar'),
+          isDirective('baz', valueOrVariable: equals(2)),
+          isDirective('quux', argument: isArgument('one', 1)),
+        ]),
+      ),
+    );
   });
 }
 
@@ -37,7 +40,8 @@ class _IsFragmentSpread extends Matcher {
   Description describe(Description description) {
     if (directives != null) {
       return directives!.describe(
-          description.add('is a fragment spread named "$name" that also '));
+        description.add('is a fragment spread named "$name" that also '),
+      );
     }
     return description.add('is a fragment spread named "$name"');
   }

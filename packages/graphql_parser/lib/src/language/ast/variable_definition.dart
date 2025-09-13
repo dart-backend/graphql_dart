@@ -15,8 +15,12 @@ class VariableDefinitionContext extends Node with Directives {
   /// The default value of the variable.
   final DefaultValueContext? defaultValue;
 
-  VariableDefinitionContext(this.variable, this.colonToken, this.type,
-      [this.defaultValue]);
+  VariableDefinitionContext(
+    this.variable,
+    this.colonToken,
+    this.type, [
+    this.defaultValue,
+  ]);
 
   /// Use [colonToken] instead.
   @Deprecated('Use [colonToken] instead.')

@@ -10,24 +10,30 @@ import 'selection_set_test.dart';
 void main() {
   test('no directives', () {
     expect(
-        '... on foo {bar, baz: quux}',
-        isInlineFragment('foo',
-            selectionSet: isSelectionSet([
-              isField(fieldName: isFieldName('bar')),
-              isField(fieldName: isFieldName('baz', alias: 'quux'))
-            ])));
+      '... on foo {bar, baz: quux}',
+      isInlineFragment(
+        'foo',
+        selectionSet: isSelectionSet([
+          isField(fieldName: isFieldName('bar')),
+          isField(fieldName: isFieldName('baz', alias: 'quux')),
+        ]),
+      ),
+    );
   });
 
   test('with directives', () {
     expect(
-        '... on foo @bar @baz: 2 @quux(one: 1) {... bar}',
-        isInlineFragment('foo',
-            directives: isDirectiveList([
-              isDirective('bar'),
-              isDirective('baz', valueOrVariable: equals(2)),
-              isDirective('quux', argument: isArgument('one', 1))
-            ]),
-            selectionSet: isSelectionSet([isFragmentSpread('bar')])));
+      '... on foo @bar @baz: 2 @quux(one: 1) {... bar}',
+      isInlineFragment(
+        'foo',
+        directives: isDirectiveList([
+          isDirective('bar'),
+          isDirective('baz', valueOrVariable: equals(2)),
+          isDirective('quux', argument: isArgument('one', 1)),
+        ]),
+        selectionSet: isSelectionSet([isFragmentSpread('bar')]),
+      ),
+    );
   });
 
   test('exceptions', () {
@@ -45,9 +51,11 @@ void main() {
 InlineFragmentContext? parseInlineFragment(String text) =>
     parse(text).parseInlineFragment();
 
-Matcher isInlineFragment(String name,
-        {Matcher? directives, Matcher? selectionSet}) =>
-    _IsInlineFragment(name, directives, selectionSet);
+Matcher isInlineFragment(
+  String name, {
+  Matcher? directives,
+  Matcher? selectionSet,
+}) => _IsInlineFragment(name, directives, selectionSet);
 
 class _IsInlineFragment extends Matcher {
   final String name;

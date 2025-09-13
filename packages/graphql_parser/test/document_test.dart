@@ -24,14 +24,15 @@ void main() {
     expect(fragment.name, 'PostInfo');
     expect(fragment.typeCondition.typeName.name, 'Post');
     expect(
-        fragment.selectionSet,
-        isSelectionSet([
-          isField(fieldName: isFieldName('description')),
-          isField(
-              fieldName: isFieldName('comments'),
-              selectionSet:
-                  isSelectionSet([isField(fieldName: isFieldName('id'))])),
-        ]));
+      fragment.selectionSet,
+      isSelectionSet([
+        isField(fieldName: isFieldName('description')),
+        isField(
+          fieldName: isFieldName('comments'),
+          selectionSet: isSelectionSet([isField(fieldName: isFieldName('id'))]),
+        ),
+      ]),
+    );
   });
 
   test('fragment exceptions', () {
@@ -54,11 +55,12 @@ void main() {
       expect(op.isMutation, isFalse);
       expect(op.name, isNull);
       expect(
-          op.selectionSet,
-          isSelectionSet([
-            isField(fieldName: isFieldName('foo')),
-            isField(fieldName: isFieldName('bar', alias: 'baz'))
-          ]));
+        op.selectionSet,
+        isSelectionSet([
+          isField(fieldName: isFieldName('foo')),
+          isField(fieldName: isFieldName('bar', alias: 'baz')),
+        ]),
+      );
     });
 
     test('mutation', () {
@@ -68,17 +70,18 @@ void main() {
       expect(op.isMutation, isTrue);
       expect(op.name, isNull);
       expect(
-          op.selectionSet,
-          isSelectionSet([
-            isField(fieldName: isFieldName('foo')),
-            isField(fieldName: isFieldName('bar', alias: 'baz'))
-          ]));
+        op.selectionSet,
+        isSelectionSet([
+          isField(fieldName: isFieldName('foo')),
+          isField(fieldName: isFieldName('bar', alias: 'baz')),
+        ]),
+      );
     });
 
     test('with operation type', () {
-      var doc =
-          parse(r'query foo ($one: [int] = 2) @foo @bar: 2 {foo, bar: baz}')
-              .parseDocument();
+      var doc = parse(
+        r'query foo ($one: [int] = 2) @foo @bar: 2 {foo, bar: baz}',
+      ).parseDocument();
       print(doc.span!.highlight());
       expect(doc.definitions, hasLength(1));
       expect(doc.definitions.first is OperationDefinitionContext, isTrue);
@@ -88,10 +91,13 @@ void main() {
 
       expect(op.variableDefinitions!.variableDefinitions, hasLength(1));
       expect(
-          op.variableDefinitions!.variableDefinitions.first,
-          isVariableDefinition('one',
-              type: isListType(isType('int'), isNullable: true),
-              defaultValue: isValue(2)));
+        op.variableDefinitions!.variableDefinitions.first,
+        isVariableDefinition(
+          'one',
+          type: isListType(isType('int'), isNullable: true),
+          defaultValue: isValue(2),
+        ),
+      );
 
       expect(op.directives, hasLength(2));
       expect(op.directives[0], isDirective('foo'));
@@ -99,11 +105,12 @@ void main() {
 
       expect(op.selectionSet, isNotNull);
       expect(
-          op.selectionSet,
-          isSelectionSet([
-            isField(fieldName: isFieldName('foo')),
-            isField(fieldName: isFieldName('bar', alias: 'baz'))
-          ]));
+        op.selectionSet,
+        isSelectionSet([
+          isField(fieldName: isFieldName('foo')),
+          isField(fieldName: isFieldName('bar', alias: 'baz')),
+        ]),
+      );
     });
 
     test('exceptions', () {

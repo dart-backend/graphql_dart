@@ -40,8 +40,8 @@ abstract class GraphQLType<Value, Serialized> {
 
 /// Shorthand to create a [GraphQLListType].
 GraphQLListType<Value, Serialized> listOf<Value, Serialized>(
-        GraphQLType<Value, Serialized> innerType) =>
-    GraphQLListType<Value, Serialized>(innerType);
+  GraphQLType<Value, Serialized> innerType,
+) => GraphQLListType<Value, Serialized>(innerType);
 
 /// A special [GraphQLType] that indicates that input vales should be a list of another type, [ofType].
 class GraphQLListType<Value, Serialized>
@@ -148,8 +148,9 @@ class GraphQLNonNullableType<Value, Serialized>
   @override
   ValidationResult<Serialized> validate(String key, Serialized input) {
     if (input == null) {
-      return ValidationResult._failure(
-          ['Expected "$key" to be a non-null value.']);
+      return ValidationResult._failure([
+        'Expected "$key" to be a non-null value.',
+      ]);
     }
     return ofType.validate(key, input);
   }

@@ -31,12 +31,18 @@ class OperationDefinitionContext extends ExecutableDefinitionContext {
   /// The [String] value of the [nameToken].
   String? get name => nameToken?.text;
 
-  OperationDefinitionContext(this.typeToken, this.nameToken,
-      this.variableDefinitions, this.selectionSet) {
-    assert(typeToken == null ||
-        typeToken!.text == 'query' ||
-        typeToken!.text == 'mutation' ||
-        typeToken!.text == 'subscription');
+  OperationDefinitionContext(
+    this.typeToken,
+    this.nameToken,
+    this.variableDefinitions,
+    this.selectionSet,
+  ) {
+    assert(
+      typeToken == null ||
+          typeToken!.text == 'query' ||
+          typeToken!.text == 'mutation' ||
+          typeToken!.text == 'subscription',
+    );
   }
 
   @override

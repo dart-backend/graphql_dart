@@ -9,7 +9,8 @@ final RegExp _whitespace = RegExp('[ \t\n\r]+');
 // final RegExp _boolean = RegExp(r'true|false');
 final RegExp _number = RegExp(r'-?[0-9]+(\.[0-9]+)?(E|e(\+|-)?[0-9]+)?');
 final RegExp _string = RegExp(
-    r'"((\\(["\\/bfnrt]|(u[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])))|([^"\\]))*"');
+  r'"((\\(["\\/bfnrt]|(u[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])))|([^"\\]))*"',
+);
 final RegExp _blockString = RegExp(r'"""(([^"])|(\\"""))*"""');
 final RegExp _name = RegExp(r'[_A-Za-z][_0-9A-Za-z]*');
 
@@ -37,7 +38,7 @@ final Map<Pattern, TokenType> _patterns = {
   _number: TokenType.NUMBER,
   _string: TokenType.STRING,
   _blockString: TokenType.BLOCK_STRING,
-  _name: TokenType.NAME
+  _name: TokenType.NAME,
 };
 
 List<Token> scan(String text, {sourceUrl}) {
