@@ -23,7 +23,7 @@ jobs:
       # https://github.com/dart-lang/setup-dart/blob/main/README.md
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: "3.6.1"
+          sdk: "3.8.3"
       
       # Graphql Schema
       - id: graphql_schema2_upgrade
