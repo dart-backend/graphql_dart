@@ -4,7 +4,7 @@ description: Generates GraphQL schemas from Dart classes, for use with pkg:graph
 homepage: https://angel3-framework.web.app/
 repository: https://github.com/dart-backend/graphql_dart/tree/master/packages/graphql_generator
 environment:
-  sdk: '>=3.8.0 <5.0.0'
+  sdk: '>=3.8.0 <4.0.0'
 dependencies:
   analyzer: ^7.7.0
   angel3_model: ^8.0.0

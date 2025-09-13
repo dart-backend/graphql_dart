@@ -4,7 +4,7 @@ description: Batch and cache database lookups. Works well with GraphQL. Ported f
 homepage: https://angel3-framework.web.app/
 repository: https://github.com/dart-backend/graphql_dart/tree/master/packages/graphql_data_loader
 environment:
-  sdk: '>=3.8.0 <5.0.0'
+  sdk: '>=3.8.0 <4.0.0'
 dev_dependencies:
   graphql_schema2: ^6.0.0
   lints: ^6.0.0
