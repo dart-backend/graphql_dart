@@ -1,19 +1,19 @@
 name: angel3_graphql
-version: 8.2.0
+version: 8.4.0
 description: The fastest and easiest way to get a GraphQL backend in Dart, using Angel3.
 homepage: https://angel3-framework.web.app/
 repository: https://github.com/dart-backend/graphql_dart/tree/master/packages/angel_graphql
 environment:
-  sdk: '>=3.6.0 <4.0.0'
+  sdk: '>=3.8.0 <5.0.0'
 dependencies:
   angel3_file_service: ^8.0.0
   angel3_framework: ^8.4.0
   angel3_container: ^8.0.0
   angel3_websocket: ^8.1.0
   angel3_validate: ^8.0.0
-  graphql_parser2: ^6.0.0
-  graphql_schema2: ^6.0.0
-  graphql_server2: ^6.0.0
+  graphql_parser2: ^6.3.0
+  graphql_schema2: ^6.3.0
+  graphql_server2: ^6.3.0
   http_parser: ^4.0.0
   web_socket_channel: ^3.0.0
   collection: ^1.17.0
@@ -21,11 +21,4 @@ dev_dependencies:
   angel3_serialize: ^8.0.0
   file: ^7.0.0
   logging: ^1.2.0
-  lints: ^5.0.0
-# dependency_overrides:
-#   graphql_server2:
-#     path: ../graphql_server
-#   graphql_parser2:
-#     path: ../graphql_parser
-#   graphql_schema2:
-#     path: ../graphql_schema
+  lints: ^6.0.0
