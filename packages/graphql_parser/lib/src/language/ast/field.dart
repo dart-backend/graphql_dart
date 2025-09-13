@@ -27,11 +27,15 @@ class FieldContext extends Node with Directives {
       return fieldName.span?.expand(otherSpan);
     } else if (directives.isNotEmpty) {
       return directives.fold<FileSpan?>(
-          fieldName.span, (out, d) => out?.expand(d.span));
+        fieldName.span,
+        (out, d) => out?.expand(d.span),
+      );
     }
     if (arguments.isNotEmpty) {
       return arguments.fold<FileSpan?>(
-          fieldName.span, (out, a) => out?.expand(a.span));
+        fieldName.span,
+        (out, a) => out?.expand(a.span),
+      );
     } else {
       return fieldName.span;
     }

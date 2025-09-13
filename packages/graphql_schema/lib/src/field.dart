@@ -1,8 +1,11 @@
 part of 'schema.dart';
 
 /// Typedef for a function that resolves the value of a [GraphQLObjectField], whether asynchronously or not.
-typedef GraphQLFieldResolver<Value, Serialized> = FutureOr<Value> Function(
-    Serialized serialized, Map<String, dynamic> argumentValues);
+typedef GraphQLFieldResolver<Value, Serialized> =
+    FutureOr<Value> Function(
+      Serialized serialized,
+      Map<String, dynamic> argumentValues,
+    );
 
 /// A field on a [GraphQLObjectType].
 ///
@@ -27,15 +30,18 @@ class GraphQLObjectField<Value, Serialized> {
   /// The reason that this field, if it is deprecated, was deprecated.
   final String? deprecationReason;
 
-  GraphQLObjectField(this.name, this.type,
-      {Iterable<GraphQLFieldInput> arguments = const <GraphQLFieldInput>[],
-      required this.resolve,
-      this.deprecationReason,
-      this.description}) {
-//    assert(type != null, 'GraphQL fields must specify a `type`.');
-//    assert(
-//        resolve != null, 'GraphQL fields must specify a `resolve` callback.');
-//    this.inputs.addAll(arguments ?? <GraphQLFieldInput>[]);
+  GraphQLObjectField(
+    this.name,
+    this.type, {
+    Iterable<GraphQLFieldInput> arguments = const <GraphQLFieldInput>[],
+    required this.resolve,
+    this.deprecationReason,
+    this.description,
+  }) {
+    //    assert(type != null, 'GraphQL fields must specify a `type`.');
+    //    assert(
+    //        resolve != null, 'GraphQL fields must specify a `resolve` callback.');
+    //    this.inputs.addAll(arguments ?? <GraphQLFieldInput>[]);
     inputs.addAll(arguments);
   }
 
@@ -46,8 +52,10 @@ class GraphQLObjectField<Value, Serialized> {
     return type.serialize(value);
   }
 
-  FutureOr<Value>? deserialize(Serialized serialized,
-      [Map<String, dynamic> argumentValues = const <String, dynamic>{}]) {
+  FutureOr<Value>? deserialize(
+    Serialized serialized, [
+    Map<String, dynamic> argumentValues = const <String, dynamic>{},
+  ]) {
     if (resolve != null) return resolve!(serialized, argumentValues);
     return type.deserialize(serialized);
   }

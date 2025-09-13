@@ -22,9 +22,11 @@ final RegExp _num = RegExp(r'^[0-9]+$');
 ///
 /// Follows the guidelines listed here:
 /// https://graphql.org/learn/serving-over-http/
-RequestHandler graphQLHttp(GraphQL graphQL,
-    {Function(RequestContext, ResponseContext, Stream<Map<String, dynamic>>)?
-        onSubscription}) {
+RequestHandler graphQLHttp(
+  GraphQL graphQL, {
+  Function(RequestContext, ResponseContext, Stream<Map<String, dynamic>>)?
+  onSubscription,
+}) {
   return (req, res) async {
     var globalVariables = <String, dynamic>{
       '__requestctx': req,
@@ -35,15 +37,14 @@ RequestHandler graphQLHttp(GraphQL graphQL,
       if (result is Stream<Map<String, dynamic>>) {
         if (onSubscription == null) {
           throw StateError(
-              'The GraphQL backend returned a Stream, but no `onSubscription` callback was provided.');
+            'The GraphQL backend returned a Stream, but no `onSubscription` callback was provided.',
+          );
         } else {
           return await onSubscription(req, res, result);
         }
       }
 
-      return {
-        'data': result,
-      };
+      return {'data': result};
     }
 
     Future executeMap(Map map) async {
@@ -56,13 +57,15 @@ RequestHandler graphQLHttp(GraphQL graphQL,
         variables = json.decode(variables);
       }
 
-      return await sendGraphQLResponse(await graphQL.parseAndExecute(
-        text,
-        sourceUrl: 'input',
-        operationName: operationName,
-        variableValues: foldToStringDynamic(variables as Map?),
-        globalVariables: globalVariables,
-      ));
+      return await sendGraphQLResponse(
+        await graphQL.parseAndExecute(
+          text,
+          sourceUrl: 'input',
+          operationName: operationName,
+          variableValues: foldToStringDynamic(variables as Map?),
+          globalVariables: globalVariables,
+        ),
+      );
     }
 
     try {
@@ -73,11 +76,13 @@ RequestHandler graphQLHttp(GraphQL graphQL,
       } else if (req.method == 'POST') {
         if (req.headers!.contentType?.mimeType == graphQlContentType.mimeType) {
           var text = await req.body!.transform(utf8.decoder).join();
-          return sendGraphQLResponse(await graphQL.parseAndExecute(
-            text,
-            sourceUrl: 'input',
-            globalVariables: globalVariables,
-          ));
+          return sendGraphQLResponse(
+            await graphQL.parseAndExecute(
+              text,
+              sourceUrl: 'input',
+              globalVariables: globalVariables,
+            ),
+          );
         } else if (req.headers!.contentType?.mimeType == 'application/json') {
           if (await validate(graphQlPostBody)(req, res) as bool) {
             return await executeMap(req.bodyAsMap);
@@ -88,29 +93,34 @@ RequestHandler graphQLHttp(GraphQL graphQL,
           var operations = fields['operations'] as String?;
           if (operations == null) {
             throw AngelHttpException.badRequest(
-                message: 'Missing "operations" field.');
+              message: 'Missing "operations" field.',
+            );
           }
           var map = fields.containsKey('map')
               ? json.decode(fields['map'] as String)
               : null;
           if (map is! Map) {
             throw AngelHttpException.badRequest(
-                message: '"map" field must decode to a JSON object.');
+              message: '"map" field must decode to a JSON object.',
+            );
           }
           var variables = Map<String, dynamic>.from(globalVariables);
           for (var entry in map.entries) {
-            var file =
-                req.uploadedFiles!.firstWhereOrNull((f) => f.name == entry.key);
+            var file = req.uploadedFiles!.firstWhereOrNull(
+              (f) => f.name == entry.key,
+            );
             if (file == null) {
               throw AngelHttpException.badRequest(
-                  message:
-                      '"map" contained key "${entry.key}", but no uploaded file '
-                      'has that name.');
+                message:
+                    '"map" contained key "${entry.key}", but no uploaded file '
+                    'has that name.',
+              );
             }
             if (entry.value is! List) {
               throw AngelHttpException.badRequest(
-                  message:
-                      'The value for "${entry.key}" in the "map" field was not a JSON array.');
+                message:
+                    'The value for "${entry.key}" in the "map" field was not a JSON array.',
+              );
             }
             var objectPaths = entry.value as List;
             for (var objectPath in objectPaths) {
@@ -123,33 +133,38 @@ RequestHandler graphQLHttp(GraphQL graphQL,
                   if (_num.hasMatch(name)) {
                     if (current is! List) {
                       throw AngelHttpException.badRequest(
-                          message:
-                              'Object "$parent" is not a JSON array, but the '
-                              '"map" field contained a mapping to $parent.$name.');
+                        message:
+                            'Object "$parent" is not a JSON array, but the '
+                            '"map" field contained a mapping to $parent.$name.',
+                      );
                     }
                     current[int.parse(name)] = file;
                   } else {
                     if (current is! Map) {
                       throw AngelHttpException.badRequest(
-                          message:
-                              'Object "$parent" is not a JSON object, but the '
-                              '"map" field contained a mapping to $parent.$name.');
+                        message:
+                            'Object "$parent" is not a JSON object, but the '
+                            '"map" field contained a mapping to $parent.$name.',
+                      );
                     }
                     current[name] = file;
                   }
                 }
               } else {
                 throw AngelHttpException.badRequest(
-                    message:
-                        'All array values in the "map" field must begin with "variables.".');
+                  message:
+                      'All array values in the "map" field must begin with "variables.".',
+                );
               }
             }
           }
-          return await sendGraphQLResponse(await graphQL.parseAndExecute(
-            operations,
-            sourceUrl: 'input',
-            globalVariables: variables,
-          ));
+          return await sendGraphQLResponse(
+            await graphQL.parseAndExecute(
+              operations,
+              sourceUrl: 'input',
+              globalVariables: variables,
+            ),
+          );
         } else {
           throw AngelHttpException.badRequest();
         }
@@ -173,9 +188,10 @@ RequestHandler graphQLHttp(GraphQL graphQL,
     } catch (e, st) {
       if (req.app?.logger != null) {
         req.app!.logger.severe(
-            'An error occurred while processing GraphQL query at ${req.uri}.',
-            e,
-            st);
+          'An error occurred while processing GraphQL query at ${req.uri}.',
+          e,
+          st,
+        );
       }
 
       return GraphQLException.fromMessage(e.toString()).toJson();

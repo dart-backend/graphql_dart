@@ -2,30 +2,25 @@ import 'package:graphql_schema2/graphql_schema2.dart';
 import 'package:test/test.dart';
 
 void main() {
-  var typeType = enumTypeFromStrings('Type', [
-    'FIRE',
-    'WATER',
-    'GRASS',
-  ]);
+  var typeType = enumTypeFromStrings('Type', ['FIRE', 'WATER', 'GRASS']);
 
-  var pokemonType = objectType('Pokémon', fields: [
-    field(
-      'name',
-      graphQLString.nonNullable(),
-    ),
-    field(
-      'type',
-      typeType,
-    ),
-  ]);
+  var pokemonType = objectType(
+    'Pokémon',
+    fields: [
+      field('name', graphQLString.nonNullable()),
+      field('type', typeType),
+    ],
+  );
 
   var isValidPokemon = predicate(
-      (dynamic x) =>
-          pokemonType.validate('@root', x as Map<String, dynamic>).successful,
-      'is a valid Pokémon');
+    (dynamic x) =>
+        pokemonType.validate('@root', x as Map<String, dynamic>).successful,
+    'is a valid Pokémon',
+  );
 
   var throwsATypeError = throwsA(
-      predicate((dynamic x) => x is TypeError, 'is a type or cast error'));
+    predicate((dynamic x) => x is TypeError, 'is a type or cast error'),
+  );
 
   test('object accepts valid input', () {
     expect({'name': 'Charmander', 'type': 'FIRE'}, isValidPokemon);
@@ -60,9 +55,7 @@ void main() {
   group('union type', () {
     var digimonType = objectType(
       'Digimon',
-      fields: [
-        field('size', graphQLFloat.nonNullable()),
-      ],
+      fields: [field('size', graphQLFloat.nonNullable())],
     );
 
     var u = GraphQLUnionType('Monster', [pokemonType, digimonType]);
@@ -70,9 +63,9 @@ void main() {
     test('any of its types returns valid', () {
       expect(u.validate('@root', {'size': 32.0}).successful, true);
       expect(
-          u.validate(
-              '@root', {'name': 'Charmander', 'type': 'FIRE'}).successful,
-          true);
+        u.validate('@root', {'name': 'Charmander', 'type': 'FIRE'}).successful,
+        true,
+      );
     });
   });
 
@@ -86,8 +79,10 @@ void main() {
     );
 
     test('accept valid input', () {
-      expect(type.validate('@root', {'bar': 'a', 'baz': 2.0}).value,
-          {'bar': 'a', 'baz': 2.0});
+      expect(type.validate('@root', {'bar': 'a', 'baz': 2.0}).value, {
+        'bar': 'a',
+        'baz': 2.0,
+      });
     });
 
     test('error on missing non-null fields', () {
@@ -96,9 +91,13 @@ void main() {
 
     test('error on unrecognized fields', () {
       expect(
-          type.validate(
-              '@root', {'bar': 'a', 'baz': 2.0, 'franken': 'stein'}).successful,
-          false);
+        type.validate('@root', {
+          'bar': 'a',
+          'baz': 2.0,
+          'franken': 'stein',
+        }).successful,
+        false,
+      );
     });
   });
 }

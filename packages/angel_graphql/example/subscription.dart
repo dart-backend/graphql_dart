@@ -23,8 +23,10 @@ void main() async {
 
   // Create an in-memory service.
   var fs = LocalFileSystem();
-  var postService =
-      app.use('/api/posts', JsonFileService(fs.file('posts.json')));
+  var postService = app.use(
+    '/api/posts',
+    JsonFileService(fs.file('posts.json')),
+  );
 
   // Also get a [Stream] of item creation events.
   var postAdded = postService.afterCreated
@@ -33,10 +35,10 @@ void main() async {
       .asBroadcastStream();
 
   // GraphQL setup.
-  var postType = objectType('Post', fields: [
-    field('author', graphQLString),
-    field('comment', graphQLString),
-  ]);
+  var postType = objectType(
+    'Post',
+    fields: [field('author', graphQLString), field('comment', graphQLString)],
+  );
 
   var schema = graphQLSchema(
     // Hooked up to the postService:
@@ -64,7 +66,9 @@ void main() async {
           postType,
           inputs: [
             GraphQLFieldInput(
-                'data', postType.toInputObject('PostInput').nonNullable()),
+              'data',
+              postType.toInputObject('PostInput').nonNullable(),
+            ),
           ],
           resolve: resolveViaServiceCreate(postService),
         ),
@@ -75,22 +79,27 @@ void main() async {
     // type Subscription { postAdded: Post }
     subscriptionType: objectType(
       'Subscription',
-      fields: [
-        field('postAdded', postType, resolve: (_, __) => postAdded),
-      ],
+      fields: [field('postAdded', postType, resolve: (_, __) => postAdded)],
     ),
   );
 
   // Mount GraphQL routes; we'll support HTTP and WebSockets transports.
   app.all('/graphql', graphQLHttp(GraphQL(schema)));
-  app.get('/subscriptions',
-      graphQLWS(GraphQL(schema), keepAliveInterval: Duration(seconds: 3)));
-  app.get('/graphiql',
-      graphiQL(subscriptionsEndpoint: 'ws://localhost:3000/subscriptions'));
+  app.get(
+    '/subscriptions',
+    graphQLWS(GraphQL(schema), keepAliveInterval: Duration(seconds: 3)),
+  );
+  app.get(
+    '/graphiql',
+    graphiQL(subscriptionsEndpoint: 'ws://localhost:3000/subscriptions'),
+  );
 
   var server = await http.startServer('127.0.0.1', 3000);
-  var uri =
-      Uri(scheme: 'http', host: server.address.address, port: server.port);
+  var uri = Uri(
+    scheme: 'http',
+    host: server.address.address,
+    port: server.port,
+  );
   var graphiqlUri = uri.replace(path: 'graphiql');
   var postsUri = uri.replace(pathSegments: ['api', 'posts']);
   print('Listening at $uri');

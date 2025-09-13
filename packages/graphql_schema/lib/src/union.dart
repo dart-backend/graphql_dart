@@ -14,13 +14,18 @@ class GraphQLUnionType
   final List<GraphQLObjectType> possibleTypes = [];
 
   GraphQLUnionType(
-      this.name,
-      Iterable<GraphQLType<Map<String, dynamic>, Map<String, dynamic>>>
-          possibleTypes) {
-    assert(possibleTypes.every((t) => t is GraphQLObjectType),
-        'The member types of a Union type must all be Object base types; Scalar, Interface and Union types must not be member types of a Union. Similarly, wrapping types must not be member types of a Union.');
-    assert(possibleTypes.isNotEmpty,
-        'A Union type must define one or more member types.');
+    this.name,
+    Iterable<GraphQLType<Map<String, dynamic>, Map<String, dynamic>>>
+    possibleTypes,
+  ) {
+    assert(
+      possibleTypes.every((t) => t is GraphQLObjectType),
+      'The member types of a Union type must all be Object base types; Scalar, Interface and Union types must not be member types of a Union. Similarly, wrapping types must not be member types of a Union.',
+    );
+    assert(
+      possibleTypes.isNotEmpty,
+      'A Union type must define one or more member types.',
+    );
 
     for (var t in possibleTypes.toSet()) {
       this.possibleTypes.add(t as GraphQLObjectType);
@@ -32,9 +37,11 @@ class GraphQLUnionType
 
   @override
   GraphQLType<Map<String, dynamic>, Map<String, dynamic>>
-      coerceToInputObject() {
+  coerceToInputObject() {
     return GraphQLUnionType(
-        '${name}Input', possibleTypes.map((t) => t.coerceToInputObject()));
+      '${name}Input',
+      possibleTypes.map((t) => t.coerceToInputObject()),
+    );
   }
 
   @override
@@ -63,7 +70,9 @@ class GraphQLUnionType
 
   @override
   ValidationResult<Map<String, dynamic>> validate(
-      String key, Map<String, dynamic> input) {
+    String key,
+    Map<String, dynamic> input,
+  ) {
     var errors = <String>[];
 
     for (var type in possibleTypes) {
@@ -84,8 +93,10 @@ class GraphQLUnionType
       other is GraphQLUnionType &&
       other.name == name &&
       other.description == description &&
-      const ListEquality<GraphQLObjectType>()
-          .equals(other.possibleTypes, possibleTypes);
+      const ListEquality<GraphQLObjectType>().equals(
+        other.possibleTypes,
+        possibleTypes,
+      );
 
   @override
   int get hashCode => hash3(name, description, possibleTypes);

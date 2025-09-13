@@ -64,8 +64,10 @@ class ObjectValueContext extends InputValueContext<Map<String?, dynamic>> {
     if (fields.isEmpty) {
       return <String, dynamic>{};
     } else {
-      return fields.fold<Map<String, dynamic>>(<String, dynamic>{},
-          (map, field) {
+      return fields.fold<Map<String, dynamic>>(<String, dynamic>{}, (
+        map,
+        field,
+      ) {
         return map
           ..[field.nameToken.text] = field.value.computeValue(variables);
       });

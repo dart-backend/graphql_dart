@@ -12,34 +12,38 @@ void main() {
 
   test('with commas', () {
     expect(
-        '{foo, bar: baz}',
-        isSelectionSet([
-          isField(fieldName: isFieldName('foo')),
-          isField(fieldName: isFieldName('bar', alias: 'baz'))
-        ]));
+      '{foo, bar: baz}',
+      isSelectionSet([
+        isField(fieldName: isFieldName('foo')),
+        isField(fieldName: isFieldName('bar', alias: 'baz')),
+      ]),
+    );
   });
 
   test('no commas', () {
     expect(
-        '''
+      '''
         {
           foo
           bar: baz ...quux
           ... on foo {bar, baz}
         }'''
-            .split('\n')
-            .map((s) => s.trim())
-            .join(' '),
-        isSelectionSet([
-          isField(fieldName: isFieldName('foo')),
-          isField(fieldName: isFieldName('bar', alias: 'baz')),
-          isFragmentSpread('quux'),
-          isInlineFragment('foo',
-              selectionSet: isSelectionSet([
-                isField(fieldName: isFieldName('bar')),
-                isField(fieldName: isFieldName('baz')),
-              ]))
-        ]));
+          .split('\n')
+          .map((s) => s.trim())
+          .join(' '),
+      isSelectionSet([
+        isField(fieldName: isFieldName('foo')),
+        isField(fieldName: isFieldName('bar', alias: 'baz')),
+        isFragmentSpread('quux'),
+        isInlineFragment(
+          'foo',
+          selectionSet: isSelectionSet([
+            isField(fieldName: isFieldName('bar')),
+            isField(fieldName: isFieldName('baz')),
+          ]),
+        ),
+      ]),
+    );
   });
 
   test('exceptions', () {
@@ -64,14 +68,16 @@ class _IsSelectionSet extends Matcher {
 
   @override
   Description describe(Description description) {
-    return description
-        .add('is selection set with ${selections.length} selection(s)');
+    return description.add(
+      'is selection set with ${selections.length} selection(s)',
+    );
   }
 
   @override
   bool matches(item, Map matchState) {
-    var set =
-        item is SelectionSetContext ? item : parseSelectionSet(item.toString());
+    var set = item is SelectionSetContext
+        ? item
+        : parseSelectionSet(item.toString());
 
     // if (set != null) {
     //   print('Item: $set has ${set.selections.length} selection(s):');
@@ -86,7 +92,9 @@ class _IsSelectionSet extends Matcher {
     for (var i = 0; i < set.selections.length; i++) {
       var sel = set.selections[i];
       if (!selections[i].matches(
-          sel.field ?? sel.fragmentSpread ?? sel.inlineFragment, matchState)) {
+        sel.field ?? sel.fragmentSpread ?? sel.inlineFragment,
+        matchState,
+      )) {
         return false;
       }
     }

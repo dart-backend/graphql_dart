@@ -27,9 +27,7 @@ class DataLoader<Id, Data> {
 
       var loadIds = current.map((i) => i.id).toSet().toList(growable: false);
 
-      var data = await loadMany(
-        loadIds,
-      );
+      var data = await loadMany(loadIds);
 
       for (var i = 0; i < loadIds.length; i++) {
         var id = loadIds[i];
@@ -63,7 +61,8 @@ class DataLoader<Id, Data> {
   void close() {
     while (_queue.isNotEmpty) {
       _queue.removeFirst().completer.completeError(
-          StateError('The DataLoader was closed before the item was loaded.'));
+        StateError('The DataLoader was closed before the item was loaded.'),
+      );
     }
 
     _queue.clear();

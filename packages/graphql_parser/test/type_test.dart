@@ -24,13 +24,17 @@ void main() {
 
     group('non-nullable list type', () {
       test('with nullable', () {
-        expect('[foo]!',
-            isListType(isType('foo', isNullable: true), isNullable: false));
+        expect(
+          '[foo]!',
+          isListType(isType('foo', isNullable: true), isNullable: false),
+        );
       });
 
       test('with non-nullable', () {
-        expect('[foo!]!',
-            isListType(isType('foo', isNullable: false), isNullable: false));
+        expect(
+          '[foo!]!',
+          isListType(isType('foo', isNullable: false), isNullable: false),
+        );
       });
     });
 

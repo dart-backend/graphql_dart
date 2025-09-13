@@ -22,8 +22,13 @@ class FragmentDefinitionContext extends ExecutableDefinitionContext {
   /// The [String] value of the [nameToken].
   String? get name => nameToken!.text;
 
-  FragmentDefinitionContext(this.fragmentToken, this.nameToken, this.onToken,
-      this.typeCondition, this.selectionSet);
+  FragmentDefinitionContext(
+    this.fragmentToken,
+    this.nameToken,
+    this.onToken,
+    this.typeCondition,
+    this.selectionSet,
+  );
 
   /// Use [fragmentToken] instead.
   @Deprecated("Use [fragmentToken]")

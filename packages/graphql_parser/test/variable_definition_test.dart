@@ -7,15 +7,21 @@ import 'value_test.dart';
 
 void main() {
   test('no default value', () {
-    expect(r'$foo: bar',
-        isVariableDefinition('foo', type: isType('bar', isNullable: true)));
+    expect(
+      r'$foo: bar',
+      isVariableDefinition('foo', type: isType('bar', isNullable: true)),
+    );
   });
 
   test('default value', () {
     expect(
-        r'$foo: int! = 2',
-        isVariableDefinition('foo',
-            type: isType('int', isNullable: false), defaultValue: isValue(2)));
+      r'$foo: int! = 2',
+      isVariableDefinition(
+        'foo',
+        type: isType('int', isNullable: false),
+        defaultValue: isValue(2),
+      ),
+    );
   });
 
   test('exceptions', () {
@@ -40,9 +46,11 @@ void main() {
 VariableDefinitionContext? parseVariableDefinition(String text) =>
     parse(text).parseVariableDefinition();
 
-Matcher isVariableDefinition(String name,
-        {Matcher? type, Matcher? defaultValue}) =>
-    _IsVariableDefinition(name, type, defaultValue);
+Matcher isVariableDefinition(
+  String name, {
+  Matcher? type,
+  Matcher? defaultValue,
+}) => _IsVariableDefinition(name, type, defaultValue);
 
 class _IsVariableDefinition extends Matcher {
   final String name;

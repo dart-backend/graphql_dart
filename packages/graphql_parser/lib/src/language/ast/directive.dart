@@ -15,8 +15,15 @@ class DirectiveContext extends Node {
   /// The (optional) value being passed with the directive.
   final InputValueContext? value;
 
-  DirectiveContext(this.arrobaToken, this.nameToken, this.colonToken,
-      this.lParenToken, this.rParenToken, this.argument, this.value) {
+  DirectiveContext(
+    this.arrobaToken,
+    this.nameToken,
+    this.colonToken,
+    this.lParenToken,
+    this.rParenToken,
+    this.argument,
+    this.value,
+  ) {
     assert(nameToken != null);
   }
 

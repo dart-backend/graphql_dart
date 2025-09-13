@@ -21,7 +21,9 @@ class SelectionSetContext extends Node {
   @override
   FileSpan? get span {
     var out = selections.fold<FileSpan?>(
-        lBraceToken!.span, (out, s) => out!.expand(s.span!))!;
+      lBraceToken!.span,
+      (out, s) => out!.expand(s.span!),
+    )!;
     return out.expand(rBraceToken!.span!);
   }
 }
@@ -31,7 +33,7 @@ class _MergedSelectionSetContext extends SelectionSetContext {
   //final List<SelectionContext> selections;
 
   _MergedSelectionSetContext(List<SelectionContext> selections)
-      : super(null, null) {
+    : super(null, null) {
     super.selections = selections;
   }
 
