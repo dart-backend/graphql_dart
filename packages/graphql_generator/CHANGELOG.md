@@ -1,5 +1,16 @@
 # Change Log
 
+## 6.4.0
+
+* Require Dart >= 3.8
+* Updated `lints` to 6.0.0
+* Updated dependencies to the latest release
+* Updated `analyzer` to 7.7.x
+
+## 6.3.1
+
+* Fixed `angel3_serialize_generator` import issue
+
 ## 6.3.0
 
 * Require Dart >= 3.6
