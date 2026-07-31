@@ -1,5 +1,12 @@
 # Change Log
 
+## 7.0.0
+
+* Require Dart >= 3.12
+* Updated `angel3_serialize` to `9.0.0`
+* Updated `graphql_schema2` to `7.0.0`
+* Updated `graphql_parser2` to `7.0.0`
+
 ## 6.5.0
 
 * Require Dart >= 3.9
