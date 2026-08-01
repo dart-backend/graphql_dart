@@ -1,5 +1,10 @@
 # Change Log
 
+## 7.0.0
+
+* Require Dart >= 3.12
+* Updated `graphql_schema2` to `7.0.0`
+
 ## 6.5.0
 
 * Require Dart >= 3.9

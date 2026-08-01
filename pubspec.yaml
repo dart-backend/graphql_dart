@@ -2,7 +2,7 @@ name: graphql_dart
 
 publish_to: none
 environment:
-  sdk: '>=3.9.0 <4.0.0'
+  sdk: '>=3.12.0 <4.0.0'
 
 workspace:
   - packages/graphql_schema
@@ -14,7 +14,7 @@ workspace:
 
 
 dependencies:
-  melos: ^7.3.0
+  melos: ^8.2.0
 
 melos:
 

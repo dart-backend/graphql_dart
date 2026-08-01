@@ -1,5 +1,17 @@
 # Change log
 
+## 9.0.0
+
+* Require Dart >= 3.12
+* Updated `angel3_file_service` to `9.0.0`
+* Updated `angel3_framework` to `9.0.0`
+* Updated `angel3_container` to `9.0.0`
+* Updated `angel3_websocket` to `9.0.0`
+* Updated `angel3_validate` to `9.0.0`
+* Updated `graphql_parser2` to `7.0.0`
+* Updated `graphql_schema2` to `7.0.0`
+* Updated `graphql_server2` to `7.0.0`
+
 ## 8.5.0
 
 * Require Dart >= 3.9
