@@ -1,5 +1,6 @@
 import 'package:graphql_parser2/graphql_parser2.dart';
 import 'package:test/test.dart';
+
 import 'common.dart';
 import 'field_test.dart';
 import 'fragment_spread_test.dart';

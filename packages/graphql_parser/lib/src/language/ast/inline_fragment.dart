@@ -1,7 +1,9 @@
 import '../token.dart';
 import 'directive.dart';
 import 'node.dart';
+
 import 'package:source_span/source_span.dart';
+
 import 'selection_set.dart';
 import 'type_condition.dart';
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:angel3_framework/angel3_framework.dart';
 import 'package:angel3_validate/server.dart';
 import 'package:collection/collection.dart' show IterableExtension;
@@ -76,7 +77,7 @@ RequestHandler graphQLHttp(
       } else if (req.method == 'POST') {
         if (req.headers!.contentType?.mimeType == graphQlContentType.mimeType) {
           var text = await req.body!.transform(utf8.decoder).join();
-          return sendGraphQLResponse(
+          return await sendGraphQLResponse(
             await graphQL.parseAndExecute(
               text,
               sourceUrl: 'input',
@@ -152,8 +153,7 @@ RequestHandler graphQLHttp(
                 }
               } else {
                 throw AngelHttpException.badRequest(
-                  message:
-                      'All array values in the "map" field must begin with "variables.".',
+                  message: 'All array values in the "map" field must begin with "variables.".',
                 );
               }
             }

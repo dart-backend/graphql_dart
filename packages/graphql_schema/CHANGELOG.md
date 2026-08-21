@@ -2,7 +2,7 @@
 
 ## 7.0.0
 
-* Require Dart >= 3.12
+* Require Dart >= 3.13
 
 ## 6.5.0
 

@@ -1,4 +1,5 @@
 import '../../../graphql_parser2.dart';
+
 import 'package:source_span/source_span.dart';
 
 /// A single variable definition.

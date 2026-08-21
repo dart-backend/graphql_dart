@@ -1,6 +1,8 @@
 import '../token.dart';
 import 'node.dart';
+
 import 'package:source_span/source_span.dart';
+
 import 'variable_definition.dart';
 
 /// A set of variable definitions in a GraphQL operation.

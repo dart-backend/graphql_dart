@@ -1,6 +1,7 @@
 import '../token.dart';
 import 'directive.dart';
 import 'node.dart';
+
 import 'package:source_span/source_span.dart';
 
 /// A GraphQL fragment spread.
