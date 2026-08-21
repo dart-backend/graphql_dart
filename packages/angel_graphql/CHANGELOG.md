@@ -2,7 +2,7 @@
 
 ## 9.0.0
 
-* Require Dart >= 3.12
+* Require Dart >= 3.13
 * Updated `angel3_file_service` to `9.0.0`
 * Updated `angel3_framework` to `9.0.0`
 * Updated `angel3_container` to `9.0.0`

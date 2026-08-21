@@ -2,8 +2,8 @@
 
 ## 7.0.0
 
-* Require Dart >= 3.12
-* Updated `analyzer` to `13.0.0`
+* Require Dart >= 3.13
+* Updated `analyzer` to `14.0.0`
 * Updated `angel3_model` to `9.0.0`
 * Updated `angel3_serialize_generator` to `9.0.0`
 * Updated `graphql_schema2` to `7.0.0`
