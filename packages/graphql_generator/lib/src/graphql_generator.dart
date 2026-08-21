@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:mirrors';
+
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:angel3_model/angel3_model.dart';
@@ -234,9 +235,8 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
 
             // Check if it is deprecated.
             var depEl = originalField?.getter ?? originalField ?? field;
-            var depAnn = TypeChecker.typeNamed(
-              Deprecated,
-            ).firstAnnotationOf(depEl);
+            var depAnn = TypeChecker.typeNamed(Deprecated)
+                .firstAnnotationOf(depEl);
 
             if (depAnn != null) {
               var dep = ConstantReader(depAnn);

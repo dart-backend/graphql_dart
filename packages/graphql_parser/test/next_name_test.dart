@@ -1,4 +1,5 @@
 import 'package:test/test.dart';
+
 import 'common.dart';
 
 var githubSrc = r'''

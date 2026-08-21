@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 import 'dart:mirrors';
+
 import 'package:angel3_serialize/angel3_serialize.dart';
 import 'package:graphql_schema2/graphql_schema2.dart';
 import 'package:recase/recase.dart';

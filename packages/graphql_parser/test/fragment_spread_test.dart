@@ -1,5 +1,6 @@
 import 'package:graphql_parser2/graphql_parser2.dart';
 import 'package:test/test.dart';
+
 import 'common.dart';
 import 'argument_test.dart';
 import 'directive_test.dart';

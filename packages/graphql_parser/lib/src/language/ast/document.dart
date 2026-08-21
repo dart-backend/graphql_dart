@@ -1,4 +1,5 @@
 import 'package:source_span/source_span.dart';
+
 import 'definition.dart';
 import 'node.dart';
 

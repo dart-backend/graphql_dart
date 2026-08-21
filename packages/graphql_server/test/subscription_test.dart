@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:graphql_schema2/graphql_schema2.dart';
 import 'package:graphql_server2/graphql_server2.dart';
 import 'package:test/test.dart';
@@ -15,9 +16,9 @@ void main() {
     };
   });
 
-  Stream<Map<String, dynamic>> resolveEpisodes(_, _) => Stream.fromIterable(
-    episodes,
-  ).map((ep) => {'prequels': ep, 'not_selected': 1337});
+  Stream<Map<String, dynamic>> resolveEpisodes(_, _) =>
+      Stream.fromIterable(episodes)
+          .map((ep) => {'prequels': ep, 'not_selected': 1337});
 
   var episodeType = objectType(
     'Episode',
@@ -41,15 +42,13 @@ void main() {
   var graphQL = GraphQL(schema);
 
   test('subscribe with selection', () async {
-    var stream =
-        await graphQL.parseAndExecute('''
+    var stream = await graphQL.parseAndExecute('''
     subscription {
       prequels {
         name
       }
     }
-    ''')
-            as Stream<Map<String, dynamic>>;
+    ''') as Stream<Map<String, dynamic>>;
 
     var asList = await stream.toList();
     print(asList);

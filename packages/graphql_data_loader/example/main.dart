@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:graphql_data_loader2/graphql_data_loader2.dart';
 import 'package:graphql_schema2/graphql_schema2.dart';
 

@@ -1,11 +1,10 @@
 part of 'schema.dart';
 
 /// Typedef for a function that resolves the value of a [GraphQLObjectField], whether asynchronously or not.
-typedef GraphQLFieldResolver<Value, Serialized> =
-    FutureOr<Value> Function(
-      Serialized serialized,
-      Map<String, dynamic> argumentValues,
-    );
+typedef GraphQLFieldResolver<Value, Serialized> = FutureOr<Value> Function(
+  Serialized serialized,
+  Map<String, dynamic> argumentValues,
+);
 
 /// A field on a [GraphQLObjectType].
 ///

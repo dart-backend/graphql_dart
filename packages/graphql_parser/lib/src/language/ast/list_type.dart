@@ -1,6 +1,8 @@
 import '../token.dart';
 import 'node.dart';
+
 import 'package:source_span/source_span.dart';
+
 import 'type.dart';
 
 /// Represents a type that holds a list of another type.
