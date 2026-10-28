@@ -86,5 +86,39 @@ void main() {
         ),
       );
     });
+
+    test('field inputs compare default values', () {
+      expect(
+        GraphQLFieldInput('limit', graphQLInt, defaultValue: 10),
+        isNot(GraphQLFieldInput('limit', graphQLInt, defaultValue: 50)),
+      );
+    });
+
+    test('equal types have equal hash codes', () {
+      GraphQLObjectType user() =>
+          objectType('User', fields: [field('name', graphQLString)]);
+      GraphQLInputObjectType userInput() => GraphQLInputObjectType(
+        'UserInput',
+        inputFields: [GraphQLInputObjectField('name', graphQLString)],
+      );
+
+      expect(user().hashCode, user().hashCode);
+      expect(userInput().hashCode, userInput().hashCode);
+      expect(
+        enumTypeFromStrings('A', ['B']).hashCode,
+        enumTypeFromStrings('A', ['B']).hashCode,
+      );
+      expect(
+        GraphQLUnionType('U', [user()]).hashCode,
+        GraphQLUnionType('U', [user()]).hashCode,
+      );
+      expect({user(), user()}, hasLength(1));
+    });
+
+    test('self-referencing type can be hashed', () {
+      var node = objectType('Node');
+      node.fields.add(field('parent', node));
+      expect(() => node.hashCode, returnsNormally);
+    });
   });
 }

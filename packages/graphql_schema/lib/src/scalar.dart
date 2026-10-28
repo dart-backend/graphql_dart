@@ -113,7 +113,11 @@ class GraphQLNumType<T extends num> extends GraphQLScalarType<T, T> {
 
   @override
   ValidationResult<T> validate(String key, input) {
-    if (input is! T?) {
+    if (input is! T) {
+      // GraphQL coerces Int input to Float.
+      if (input is int && T == double) {
+        return ValidationResult._ok(input.toDouble() as T);
+      }
       return ValidationResult._failure(['Expected "$key" to be $name.']);
     }
 
@@ -121,8 +125,10 @@ class GraphQLNumType<T extends num> extends GraphQLScalarType<T, T> {
   }
 
   @override
-  T deserialize(T serialized) {
-    return serialized;
+  T deserialize(num serialized) {
+    if (serialized is T) return serialized;
+    if (serialized is int && T == double) return serialized.toDouble() as T;
+    throw ArgumentError.value(serialized, 'serialized', 'Expected $name.');
   }
 
   @override
@@ -141,12 +147,13 @@ class GraphQLNumMinType<T extends num> extends GraphQLNumType<T> {
   final T min;
 
   @override
-  ValidationResult<T> validate(String key, T input) {
+  ValidationResult<T> validate(String key, input) {
     var ret = super.validate(key, input);
+    var value = ret.value;
 
-    if (ret.successful && input < min) {
+    if (value != null && value < min) {
       ret = ValidationResult._failure([
-        'Value ($input) can not be lower than $min',
+        'Value ($value) can not be lower than $min',
       ]);
     }
 
@@ -161,12 +168,13 @@ class GraphQLNumMaxType<T extends num> extends GraphQLNumType<T> {
   final T max;
 
   @override
-  ValidationResult<T> validate(String key, T input) {
+  ValidationResult<T> validate(String key, input) {
     var ret = super.validate(key, input);
+    var value = ret.value;
 
-    if (ret.successful && input > max) {
+    if (value != null && value > max) {
       ret = ValidationResult._failure([
-        'Value ($input) can not be greater than $max',
+        'Value ($value) can not be greater than $max',
       ]);
     }
 
@@ -185,12 +193,13 @@ class GraphQLNumRangedType<T extends num> extends GraphQLNumType<T> {
   final T max;
 
   @override
-  ValidationResult<T> validate(String key, T input) {
+  ValidationResult<T> validate(String key, input) {
     var ret = super.validate(key, input);
+    var value = ret.value;
 
-    if (ret.successful && (input < min || input > max)) {
+    if (value != null && (value < min || value > max)) {
       ret = ValidationResult._failure([
-        'Value ($input) must be between $min and $max. (>= $min && <= $max)',
+        'Value ($value) must be between $min and $max. (>= $min && <= $max)',
       ]);
     }
 
@@ -234,12 +243,12 @@ class GraphQLStringMinType extends GraphQLStringType {
   final int min;
 
   @override
-  ValidationResult<String> validate(String key, String input) {
+  ValidationResult<String> validate(String key, input) {
     var ret = super.validate(key, input);
 
-    if (ret.successful && input.length < min) {
+    if (ret.successful && ret.value!.length < min) {
       ret = ValidationResult._failure([
-        'Value (${input.length} chars) can not be lower than $min',
+        'Value (${ret.value!.length} chars) can not be lower than $min',
       ]);
     }
 
@@ -254,12 +263,12 @@ class GraphQLStringMaxType extends GraphQLStringType {
   final int max;
 
   @override
-  ValidationResult<String> validate(String key, String input) {
+  ValidationResult<String> validate(String key, input) {
     var ret = super.validate(key, input);
 
-    if (ret.successful && input.length > max) {
+    if (ret.successful && ret.value!.length > max) {
       ret = ValidationResult._failure([
-        'Value (${input.length} chars) can not be greater than $max',
+        'Value (${ret.value!.length} chars) can not be greater than $max',
       ]);
     }
 
@@ -278,12 +287,13 @@ class GraphQLStringRangeType extends GraphQLStringType {
   final int max;
 
   @override
-  ValidationResult<String> validate(String key, String input) {
+  ValidationResult<String> validate(String key, input) {
     var ret = super.validate(key, input);
 
-    if (ret.successful && (input.length < min || input.length > max)) {
+    if (ret.successful &&
+        (ret.value!.length < min || ret.value!.length > max)) {
       ret = ValidationResult._failure([
-        'Value (${input.length} chars) must have between $min and $max chars',
+        'Value (${ret.value!.length} chars) must have between $min and $max chars',
       ]);
     }
 
@@ -291,8 +301,7 @@ class GraphQLStringRangeType extends GraphQLStringType {
   }
 }
 
-class _GraphQLDateType extends GraphQLScalarType<DateTime, String>
-    with _NonNullableMixin<DateTime, String> {
+class _GraphQLDateType extends GraphQLScalarType<DateTime, String> {
   _GraphQLDateType._();
 
   @override
@@ -306,6 +315,10 @@ class _GraphQLDateType extends GraphQLScalarType<DateTime, String>
 
   @override
   DateTime deserialize(String serialized) => DateTime.parse(serialized);
+
+  @override
+  String? convert(value) =>
+      value is DateTime ? serialize(value) : super.convert(value);
 
   @override
   ValidationResult<String> validate(String key, input) {

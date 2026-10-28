@@ -38,9 +38,10 @@ class GraphQLUnionType
   @override
   GraphQLType<Map<String, dynamic>, Map<String, dynamic>>
   coerceToInputObject() {
-    return GraphQLUnionType(
-      '${name}Input',
-      possibleTypes.map((t) => t.coerceToInputObject()),
+    // A union's members must be object types, which cannot be inputs.
+    throw UnsupportedError(
+      'The union type "$name" cannot be used as an input type. '
+      'Use an input object type for this field instead.',
     );
   }
 
@@ -69,10 +70,7 @@ class GraphQLUnionType
   }
 
   @override
-  ValidationResult<Map<String, dynamic>> validate(
-    String key,
-    Map<String, dynamic> input,
-  ) {
+  ValidationResult<Map<String, dynamic>> validate(String key, input) {
     var errors = <String>[];
 
     for (var type in possibleTypes) {
@@ -99,5 +97,9 @@ class GraphQLUnionType
       );
 
   @override
-  int get hashCode => hash3(name, description, possibleTypes);
+  int get hashCode => hash3(
+    name,
+    description,
+    const ListEquality<GraphQLObjectType>().hash(possibleTypes),
+  );
 }

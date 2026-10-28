@@ -14,7 +14,7 @@ dependencies:
   analyzer: ^14.0.0
   angel3_model: ^9.0.0
   angel3_serialize_generator: ^9.0.0
-  graphql_schema2: ^7.0.0 
+  graphql_schema2: ^8.0.0 
   build: ^4.0.0
   build_config: ^1.2.0
   code_builder: ^4.11.0

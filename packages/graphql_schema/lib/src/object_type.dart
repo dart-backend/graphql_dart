@@ -74,10 +74,10 @@ class GraphQLObjectType
   }
 
   @override
-  ValidationResult<Map<String, dynamic>> validate(String key, Map input) {
-    //if (input is! Map) {
-    //  return ValidationResult._failure(['Expected "$key" to be a Map.']);
-    //}
+  ValidationResult<Map<String, dynamic>> validate(String key, input) {
+    if (input is! Map) {
+      return ValidationResult._failure(['Expected "$key" to be an object.']);
+    }
 
     if (isInterface) {
       var errors = <String>[];
@@ -102,7 +102,7 @@ class GraphQLObjectType
       if (field.type is GraphQLNonNullableType) {
         if (!input.containsKey(field.name) || input[field.name] == null) {
           errors.add(
-            'Field "${field.name}, of type ${field.type} cannot be null."',
+            'Field "${field.name}", of type ${field.type}, cannot be null.',
           );
         }
       }
@@ -117,12 +117,24 @@ class GraphQLObjectType
         );
       } else {
         var v = input[k];
-        var result = field.type.validate(k.toString(), field.type.convert(v));
+
+        // Null for a non-null field was already reported above.
+        if (v == null) {
+          if (field.type is! GraphQLNonNullableType) out[k] = v;
+          continue;
+        }
+
+        // Only resolver output is validated against an object type, so a value
+        // may be a Dart value (such as an enum's) to convert first.
+        var result = field.type.validate(
+          k.toString(),
+          field.type.convert(v) ?? v,
+        );
 
         if (!result.successful) {
           errors.addAll(result.errors.map((s) => '$key: $s'));
         } else {
-          out[k] = v;
+          out[k] = result.value;
         }
       }
     }
@@ -143,7 +155,8 @@ class GraphQLObjectType
           'Cannot serialize field "$k", which was not defined in the schema.',
         );
       }
-      return out..[k.toString()] = field.serialize(value[k]);
+      var v = value[k];
+      return out..[k.toString()] = v == null ? null : field.serialize(v);
     });
   }
 
@@ -154,7 +167,8 @@ class GraphQLObjectType
       if (field == null) {
         throw UnsupportedError('Unexpected field "$k" encountered in map.');
       }
-      return out..[k.toString()] = field.deserialize(serialized[k]);
+      var v = serialized[k];
+      return out..[k.toString()] = v == null ? null : field.deserialize(v);
     });
   }
 
@@ -187,7 +201,9 @@ class GraphQLObjectType
   }
 
   @override
-  int get hashCode => hash4(name, name, isInterface, fields);
+  // Fields are left out: hashing them would recurse forever on self-referencing
+  // types. Equal objects still share these values, so they hash equally.
+  int get hashCode => hash3(name, description, isInterface);
 }
 
 Map<String, dynamic> _foldToStringDynamic(Map map) {
@@ -247,10 +263,10 @@ class GraphQLInputObjectType
   }
 
   @override
-  ValidationResult<Map<String, dynamic>> validate(String key, Map input) {
-    //if (input is! Map) {
-    //  return ValidationResult._failure(['Expected "$key" to be a Map.']);
-    //}
+  ValidationResult<Map<String, dynamic>> validate(String key, input) {
+    if (input is! Map) {
+      return ValidationResult._failure(['Expected "$key" to be an object.']);
+    }
 
     var out = {};
     var errors = <String>[];
@@ -259,7 +275,7 @@ class GraphQLInputObjectType
       if (field.type is GraphQLNonNullableType) {
         if (!input.containsKey(field.name) || input[field.name] == null) {
           errors.add(
-            'Field "${field.name}, of type ${field.type} cannot be null."',
+            'Field "${field.name}", of type ${field.type}, cannot be null.',
           );
         }
       }
@@ -274,12 +290,19 @@ class GraphQLInputObjectType
         );
       } else {
         var v = input[k];
+
+        // Null for a non-null field was already reported above.
+        if (v == null) {
+          if (field.type is! GraphQLNonNullableType) out[k] = v;
+          continue;
+        }
+
         var result = field.type.validate(k.toString(), v);
 
         if (!result.successful) {
           errors.addAll(result.errors.map((s) => '$key: $s'));
         } else {
-          out[k] = v;
+          out[k] = result.value;
         }
       }
     }
@@ -300,7 +323,8 @@ class GraphQLInputObjectType
           'Cannot serialize field "$k", which was not defined in the schema.',
         );
       }
-      return out..[k.toString()] = field.type.serialize(value[k]);
+      var v = value[k];
+      return out..[k.toString()] = v == null ? null : field.type.serialize(v);
     });
   }
 
@@ -311,7 +335,8 @@ class GraphQLInputObjectType
       if (field == null) {
         throw UnsupportedError('Unexpected field "$k" encountered in map.');
       }
-      return out..[k.toString()] = field.type.deserialize(serialized[k]);
+      var v = serialized[k];
+      return out..[k.toString()] = v == null ? null : field.type.deserialize(v);
     });
   }
 
@@ -327,7 +352,8 @@ class GraphQLInputObjectType
   }
 
   @override
-  int get hashCode => hash4(name, name, description, inputFields);
+  // Input fields are left out, as in [GraphQLObjectType.hashCode].
+  int get hashCode => hash2(name, description);
 
   @override
   GraphQLType<Map<String, dynamic>, Map<String, dynamic>>

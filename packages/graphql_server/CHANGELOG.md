@@ -1,5 +1,19 @@
 # Change Log
 
+## 8.0.0
+
+### Breaking changes in 8.0.0
+
+* **Breaking:** Requires `graphql_schema2` 8.0.0, whose `validate` returns a failed `ValidationResult` for wrongly typed input instead of throwing. Wrongly typed variables are reported as GraphQL errors.
+* **Breaking:** An argument given as a variable takes the variable's coerced value as is, instead of being validated and deserialized again.
+* **Breaking:** An omitted or `null` variable for an argument with a default value takes that default, instead of failing.
+
+### Fixes in 8.0.0
+
+* **Unions:** A field of a union type no longer throws a `TypeError` when its value is completed.
+* **Variables:** Enum variables are accepted; they failed because their Dart value was validated again as a name.
+* **Variables:** A `null` variable for a non-null argument is reported as an error naming the argument.
+
 ## 7.0.0
 
 * Require Dart >= 3.13

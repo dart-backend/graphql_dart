@@ -19,8 +19,9 @@ abstract class GraphQLType<Value, Serialized> {
   /// Deserializes a serialized value.
   Value deserialize(Serialized serialized);
 
-  /// Attempts to cast a dynamic [value] into a [Serialized] instance.
-  Serialized? convert(dynamic value) => value as Serialized?;
+  /// Attempts to convert a dynamic [value], such as a resolver's output, into a
+  /// [Serialized] instance. Returns `null` if it cannot.
+  Serialized? convert(dynamic value) => value is Serialized ? value : null;
 
   /// Performs type coercion against an [input] value, and returns a list of errors if the validation was unsuccessful.
   ValidationResult<Serialized> validate(String key, covariant dynamic input);
@@ -53,11 +54,15 @@ class GraphQLListType<Value, Serialized>
 
   @override
   List<Serialized>? convert(value) {
-    if (value is Iterable) {
-      return value.cast<Serialized>().toList();
-    } else {
-      return super.convert(value);
+    if (value is! Iterable) return super.convert(value);
+
+    var out = <Serialized>[];
+    for (var v in value) {
+      var converted = ofType.convert(v);
+      if (converted == null) return null;
+      out.add(converted);
     }
+    return out;
   }
 
   @override
@@ -68,22 +73,35 @@ class GraphQLListType<Value, Serialized>
       'A list of items of type ${ofType.name ?? '(${ofType.description}).'}';
 
   @override
-  ValidationResult<List<Serialized>> validate(String key, List input) {
-    //if (input is! List) {
-    //  return ValidationResult._failure(['Expected "$key" to be a list.']);
-    //}
+  ValidationResult<List<Serialized>> validate(String key, input) {
+    if (input is! Iterable) {
+      return ValidationResult._failure(['Expected "$key" to be a list.']);
+    }
 
     var out = <Serialized>[];
     var errors = <String>[];
+    var i = 0;
 
-    for (var i = 0; i < input.length; i++) {
-      var k = '"$key" at index $i';
-      var v = input[i];
+    for (var v in input) {
+      var k = '"$key" at index ${i++}';
+
+      // A null item is valid unless the item type is non-nullable. The list
+      // must also be able to hold it, which `listOf(graphQLString)` (a list of
+      // non-nullable Dart `String`s) cannot, unlike `listOf<dynamic, dynamic>`.
+      if (v == null && ofType is! GraphQLNonNullableType) {
+        if (null is Serialized) {
+          out.add(null as Serialized);
+        } else {
+          errors.add('Expected $k to be a non-null value.');
+        }
+        continue;
+      }
+
       var result = ofType.validate(k, v);
       if (!result.successful) {
         errors.addAll(result.errors);
       } else {
-        out.add(v);
+        out.add(result.value as Serialized);
       }
     }
 
@@ -94,7 +112,11 @@ class GraphQLListType<Value, Serialized>
   @override
   List<Value> deserialize(List serialized) {
     return serialized
-        .map<Value>((v) => ofType.deserialize(v as Serialized))
+        .map<Value>(
+          (v) => v == null && null is Value
+              ? null as Value
+              : ofType.deserialize(v as Serialized),
+        )
         .toList();
   }
 
@@ -146,7 +168,10 @@ class GraphQLNonNullableType<Value, Serialized>
   }
 
   @override
-  ValidationResult<Serialized> validate(String key, Serialized input) {
+  Serialized? convert(value) => ofType.convert(value);
+
+  @override
+  ValidationResult<Serialized> validate(String key, input) {
     if (input == null) {
       return ValidationResult._failure([
         'Expected "$key" to be a non-null value.',

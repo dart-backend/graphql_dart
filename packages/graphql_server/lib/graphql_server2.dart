@@ -677,6 +677,29 @@ class GraphQL {
         (a) => a.name == argumentName,
       );
 
+      // A variable's value was already validated and coerced by
+      // coerceVariableValues, so it is used as is instead of being coerced
+      // again (which fails for enums, whose coerced values are Dart values).
+      final value = argumentValue?.value;
+      if (value is VariableContext &&
+          variableValues.containsKey(value.name) &&
+          variableValues[value.name] is! JsonPathArgument) {
+        final variableValue = variableValues[value.name];
+
+        if (variableValue != null) {
+          coercedValues[argumentName] = variableValue;
+          continue;
+        } else if (argumentType is GraphQLNonNullableType) {
+          throw GraphQLException.fromSourceSpan(
+            'Argument "$argumentName" of field "$fieldName" cannot be null.',
+            value.span,
+          );
+        }
+
+        // A null or omitted variable falls back to the argument's default.
+        argumentValue = null;
+      }
+
       if (argumentValue == null) {
         if (defaultValue != null || argumentDefinition.defaultsToNull) {
           coercedValues[argumentName] = defaultValue;
@@ -868,7 +891,7 @@ class GraphQL {
         variableValues,
         globalVariables,
         lazy: lazy,
-        parentType: fieldType as GraphQLObjectType,
+        parentType: fieldType is GraphQLObjectType ? fieldType : null,
       );
     }
 
