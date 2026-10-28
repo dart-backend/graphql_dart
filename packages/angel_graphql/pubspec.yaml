@@ -27,7 +27,7 @@ dev_dependencies:
   angel3_serialize: ^10.0.0
   angel3_serialize_generator: ^10.0.0
   build_runner: ^2.7.0
-  graphql_generator2: ^7.0.0
+  graphql_generator2: ^8.0.0
   file: ^7.0.0
   logging: ^1.2.0
   lints: ^6.0.0

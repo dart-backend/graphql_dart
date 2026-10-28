@@ -3,6 +3,9 @@ part 'main.g.dart';
 
 @graphQLClass
 class TodoItem {
+  @GraphQLDocumentation(typeName: #graphQLId)
+  String? id;
+
   String? text;
 
   @GraphQLDocumentation(description: 'Whether this item is complete.')

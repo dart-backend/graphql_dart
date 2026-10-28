@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:mirrors';
 
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -72,20 +71,23 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
     return false;
   }
 
+  /// A reference to the generated GraphQL type of [type]. A `@serializable`
+  /// model's type is named after its generated class, as `todoGraphQLType` of
+  /// `TodoEntity` or `_Todo`. The element's name is used, as the type's display
+  /// string has a `?` when it is nullable.
+  Expression _graphQLTypeOf(InterfaceType type) {
+    var name = type.element.displayName;
+    if (serializableTypeChecker.hasAnnotationOf(type.element)) {
+      name = generatedClassNameOf(name);
+    }
+
+    return refer('${ReCase(name).camelCase}GraphQLType');
+  }
+
   Expression _inferType(String className, String name, DartType type) {
     // Firstly, check if it's a GraphQL class.
     if (type is InterfaceType && _isGraphQLClass(type)) {
-      // The element's name, as the type's display string has a `?` when it
-      // is nullable.
-      var c = type.element.displayName;
-      var name =
-          serializableTypeChecker.hasAnnotationOf(type.element) &&
-              c.startsWith('_')
-          ? c.substring(1)
-          : c;
-      var rc = ReCase(name);
-
-      return refer('${rc.camelCase}GraphQLType');
+      return _graphQLTypeOf(type);
     }
 
     var primitive = {
@@ -190,17 +192,9 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
           _applyDescription(named, clazz, clazz.documentationComment);
 
           // Add interfaces
-          var interfaces = clazz.interfaces.where(_isGraphQLClass).map((c) {
-            var displayName = c.element.displayName;
-            var name =
-                serializableTypeChecker.hasAnnotationOf(c.element) &&
-                    displayName.startsWith('_')
-                ? displayName.substring(1)
-                : displayName;
-            var rc = ReCase(name);
-
-            return refer('${rc.camelCase}GraphQLType');
-          });
+          var interfaces = clazz.interfaces
+              .where(_isGraphQLClass)
+              .map(_graphQLTypeOf);
 
           named['interfaces'] = literalList(interfaces);
 
@@ -233,10 +227,23 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
               (f) => f.name == field.name,
             );
 
+            // Annotations are on the field when it is declared as a field, and
+            // on the getter when it is declared as a getter (as in a
+            // `@serializable` model), so look for them on both.
+            var candidates = <Element>[
+              ?originalField,
+              ?originalField?.getter,
+              field,
+            ];
+            Element annotatedWith(TypeChecker checker) => candidates.firstWhere(
+              checker.hasAnnotationOf,
+              orElse: () => candidates.first,
+            );
+
             // Check if it is deprecated.
-            var depEl = originalField?.getter ?? originalField ?? field;
-            var depAnn = TypeChecker.typeNamed(Deprecated)
-                .firstAnnotationOf(depEl);
+            var depAnn = TypeChecker.typeNamed(Deprecated).firstAnnotationOf(
+              annotatedWith(TypeChecker.typeNamed(Deprecated)),
+            );
 
             if (depAnn != null) {
               var dep = ConstantReader(depAnn);
@@ -249,24 +256,25 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
             }
 
             // Description finder...
+            var docEl = annotatedWith(_graphQLDoc);
             _applyDescription(
               named,
-              originalField?.getter ?? originalField ?? field,
+              docEl,
               originalField?.getter?.documentationComment ??
                   originalField?.documentationComment,
             );
 
             // Pick the type.
-            var doc = _graphQLDoc.firstAnnotationOf(depEl);
+            var doc = _graphQLDoc.firstAnnotationOf(docEl);
 
             Expression? type;
 
             if (doc != null) {
               var cr = ConstantReader(doc);
-              var typeName = cr.peek('typeName')?.symbolValue;
+              var typeName = cr.peek('typeName')?.objectValue.toSymbolValue();
 
               if (typeName != null) {
-                type = refer(MirrorSystem.getName(typeName));
+                type = refer(typeName);
               }
             }
 
