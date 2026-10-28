@@ -1,5 +1,29 @@
 # Change Log
 
+## 8.0.0
+
+### Breaking changes in 8.0.0
+
+* **Breaking:** `InlineFragmentContext.typeCondition` and `onToken` are nullable, as an inline fragment's type condition is optional.
+* **Breaking:** `InlineFragmentContext` and `FragmentSpreadContext` use the `Directives` mixin, so code can read their directives the same way as a field's.
+* **Breaking:** Leftover tokens after the last definition are reported as a syntax error.
+* **Breaking:** Integers with leading zeros, such as `007`, and numbers followed directly by a digit, `.` or letter are rejected.
+* **Breaking:** Block strings keep backslashes and are not trimmed. Their value is computed as in the GraphQL spec: common indentation and leading and trailing blank lines are removed.
+
+### New in 8.0.0
+
+* `DirectiveContext.arguments` lists all of a directive's arguments; `argument` is the first of them.
+
+### Fixes in 8.0.0
+
+* **Directives:** A directive with several arguments, such as `@dir(x: 1, y: 2)`, is parsed.
+* **Fragments:** An inline fragment without a type condition, such as `... @include(if: $x) { a }`, is parsed.
+* **Numbers:** Exponents with an uppercase `E` or a sign, such as `1E10` and `1E+5`, are parsed.
+* **Strings:** A block string may contain `"` characters.
+* **Errors:** An operation without a selection set reports "Missing selection set in operation definition." instead of naming a fragment definition.
+* **Parser:** `parseFragmentSpread` restores `current` when it backtracks.
+* **Parser:** `eatCommas` is deprecated: the lexer skips commas, so it never did anything.
+
 ## 7.0.0
 
 * Require Dart >= 3.13

@@ -16,7 +16,7 @@ Directory names differ from published package names; most published names carry 
 
 | Directory | Package | Version | Role |
 |---|---|---|---|
-| `packages/graphql_parser` | `graphql_parser2` | 7.0.0 | Lexer + recursive-descent parser; GraphQL AST (`*Context` classes) |
+| `packages/graphql_parser` | `graphql_parser2` | 8.0.0 | Lexer + recursive-descent parser; GraphQL AST (`*Context` classes) |
 | `packages/graphql_schema` | `graphql_schema2` | 8.0.0 | Type system: scalars, object/input/enum/union types, schema, validation, annotations |
 | `packages/graphql_server` | `graphql_server2` | 8.0.0 | Execution engine (`GraphQL` class), introspection, mirrors helpers, Apollo `subscriptions-transport-ws` |
 | `packages/graphql_generator` | `graphql_generator2` | 7.0.0 | `build_runner` builder: Dart classes → `GraphQLObjectType`s |
@@ -62,7 +62,7 @@ Generator usage: annotate a class with `@graphQLClass` (optionally `@GraphQLDocu
 
 ## Development Workflow
 
-- **Master Branch**: Stable release branch (`graphql_schema2` and `graphql_server2` 8.x, the other `graphql_*2` packages 7.x, `angel3_graphql` 9.x). All PRs target `master`.
+- **Master Branch**: Stable release branch (`graphql_parser2`, `graphql_schema2` and `graphql_server2` 8.x, the other `graphql_*2` packages 7.x, `angel3_graphql` 9.x). All PRs target `master`.
 - **Feature Branches**: Work is done on `feature/<name>` branches (e.g. `feature/dart3.13` for the SDK 3.13 upgrade) and bug fixes on `bugfix/<name>`. Contributors fork the repo, then branch from `master`.
 - **Setup**: Install melos (`dart pub global activate melos`), then run `dart pub get` at the root. That resolves the whole workspace into the root `pubspec.lock`, which is tracked in git. Upgrade all packages with `melos exec "dart pub upgrade"`.
 - **Code generation**: After changing `graphql_generator2`, regenerate its example with `dart run build_runner build --delete-conflicting-outputs` in `packages/graphql_generator`. The output, `example/main.g.dart`, is committed and must not be edited by hand.
@@ -86,7 +86,7 @@ Generator usage: annotate a class with `@graphQLClass` (optionally `@GraphQLDocu
 
 - Each package uses `resolution: workspace`; don't add per-package lockfiles or `dependency_overrides` for sibling packages, since the workspace already links them.
 - Inter-package constraints use caret versions (`graphql_schema2: ^8.0.0`). When bumping a package's major version, update dependents' constraints and the root workspace together.
-- Version scheme: `graphql_schema2` and `graphql_server2` are on 8.x and the other `graphql_*2` packages on 7.x; `angel3_graphql` tracks Angel3 on 9.x.
+- Version scheme: `graphql_parser2`, `graphql_schema2` and `graphql_server2` are on 8.x and the other `graphql_*2` packages on 7.x; `angel3_graphql` tracks Angel3 on 9.x.
 - Null safety throughout; prefer explicit types on public APIs.
 - Public API is exported from each package's top-level `lib/<package_name>.dart`; implementation lives in `lib/src/`.
 

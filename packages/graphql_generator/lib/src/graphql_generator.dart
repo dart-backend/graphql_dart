@@ -75,21 +75,17 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
   Expression _inferType(String className, String name, DartType type) {
     // Firstly, check if it's a GraphQL class.
     if (type is InterfaceType && _isGraphQLClass(type)) {
-      var c = type;
+      // The element's name, as the type's display string has a `?` when it
+      // is nullable.
+      var c = type.element.displayName;
       var name =
-          serializableTypeChecker.hasAnnotationOf(c.element) &&
-              c.getDisplayString().startsWith('_')
-          ? c.getDisplayString().substring(1)
-          : c.getDisplayString();
+          serializableTypeChecker.hasAnnotationOf(type.element) &&
+              c.startsWith('_')
+          ? c.substring(1)
+          : c;
       var rc = ReCase(name);
 
       return refer('${rc.camelCase}GraphQLType');
-    }
-
-    // Next, check if this is the "id" field of a `Model`.
-    if (TypeChecker.typeNamed(Model).isAssignableFromType(type) &&
-        name == 'id') {
-      return refer('graphQLId');
     }
 
     var primitive = {
@@ -195,11 +191,12 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
 
           // Add interfaces
           var interfaces = clazz.interfaces.where(_isGraphQLClass).map((c) {
+            var displayName = c.element.displayName;
             var name =
                 serializableTypeChecker.hasAnnotationOf(c.element) &&
-                    c.getDisplayString().startsWith('_')
-                ? c.getDisplayString().substring(1)
-                : c.getDisplayString();
+                    displayName.startsWith('_')
+                ? displayName.substring(1)
+                : displayName;
             var rc = ReCase(name);
 
             return refer('${rc.camelCase}GraphQLType');
@@ -217,7 +214,10 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
           while (search != null &&
               !TypeChecker.typeNamed(Object).isExactlyType(search)) {
             for (var field in search.element.fields) {
-              if (!ctxFields.any((f) => f.name == field.name)) {
+              // Skip computed getters (such as `Model.idAsInt`), which have
+              // no stored value to resolve.
+              if (!field.isOriginGetterSetter &&
+                  !ctxFields.any((f) => f.name == field.name)) {
                 ctxFields.add(field);
               }
             }
@@ -241,7 +241,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
             if (depAnn != null) {
               var dep = ConstantReader(depAnn);
               var reason =
-                  dep.peek('messages')?.stringValue ??
+                  dep.peek('message')?.stringValue ??
                   dep.peek('expires')?.stringValue ??
                   'Expires: ${deprecated.message}.';
 
@@ -268,6 +268,13 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
               if (typeName != null) {
                 type = refer(MirrorSystem.getName(typeName));
               }
+            }
+
+            // The "id" field of a `Model` is an ID.
+            if (field.displayName == 'id' &&
+                TypeChecker.typeNamed(Model)
+                    .isAssignableFromType(clazz.thisType)) {
+              type ??= refer('graphQLId');
             }
 
             fields.add(

@@ -7,6 +7,6 @@ abstract class Node {
 }
 
 mixin Directives {
-  /// Any directives affixed to this field.
+  /// Any directives affixed to this node.
   final List<DirectiveContext> directives = [];
 }

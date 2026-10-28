@@ -1,17 +1,13 @@
 import '../token.dart';
-import 'directive.dart';
 import 'node.dart';
 
 import 'package:source_span/source_span.dart';
 
 /// A GraphQL fragment spread.
-class FragmentSpreadContext extends Node {
+class FragmentSpreadContext extends Node with Directives {
   /// The source tokens.
   final Token ellipsisToken;
   final Token nameToken;
-
-  /// Any directives affixed to this fragment spread.
-  final List<DirectiveContext> directives = [];
 
   FragmentSpreadContext(this.ellipsisToken, this.nameToken);
 

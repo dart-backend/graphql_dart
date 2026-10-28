@@ -979,13 +979,18 @@ class GraphQL {
     visitedFragments ??= [];
 
     for (var selection in selectionSet.selections) {
-      final field = selection.field;
+      // @skip and @include apply to fields, fragment spreads and inline
+      // fragments.
+      final Directives? holder =
+          selection.field ??
+          selection.fragmentSpread ??
+          selection.inlineFragment;
 
-      if (field != null) {
-        if (getDirectiveValue('skip', 'if', field, variableValues) == true) {
+      if (holder != null) {
+        if (getDirectiveValue('skip', 'if', holder, variableValues) == true) {
           continue;
         }
-        if (getDirectiveValue('include', 'if', field, variableValues) ==
+        if (getDirectiveValue('include', 'if', holder, variableValues) ==
             false) {
           continue;
         }
@@ -1028,12 +1033,14 @@ class GraphQL {
           groupForResponseKey.addAll(fragmentGroup);
         }
       } else if (selection.inlineFragment != null) {
+        // An inline fragment without a type condition applies to any type.
         var fragmentType = selection.inlineFragment!.typeCondition;
-        if (!doesFragmentTypeApply(
-          objectType,
-          fragmentType,
-          parentType: parentType,
-        )) {
+        if (fragmentType != null &&
+            !doesFragmentTypeApply(
+              objectType,
+              fragmentType,
+              parentType: parentType,
+            )) {
           continue;
         }
         var fragmentSelectionSet = selection.inlineFragment!.selectionSet;
@@ -1077,9 +1084,12 @@ class GraphQL {
     });
 
     if (directive == null) return null;
-    if (directive.argument?.name != argumentName) return null;
+    var argument = directive.arguments.firstWhereOrNull(
+      (a) => a.name == argumentName,
+    );
+    if (argument == null) return null;
 
-    var vv = directive.argument!.value;
+    var vv = argument.value;
     if (vv is VariableContext) {
       var vname = vv.name;
       if (!variableValues.containsKey(vname)) {

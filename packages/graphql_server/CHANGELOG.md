@@ -4,6 +4,7 @@
 
 ### Breaking changes in 8.0.0
 
+* **Breaking:** Requires `graphql_parser2` 8.0.0, whose inline fragments may have no type condition.
 * **Breaking:** Requires `graphql_schema2` 8.0.0, whose `validate` returns a failed `ValidationResult` for wrongly typed input instead of throwing. Wrongly typed variables are reported as GraphQL errors.
 * **Breaking:** An argument given as a variable takes the variable's coerced value as is, instead of being validated and deserialized again.
 * **Breaking:** An omitted or `null` variable for an argument with a default value takes that default, instead of failing.
@@ -13,6 +14,9 @@
 * **Unions:** A field of a union type no longer throws a `TypeError` when its value is completed.
 * **Variables:** Enum variables are accepted; they failed because their Dart value was validated again as a name.
 * **Variables:** A `null` variable for a non-null argument is reported as an error naming the argument.
+* **Directives:** `@skip` and `@include` apply to fragment spreads and inline fragments, not only fields.
+* **Directives:** `@skip` and `@include` find their `if` argument among several arguments.
+* **Fragments:** An inline fragment without a type condition applies to any type.
 
 ## 7.0.0
 
