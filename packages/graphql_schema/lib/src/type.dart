@@ -52,14 +52,20 @@ class GraphQLListType<Value, Serialized>
 
   GraphQLListType(this.ofType);
 
+  /// Whether a null item is allowed, and a list of [T] can hold it.
+  ///
+  /// `listOf(graphQLString)` (a list of non-nullable Dart `String`s) cannot,
+  /// unlike `listOf<dynamic, dynamic>(graphQLString)`.
+  bool _holdsNull<T>() => ofType is! GraphQLNonNullableType && null is T;
+
   @override
   List<Serialized>? convert(value) {
     if (value is! Iterable) return super.convert(value);
 
     var out = <Serialized>[];
     for (var v in value) {
-      // Keep null items the list can hold; [validate] decides if they are valid.
-      if (v == null && null is Serialized) {
+      if (v == null) {
+        if (!_holdsNull<Serialized>()) return null;
         out.add(null as Serialized);
         continue;
       }
@@ -90,11 +96,8 @@ class GraphQLListType<Value, Serialized>
     for (var v in input) {
       var k = '"$key" at index ${i++}';
 
-      // A null item is valid unless the item type is non-nullable. The list
-      // must also be able to hold it, which `listOf(graphQLString)` (a list of
-      // non-nullable Dart `String`s) cannot, unlike `listOf<dynamic, dynamic>`.
-      if (v == null && ofType is! GraphQLNonNullableType) {
-        if (null is Serialized) {
+      if (v == null) {
+        if (_holdsNull<Serialized>()) {
           out.add(null as Serialized);
         } else {
           errors.add('Expected $k to be a non-null value.');
@@ -118,8 +121,8 @@ class GraphQLListType<Value, Serialized>
   List<Value> deserialize(List serialized) {
     return serialized
         .map<Value>(
-          (v) => v == null && null is Value
-              ? null as Value
+          (v) => v == null
+              ? _nullItem<Value>()
               : ofType.deserialize(v as Serialized),
         )
         .toList();
@@ -129,11 +132,14 @@ class GraphQLListType<Value, Serialized>
   List<Serialized> serialize(List<Value> value) {
     return value
         .map<Serialized>(
-          (v) => v == null && null is Serialized
-              ? null as Serialized
-              : ofType.serialize(v),
+          (v) => v == null ? _nullItem<Serialized>() : ofType.serialize(v),
         )
         .toList();
+  }
+
+  T _nullItem<T>() {
+    if (_holdsNull<T>()) return null as T;
+    throw ArgumentError('A list of type $this cannot hold a null item.');
   }
 
   @override

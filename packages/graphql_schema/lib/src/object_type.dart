@@ -41,36 +41,70 @@ class GraphQLObjectType
     this.polymorphicName,
   });
 
+  /// The input object [toInputObject] is building, so a field that refers back
+  /// to this type reuses it instead of recursing forever.
+  GraphQLInputObjectType? _inputObjectInProgress;
+
   @override
   GraphQLType<Map<String, dynamic>, Map<String, dynamic>>
   coerceToInputObject() {
-    return toInputObject('${name}Input', description: description);
+    return _inputObjectInProgress ??
+        toInputObject('${name}Input', description: description);
   }
 
   /// Converts [this] into a [GraphQLInputObjectType].
   ///
-  /// Fields of a union type are left out, as a union cannot be an input type.
+  /// Nullable fields of a union or interface type are left out, as those
+  /// cannot be input types. A non-null one throws an [UnsupportedError], as
+  /// does an object left with no input fields.
   GraphQLInputObjectType toInputObject(String name, {String? description}) {
-    return GraphQLInputObjectType(
+    var input = GraphQLInputObjectType(
       name,
       description: description ?? this.description,
-      inputFields: fields
-          .where((f) => !_isUnion(f.type))
-          .map(
-            (f) => GraphQLInputObjectField(
-              f.name,
-              f.type.coerceToInputObject(),
-              description: f.description,
-            ),
-          ),
     );
+    var previous = _inputObjectInProgress;
+    _inputObjectInProgress = input;
+
+    try {
+      for (var f in fields) {
+        if (!_canBeInput(f.type)) {
+          if (f.type is GraphQLNonNullableType) {
+            throw UnsupportedError(
+              'Cannot convert "${this.name}" to an input type: its non-null '
+              'field "${f.name}", of type ${f.type}, cannot be an input.',
+            );
+          }
+          continue;
+        }
+
+        input.inputFields.add(
+          GraphQLInputObjectField(
+            f.name,
+            f.type.coerceToInputObject(),
+            description: f.description,
+          ),
+        );
+      }
+    } finally {
+      _inputObjectInProgress = previous;
+    }
+
+    if (input.inputFields.isEmpty && fields.isNotEmpty) {
+      throw UnsupportedError(
+        'Cannot convert "${this.name}" to an input type: none of its fields '
+        'can be an input.',
+      );
+    }
+
+    return input;
   }
 
-  static bool _isUnion(GraphQLType type) => switch (type) {
-    GraphQLUnionType() => true,
-    GraphQLNonNullableType(:var ofType) => _isUnion(ofType),
-    GraphQLListType(:var ofType) => _isUnion(ofType),
-    _ => false,
+  static bool _canBeInput(GraphQLType type) => switch (type) {
+    GraphQLUnionType() => false,
+    GraphQLObjectType(:var isInterface) => !isInterface,
+    GraphQLNonNullableType(:var ofType) => _canBeInput(ofType),
+    GraphQLListType(:var ofType) => _canBeInput(ofType),
+    _ => true,
   };
 
   /// Declares that this type inherits from another parent type.
@@ -139,7 +173,7 @@ class GraphQLObjectType
         // may be a Dart value (such as an enum's) to convert first.
         var result = field.type.validate(
           k.toString(),
-          field.type.convert(v) ?? v,
+          _convertOutput(field.type, v),
         );
 
         if (!result.successful) {
@@ -216,6 +250,17 @@ class GraphQLObjectType
   // types. Equal objects still share these values, so they hash equally.
   int get hashCode => hash3(name, description, isInterface);
 }
+
+/// Converts resolver output [value] for validation against [type]. Lists are
+/// converted item by item, so one item that cannot be converted is reported on
+/// its own instead of leaving the whole list unconverted.
+dynamic _convertOutput(GraphQLType type, dynamic value) => switch (type) {
+  GraphQLNonNullableType(:var ofType) => _convertOutput(ofType, value),
+  GraphQLListType(:var ofType) when value is Iterable => [
+    for (var v in value) v == null ? null : _convertOutput(ofType, v),
+  ],
+  _ => type.convert(value) ?? value,
+};
 
 Map<String, dynamic> _foldToStringDynamic(Map map) {
   return map.keys.fold<Map<String, dynamic>>(

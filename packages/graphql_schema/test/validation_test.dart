@@ -303,18 +303,60 @@ void main() {
     expect(union.coerceToInputObject, throwsUnsupportedError);
   });
 
-  test('union fields are left out of an input object', () {
+  group('toInputObject', () {
     var union = GraphQLUnionType('U', [pokemonType]);
-    var holder = objectType(
-      'Holder',
-      fields: [
-        field('name', graphQLString),
-        field('u', union),
-        field('us', listOf(union).nonNullable()),
-      ],
-    );
-    var input = holder.toInputObject('HolderInput');
-    expect(input.inputFields.map((f) => f.name), ['name']);
+
+    test('leaves out nullable union and interface fields', () {
+      var shape = objectType(
+        'Shape',
+        isInterface: true,
+        fields: [field('name', graphQLString)],
+      );
+      var holder = objectType(
+        'Holder',
+        fields: [
+          field('name', graphQLString),
+          field('u', union),
+          field('us', listOf(union.nonNullable())),
+          field('shape', shape),
+        ],
+      );
+      var input = holder.toInputObject('HolderInput');
+      expect(input.inputFields.map((f) => f.name), ['name']);
+    });
+
+    test('rejects a non-null union field', () {
+      var holder = objectType(
+        'Holder',
+        fields: [
+          field('name', graphQLString),
+          field('us', listOf(union).nonNullable()),
+        ],
+      );
+      expect(() => holder.toInputObject('HolderInput'), throwsUnsupportedError);
+    });
+
+    test('rejects an object with no input fields left', () {
+      var holder = objectType('Holder', fields: [field('u', union)]);
+      expect(holder.coerceToInputObject, throwsUnsupportedError);
+    });
+
+    test('handles a type that refers to itself', () {
+      var todo = objectType('Todo', fields: [field('text', graphQLString)]);
+      todo.fields.add(field('parent', todo));
+      var input = todo.toInputObject('TodoInput');
+      expect(input.inputFields.last.type, same(input));
+    });
+
+    test('handles types that refer to each other', () {
+      var a = objectType('A', fields: [field('n', graphQLInt)]);
+      var b = objectType('B', fields: [field('a', a)]);
+      a.fields.add(field('b', b));
+      var aInput = a.coerceToInputObject() as GraphQLInputObjectType;
+      var bInput = aInput.inputFields.last.type as GraphQLInputObjectType;
+      expect(bInput.name, 'BInput');
+      expect(bInput.inputFields.single.type, same(aInput));
+    });
   });
 
   group('lists with null items', () {
@@ -340,6 +382,39 @@ void main() {
         'RED',
         null,
       ]);
+    });
+
+    test(
+      'only the null item is reported for a list of non-nullable values',
+      () {
+        var palette = objectType(
+          'Palette',
+          fields: [field('colors', listOf(color))],
+        );
+        expect(
+          palette.validate('x', {
+            'colors': [1, null],
+          }).errors,
+          ['x: Expected "colors" at index 1 to be a non-null value.'],
+        );
+      },
+    );
+
+    test('serialize rejects a null item for a non-null item type', () {
+      expect(
+        () =>
+            listOf<dynamic, dynamic>(color.nonNullable()).serialize([1, null]),
+        throwsArgumentError,
+      );
+    });
+
+    test('serialize rejects a null item the list cannot hold', () {
+      expect(
+        () => GraphQLListType<int?, String>(
+          GraphQLEnumType<int?>('C', [GraphQLEnumValue('RED', 1)]),
+        ).serialize([1, null]),
+        throwsArgumentError,
+      );
     });
   });
 

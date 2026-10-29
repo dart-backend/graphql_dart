@@ -9,6 +9,7 @@
 * **Breaking:** An enum's `validate` accepts only value names. Dart values are converted with `convert`, which `GraphQLObjectType.validate` applies to resolver output.
 * **Breaking:** `GraphQLType.convert` returns `null` for a value it cannot convert, instead of throwing.
 * **Breaking:** `GraphQLUnionType.coerceToInputObject` throws an `UnsupportedError`, as a union cannot be an input type.
+* **Breaking:** `toInputObject` and `coerceToInputObject` on an object type leave out nullable fields of a union or interface type, which cannot be input types. They throw an `UnsupportedError` for such a field that is non-null, or when no field is left.
 * **Breaking:** Type hash codes no longer include fields, so equal types have equal hash codes and self-referencing types can be hashed.
 
 ### New in 8.0.0
@@ -24,9 +25,9 @@
 * **Numbers:** `Float` accepts and converts `Int` input.
 * **Unions:** Resolving a union or interface member handles enum, list-of-enum and `Date` fields holding Dart values.
 * **Equality:** `GraphQLFieldInput` equality compares `defaultValue`.
-* **Input objects:** `toInputObject` and `coerceToInputObject` leave out union-typed fields, instead of throwing for any object type that has one.
-* **Lists:** Converting resolver output keeps `null` items the list can hold, so a list of enum or `Date` values with a `null` item is no longer rejected as a whole.
-* **Lists:** `serialize` keeps `null` items the list can hold, instead of passing them to the item type.
+* **Input objects:** `toInputObject` and `coerceToInputObject` handle object types that refer to themselves or to each other, instead of overflowing the stack.
+* **Lists:** Resolver output for a list of enum or `Date` values is converted item by item, so a `null` item is reported on its own instead of failing every other item too.
+* **Lists:** `serialize` keeps a `null` item the list can hold, and throws an `ArgumentError` for one it cannot, instead of passing it to the item type.
 
 ## 7.0.0
 
