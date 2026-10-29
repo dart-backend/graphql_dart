@@ -299,12 +299,70 @@ void main() {
   });
 
   test('union cannot be coerced to an input type', () {
+    var union = GraphQLUnionType('U', [pokemonType]);
+    expect(union.coerceToInputObject, throwsUnsupportedError);
+  });
+
+  test('union fields are left out of an input object', () {
+    var union = GraphQLUnionType('U', [pokemonType]);
     var holder = objectType(
       'Holder',
       fields: [
-        field('u', GraphQLUnionType('U', [pokemonType])),
+        field('name', graphQLString),
+        field('u', union),
+        field('us', listOf(union).nonNullable()),
       ],
     );
-    expect(holder.coerceToInputObject, throwsUnsupportedError);
+    var input = holder.toInputObject('HolderInput');
+    expect(input.inputFields.map((f) => f.name), ['name']);
+  });
+
+  group('lists with null items', () {
+    var color = enumType('Color', {'RED': 1, 'BLUE': 2});
+
+    test('convert keeps null items the list can hold', () {
+      var palette = objectType(
+        'Palette',
+        fields: [field('colors', listOf<dynamic, dynamic>(color))],
+      );
+      expect(
+        palette.validate('x', {
+          'colors': [1, null],
+        }).value,
+        {
+          'colors': ['RED', null],
+        },
+      );
+    });
+
+    test('serialize keeps null items the list can hold', () {
+      expect(listOf<dynamic, dynamic>(color).serialize([1, null]), [
+        'RED',
+        null,
+      ]);
+    });
+  });
+
+  group('Int given for Float', () {
+    test('deserializes for Float!', () {
+      var type = graphQLFloat.nonNullable();
+      var value = type.validate('x', 1).value;
+      expect(type.deserialize(value!), 1.0);
+    });
+
+    test('deserializes for [Float]', () {
+      var type = listOf(graphQLFloat);
+      var value = type.validate('x', [1, 2]).value;
+      expect(type.deserialize(value!), [1.0, 2.0]);
+    });
+
+    test('deserializes for an input field of type Float!', () {
+      var type = GraphQLInputObjectType(
+        'I',
+        inputFields: [GraphQLInputObjectField('f', graphQLFloat.nonNullable())],
+      );
+      var value = type.validate('x', {'f': 1}).value;
+      expect(type.deserialize(value!), {'f': 1.0});
+    });
   });
 }

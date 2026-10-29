@@ -48,19 +48,30 @@ class GraphQLObjectType
   }
 
   /// Converts [this] into a [GraphQLInputObjectType].
+  ///
+  /// Fields of a union type are left out, as a union cannot be an input type.
   GraphQLInputObjectType toInputObject(String name, {String? description}) {
     return GraphQLInputObjectType(
       name,
       description: description ?? this.description,
-      inputFields: fields.map(
-        (f) => GraphQLInputObjectField(
-          f.name,
-          f.type.coerceToInputObject(),
-          description: f.description,
-        ),
-      ),
+      inputFields: fields
+          .where((f) => !_isUnion(f.type))
+          .map(
+            (f) => GraphQLInputObjectField(
+              f.name,
+              f.type.coerceToInputObject(),
+              description: f.description,
+            ),
+          ),
     );
   }
+
+  static bool _isUnion(GraphQLType type) => switch (type) {
+    GraphQLUnionType() => true,
+    GraphQLNonNullableType(:var ofType) => _isUnion(ofType),
+    GraphQLListType(:var ofType) => _isUnion(ofType),
+    _ => false,
+  };
 
   /// Declares that this type inherits from another parent type.
   ///

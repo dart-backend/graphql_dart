@@ -1,5 +1,13 @@
 # Change log
 
+## 10.0.0
+
+### Breaking changes in 10.0.0
+
+* **Breaking:** Requires Angel3 10: `angel3_framework`, `angel3_container`, `angel3_file_service`, `angel3_websocket` and `angel3_validate` 10.0.0.
+* **Breaking:** Requires `graphql_parser2` 8.0.0, `graphql_schema2` 8.0.0 and `graphql_server2` 9.0.0. See their change logs for the breaking changes in parsing, validation and execution.
+* **Breaking:** `graphql_server2` 9.0.0 removes `package:graphql_server2/mirrors.dart`, so `convertDartType` is gone. Generate GraphQL types with `graphql_generator2` instead, as the README and example now do.
+
 ## 9.0.0
 
 * Require Dart >= 3.13
@@ -10,7 +18,7 @@
 * Updated `angel3_validate` to `9.0.0`
 * Updated `graphql_parser2` to `7.0.0`
 * Updated `graphql_schema2` to `7.0.0`
-* Updated `graphql_server2` to `9.0.0`
+* Updated `graphql_server2` to `7.0.0`
 
 ## 8.5.0
 

@@ -58,6 +58,11 @@ class GraphQLListType<Value, Serialized>
 
     var out = <Serialized>[];
     for (var v in value) {
+      // Keep null items the list can hold; [validate] decides if they are valid.
+      if (v == null && null is Serialized) {
+        out.add(null as Serialized);
+        continue;
+      }
       var converted = ofType.convert(v);
       if (converted == null) return null;
       out.add(converted);
@@ -122,7 +127,13 @@ class GraphQLListType<Value, Serialized>
 
   @override
   List<Serialized> serialize(List<Value> value) {
-    return value.map<Serialized>(ofType.serialize).toList();
+    return value
+        .map<Serialized>(
+          (v) => v == null && null is Serialized
+              ? null as Serialized
+              : ofType.serialize(v),
+        )
+        .toList();
   }
 
   @override

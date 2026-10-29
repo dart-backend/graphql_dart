@@ -302,7 +302,9 @@ class GraphQL {
                 .toList(),
           );
         } else {
-          toSet = type.deserialize(value);
+          // Deserialize the validated value, which carries coercions such as
+          // Int to Float, rather than the raw input.
+          toSet = type.deserialize(validation.value);
         }
       }
 
@@ -743,7 +745,7 @@ class GraphQL {
 
             throw GraphQLException(errors);
           } else {
-            final coercedValue = argumentType.deserialize(inputValue);
+            final coercedValue = argumentType.deserialize(validation.value);
 
             coercedValues[argumentName] = coercedValue;
           }

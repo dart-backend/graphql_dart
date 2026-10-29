@@ -25,8 +25,8 @@ To install `package:angel3_graphql`, add the following to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-    angel3_framework: ^9.0.0
-    angel3_graphql: ^9.0.0
+    angel3_framework: ^10.0.0
+    angel3_graphql: ^10.0.0
 ```
 
 ## Usage

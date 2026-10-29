@@ -17,6 +17,10 @@ var graphQL = GraphQL(
 );
 ```
 
+### Fixes in 9.0.0
+
+* **Arguments:** Arguments and variables are deserialized from their validated value, so an `Int` given for `Float!`, `[Float]` or a `Float!` input field is coerced instead of throwing a `TypeError`.
+
 ## 8.0.0
 
 ### Breaking changes in 8.0.0

@@ -41,6 +41,15 @@ void main() {
             inputs: [GraphQLFieldInput('i', paintInput)],
             resolve: (_, args) => '${args['i']}',
           ),
+          field(
+            'sum',
+            graphQLString,
+            inputs: [
+              GraphQLFieldInput('f', graphQLFloat.nonNullable()),
+              GraphQLFieldInput('fs', listOf(graphQLFloat)),
+            ],
+            resolve: (_, args) => '${args['f']} ${args['fs']}',
+          ),
         ],
       ),
     ),
@@ -95,6 +104,25 @@ void main() {
         },
       ),
       {'echo': '{name: x, note: null}'},
+    );
+  });
+
+  test('Int arguments are coerced to Float', () async {
+    expect(await graphql.parseAndExecute('{ sum(f: 1, fs: [1, 2]) }'), {
+      'sum': '1.0 [1.0, 2.0]',
+    });
+  });
+
+  test('Int variables are coerced to Float', () async {
+    expect(
+      await graphql.parseAndExecute(
+        r'query($f: Float!, $fs: [Float]) { sum(f: $f, fs: $fs) }',
+        variableValues: {
+          'f': 1,
+          'fs': [1, 2],
+        },
+      ),
+      {'sum': '1.0 [1.0, 2.0]'},
     );
   });
 

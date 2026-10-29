@@ -24,6 +24,9 @@
 * **Numbers:** `Float` accepts and converts `Int` input.
 * **Unions:** Resolving a union or interface member handles enum, list-of-enum and `Date` fields holding Dart values.
 * **Equality:** `GraphQLFieldInput` equality compares `defaultValue`.
+* **Input objects:** `toInputObject` and `coerceToInputObject` leave out union-typed fields, instead of throwing for any object type that has one.
+* **Lists:** Converting resolver output keeps `null` items the list can hold, so a list of enum or `Date` values with a `null` item is no longer rejected as a whole.
+* **Lists:** `serialize` keeps `null` items the list can hold, instead of passing them to the item type.
 
 ## 7.0.0
 
