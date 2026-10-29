@@ -35,4 +35,34 @@ void main() {
       'b': 'b',
     });
   });
+
+  test('@jsonpath fills a variable from an earlier field', () async {
+    var user = objectType('User', fields: [field('id', graphQLString)]);
+    var graphQL = GraphQL(
+      graphQLSchema(
+        queryType: objectType(
+          'Query',
+          fields: [
+            field('me', user, resolve: (_, _) => {'id': 'u1'}),
+            field(
+              'greet',
+              graphQLString,
+              inputs: [GraphQLFieldInput('id', graphQLString)],
+              resolve: (_, args) => 'hi ${args['id']}',
+            ),
+          ],
+        ),
+      ),
+    );
+    expect(
+      await graphQL.parseAndExecute(
+        r'query($id: String @jsonpath(path: "$.me.id")) '
+        r'{ me { id } greet(id: $id) }',
+      ),
+      {
+        'me': {'id': 'u1'},
+        'greet': 'hi u1',
+      },
+    );
+  });
 }

@@ -318,19 +318,13 @@ class GraphQL {
     return coercedValues;
   }
 
-  List<List> makeLazy(Map<String, dynamic> map) {
-    final lazy = <List>[];
-
-    for (final val in map.values) {
-      if (val is JsonPathArgument) {
-        lazy.add([...val.splitted, val]);
-      } else if (val is Map<String, dynamic>) {
-        makeLazy(val);
-      }
-    }
-
-    return lazy;
-  }
+  /// The `@jsonpath` variables in [map], each as its path followed by the
+  /// [JsonPathArgument] to complete. They are only ever top-level variable
+  /// values: nested values come from the client's input.
+  List<List> makeLazy(Map<String, dynamic> map) => [
+    for (final val in map.values)
+      if (val is JsonPathArgument) [...val.splitted, val],
+  ];
 
   Future<Map<String, dynamic>> executeQuery(
     DocumentContext document,
