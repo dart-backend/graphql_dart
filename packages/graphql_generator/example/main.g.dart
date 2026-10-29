@@ -11,5 +11,13 @@ final GraphQLObjectType todoItemGraphQLType = objectType(
   'TodoItem',
   isInterface: false,
   interfaces: [],
-  fields: [field('text', graphQLString), field('isComplete', graphQLBoolean)],
+  fields: [
+    field('id', graphQLId),
+    field('text', graphQLString),
+    field(
+      'isComplete',
+      graphQLBoolean,
+      description: 'Whether this item is complete.',
+    ),
+  ],
 );

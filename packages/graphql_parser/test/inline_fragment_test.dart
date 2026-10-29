@@ -75,7 +75,7 @@ class _IsInlineFragment extends Matcher {
         ? item
         : parseInlineFragment(item.toString());
     if (fragment == null) return false;
-    if (fragment.typeCondition.typeName.name != name) return false;
+    if (fragment.typeCondition?.typeName.name != name) return false;
     if (directives != null &&
         !directives!.matches(fragment.directives, matchState)) {
       return false;

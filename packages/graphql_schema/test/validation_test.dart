@@ -18,27 +18,27 @@ void main() {
     'is a valid Pokémon',
   );
 
-  var throwsATypeError = throwsA(
-    predicate((dynamic x) => x is TypeError, 'is a type or cast error'),
-  );
-
   test('object accepts valid input', () {
     expect({'name': 'Charmander', 'type': 'FIRE'}, isValidPokemon);
   });
 
   test('mismatched scalar type', () {
-    expect(() => pokemonType.validate('@root', {'name': 24}), throwsATypeError);
+    expect({'name': 24}, isNot(isValidPokemon));
   });
 
   test('empty passed for non-nullable', () {
     expect(<String, dynamic>{}, isNot(isValidPokemon));
   });
 
-  /* TODO: Required fixing
   test('null passed for non-nullable', () {
-    expect({'name': null}, isNot(isValidPokemon));
+    var result = pokemonType.validate('@root', {'name': null});
+    expect(result.successful, false);
+    expect(result.errors, ['Field "name", of type String!, cannot be null.']);
   });
-  */
+
+  test('null passed for nullable field', () {
+    expect({'name': 'Ditto', 'type': null}, isValidPokemon);
+  });
 
   test('rejects extraneous fields', () {
     expect({'name': 'Vulpix', 'foo': 'bar'}, isNot(isValidPokemon));
@@ -99,5 +99,212 @@ void main() {
         false,
       );
     });
+  });
+
+  group('wrongly typed input fails instead of throwing', () {
+    void expectFailure(GraphQLType type, Object? input) =>
+        expect(type.validate('x', input).successful, false);
+
+    test('list', () => expectFailure(listOf(graphQLId), 'abc'));
+    test('object', () => expectFailure(pokemonType, 5));
+    test('input object', () {
+      expectFailure(
+        GraphQLInputObjectType(
+          'F',
+          inputFields: [GraphQLInputObjectField('a', graphQLString)],
+        ),
+        5,
+      );
+    });
+    test('union', () => expectFailure(GraphQLUnionType('U', [pokemonType]), 5));
+    test('string bounds', () => expectFailure(graphQLStringMin(1), 42));
+    test('number bounds', () => expectFailure(graphQLIntMin(1), 'a'));
+    test('enum', () => expectFailure(typeType, 3));
+    test('non-null', () => expectFailure(graphQLString.nonNullable(), null));
+  });
+
+  group('number', () {
+    test('Float accepts and coerces an Int', () {
+      var result = graphQLFloat.validate('price', 3);
+      expect(result.successful, true);
+      expect(result.value, 3.0);
+      expect(graphQLFloat.deserialize(3), 3.0);
+    });
+
+    test('Int rejects a Float', () {
+      expect(graphQLInt.validate('n', 3.5).successful, false);
+    });
+
+    test('Int cannot deserialize a Float', () {
+      expect(() => graphQLInt.deserialize(3.5), throwsArgumentError);
+    });
+
+    test('bounds reject null and check values', () {
+      expect(graphQLInt.validate('x', null).successful, false);
+      expect(graphQLIntMin(1).validate('x', null).successful, false);
+      expect(graphQLIntMin(1).validate('x', 0).successful, false);
+      expect(graphQLIntMax(1).validate('x', 2).successful, false);
+      expect(graphQLIntRange(1, 3).validate('x', 2).successful, true);
+    });
+  });
+
+  group('enum', () {
+    var color = enumType('Color', {'RED': 1, 'BLUE': 2});
+    var paint = objectType('Paint', fields: [field('color', color)]);
+
+    test('object accepts a value name', () {
+      expect(paint.validate('x', {'color': 'RED'}).successful, true);
+    });
+
+    test('object accepts a Dart value, as in resolver output', () {
+      var result = paint.validate('x', {'color': 1});
+      expect(result.successful, true);
+      expect(result.value, {'color': 'RED'});
+    });
+
+    test('enum rejects a Dart value as input', () {
+      expect(color.validate('x', 1).successful, false);
+      expect(
+        GraphQLInputObjectType(
+          'PaintInput',
+          inputFields: [GraphQLInputObjectField('color', color)],
+        ).validate('x', {'color': 1}).successful,
+        false,
+      );
+    });
+
+    test('Dart values are converted, preferring values over names', () {
+      var e = enumType('E', {'A': 'B', 'B': 'C'});
+      expect(e.convert('B'), 'A');
+      expect(e.validate('x', 'B').value, 'B');
+      expect(
+        objectType(
+          'O',
+          fields: [field('e', e)],
+        ).validate('x', {'e': 'B'}).value,
+        {'e': 'A'},
+      );
+    });
+
+    test('object accepts a list of Dart values', () {
+      var palette = objectType(
+        'Palette',
+        fields: [field('colors', listOf(color))],
+      );
+      expect(
+        palette.validate('x', {
+          'colors': [1, 2],
+        }).value,
+        {
+          'colors': ['RED', 'BLUE'],
+        },
+      );
+    });
+
+    test('object rejects an unknown value', () {
+      expect(paint.validate('x', {'color': 'GREEN'}).successful, false);
+    });
+
+    test('non-null enum accepts a Dart value', () {
+      var type = objectType(
+        'Paint',
+        fields: [field('color', color.nonNullable())],
+      );
+      expect(type.validate('x', {'color': 2}).successful, true);
+    });
+  });
+
+  group('null list items', () {
+    test('are accepted when the list can hold them', () {
+      var type = listOf<dynamic, dynamic>(graphQLString);
+      var result = type.validate('x', ['a', null]);
+      expect(result.successful, true);
+      expect(result.value, ['a', null]);
+      expect(type.deserialize(['a', null]), ['a', null]);
+    });
+
+    test('are rejected for a list of non-nullable Dart values', () {
+      var result = listOf(graphQLString).validate('x', ['a', null]);
+      expect(result.successful, false);
+      expect(result.errors, [
+        'Expected "x" at index 1 to be a non-null value.',
+      ]);
+    });
+
+    test('are rejected for a non-null item type', () {
+      expect(
+        listOf<dynamic, dynamic>(graphQLString.nonNullable())
+            .validate('x', ['a', null])
+            .successful,
+        false,
+      );
+    });
+  });
+
+  test('null field values serialize and deserialize', () {
+    var input = GraphQLInputObjectType(
+      'I',
+      inputFields: [
+        GraphQLInputObjectField('name', graphQLString),
+        GraphQLInputObjectField('when', graphQLDate),
+      ],
+    );
+    var value = {'name': 'x', 'when': null};
+    expect(input.validate('x', value).successful, true);
+    expect(input.deserialize(value), value);
+    expect(input.serialize(value), value);
+
+    var output = objectType('O', fields: [field('name', graphQLString)]);
+    expect(output.deserialize({'name': null}), {'name': null});
+    expect(output.serialize({'name': null}), {'name': null});
+  });
+
+  test('nested validated values are kept', () {
+    var inner = GraphQLInputObjectType(
+      'Inner',
+      inputFields: [GraphQLInputObjectField('n', graphQLFloat)],
+    );
+    var outer = GraphQLInputObjectType(
+      'Outer',
+      inputFields: [GraphQLInputObjectField('items', listOf(inner))],
+    );
+
+    var result = outer.validate('x', {
+      'items': [
+        <dynamic, dynamic>{'n': 1},
+      ],
+    });
+    expect(result.successful, true);
+    var items = result.value!['items'] as List;
+    expect(items.single, isA<Map<String, dynamic>>());
+    expect((items.single as Map)['n'], isA<double>());
+  });
+
+  test('object accepts a DateTime, as in resolver output', () {
+    var date = DateTime.utc(2020);
+    var event = objectType('Event', fields: [field('at', graphQLDate)]);
+    expect(event.validate('x', {'at': date}).value, {
+      'at': date.toIso8601String(),
+    });
+    expect(graphQLDate.validate('d', date).successful, false);
+  });
+
+  test('field arguments can have their own types', () {
+    var f = field(
+      'user',
+      objectType('User'),
+      inputs: [GraphQLFieldInput('id', graphQLInt)],
+    );
+    expect(f.inputs.single.type, graphQLInt);
+  });
+
+  test('union cannot be coerced to an input type', () {
+    var holder = objectType(
+      'Holder',
+      fields: [
+        field('u', GraphQLUnionType('U', [pokemonType])),
+      ],
+    );
+    expect(holder.coerceToInputObject, throwsUnsupportedError);
   });
 }

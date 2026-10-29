@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:mirrors';
 
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -72,24 +71,23 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
     return false;
   }
 
+  /// A reference to the generated GraphQL type of [type]. A `@serializable`
+  /// model's type is named after its generated class, as `todoGraphQLType` of
+  /// `TodoEntity` or `_Todo`. The element's name is used, as the type's display
+  /// string has a `?` when it is nullable.
+  Expression _graphQLTypeOf(InterfaceType type) {
+    var name = type.element.displayName;
+    if (serializableTypeChecker.hasAnnotationOf(type.element)) {
+      name = generatedClassNameOf(name);
+    }
+
+    return refer('${ReCase(name).camelCase}GraphQLType');
+  }
+
   Expression _inferType(String className, String name, DartType type) {
     // Firstly, check if it's a GraphQL class.
     if (type is InterfaceType && _isGraphQLClass(type)) {
-      var c = type;
-      var name =
-          serializableTypeChecker.hasAnnotationOf(c.element) &&
-              c.getDisplayString().startsWith('_')
-          ? c.getDisplayString().substring(1)
-          : c.getDisplayString();
-      var rc = ReCase(name);
-
-      return refer('${rc.camelCase}GraphQLType');
-    }
-
-    // Next, check if this is the "id" field of a `Model`.
-    if (TypeChecker.typeNamed(Model).isAssignableFromType(type) &&
-        name == 'id') {
-      return refer('graphQLId');
+      return _graphQLTypeOf(type);
     }
 
     var primitive = {
@@ -194,16 +192,9 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
           _applyDescription(named, clazz, clazz.documentationComment);
 
           // Add interfaces
-          var interfaces = clazz.interfaces.where(_isGraphQLClass).map((c) {
-            var name =
-                serializableTypeChecker.hasAnnotationOf(c.element) &&
-                    c.getDisplayString().startsWith('_')
-                ? c.getDisplayString().substring(1)
-                : c.getDisplayString();
-            var rc = ReCase(name);
-
-            return refer('${rc.camelCase}GraphQLType');
-          });
+          var interfaces = clazz.interfaces
+              .where(_isGraphQLClass)
+              .map(_graphQLTypeOf);
 
           named['interfaces'] = literalList(interfaces);
 
@@ -217,7 +208,10 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
           while (search != null &&
               !TypeChecker.typeNamed(Object).isExactlyType(search)) {
             for (var field in search.element.fields) {
-              if (!ctxFields.any((f) => f.name == field.name)) {
+              // Skip computed getters (such as `Model.idAsInt`), which have
+              // no stored value to resolve.
+              if (!field.isOriginGetterSetter &&
+                  !ctxFields.any((f) => f.name == field.name)) {
                 ctxFields.add(field);
               }
             }
@@ -233,15 +227,28 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
               (f) => f.name == field.name,
             );
 
+            // Annotations are on the field when it is declared as a field, and
+            // on the getter when it is declared as a getter (as in a
+            // `@serializable` model), so look for them on both.
+            var candidates = <Element>[
+              ?originalField,
+              ?originalField?.getter,
+              field,
+            ];
+            Element annotatedWith(TypeChecker checker) => candidates.firstWhere(
+              checker.hasAnnotationOf,
+              orElse: () => candidates.first,
+            );
+
             // Check if it is deprecated.
-            var depEl = originalField?.getter ?? originalField ?? field;
-            var depAnn = TypeChecker.typeNamed(Deprecated)
-                .firstAnnotationOf(depEl);
+            var depAnn = TypeChecker.typeNamed(Deprecated).firstAnnotationOf(
+              annotatedWith(TypeChecker.typeNamed(Deprecated)),
+            );
 
             if (depAnn != null) {
               var dep = ConstantReader(depAnn);
               var reason =
-                  dep.peek('messages')?.stringValue ??
+                  dep.peek('message')?.stringValue ??
                   dep.peek('expires')?.stringValue ??
                   'Expires: ${deprecated.message}.';
 
@@ -249,25 +256,33 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
             }
 
             // Description finder...
+            var docEl = annotatedWith(_graphQLDoc);
             _applyDescription(
               named,
-              originalField?.getter ?? originalField ?? field,
+              docEl,
               originalField?.getter?.documentationComment ??
                   originalField?.documentationComment,
             );
 
             // Pick the type.
-            var doc = _graphQLDoc.firstAnnotationOf(depEl);
+            var doc = _graphQLDoc.firstAnnotationOf(docEl);
 
             Expression? type;
 
             if (doc != null) {
               var cr = ConstantReader(doc);
-              var typeName = cr.peek('typeName')?.symbolValue;
+              var typeName = cr.peek('typeName')?.objectValue.toSymbolValue();
 
               if (typeName != null) {
-                type = refer(MirrorSystem.getName(typeName));
+                type = refer(typeName);
               }
+            }
+
+            // The "id" field of a `Model` is an ID.
+            if (field.displayName == 'id' &&
+                TypeChecker.typeNamed(Model)
+                    .isAssignableFromType(clazz.thisType)) {
+              type ??= refer('graphQLId');
             }
 
             fields.add(

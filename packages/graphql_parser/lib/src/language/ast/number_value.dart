@@ -18,7 +18,7 @@ class NumberValueContext extends InputValueContext<num> {
     if (!text.contains('E') && !text.contains('e')) {
       return num.parse(text);
     } else {
-      var split = text.split(text.contains('E') ? 'E' : 'e');
+      var split = text.split(RegExp('[eE]'));
       var base = num.parse(split[0]);
       var exp = num.parse(split[1]);
       return base * math.pow(10, exp);

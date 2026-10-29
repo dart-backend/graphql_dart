@@ -147,8 +147,7 @@ class GraphQLDocumentation {
   /// The reason the annotated field or enum value was deprecated, if any.
   final String? deprecationReason;
 
-  /// A constant callback that returns an explicit type for the annotated field, rather than having it be assumed
-  /// via `dart:mirrors`.
+  /// A constant callback that returns an explicit type for the annotated field, rather than having it be inferred.
   final GraphDocumentationTypeProvider? type;
 
   /// The name of an explicit type for the annotated field, rather than having it be assumed.

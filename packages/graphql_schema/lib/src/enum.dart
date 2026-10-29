@@ -6,11 +6,8 @@ GraphQLEnumType enumType<Value>(
   Map<String, Value> values, {
   String? description,
 }) {
-  final len = values.keys.length;
-
   return GraphQLEnumType<Value>(name, [
-    for (var i = 0; i < len; i++)
-      GraphQLEnumValue(values.keys.elementAt(i), values.values.elementAt(i)),
+    for (var e in values.entries) GraphQLEnumValue(e.key, e.value),
   ], description: description);
 }
 
@@ -31,8 +28,7 @@ GraphQLEnumType<String> enumTypeFromStrings(
 /// A [GraphQLType] with only a predetermined number of possible values.
 ///
 /// Though these are serialized as strings, they carry special meaning with a type system.
-class GraphQLEnumType<Value> extends GraphQLScalarType<Value, String>
-    with _NonNullableMixin<Value, String> {
+class GraphQLEnumType<Value> extends GraphQLScalarType<Value, String> {
   /// The name of this enum type.
   @override
   final String name;
@@ -54,22 +50,23 @@ class GraphQLEnumType<Value> extends GraphQLScalarType<Value, String>
     return values.firstWhere((v) => v.value == value).name;
   }
 
+  /// Converts a Dart value to its name; a value that is already a name is
+  /// returned unchanged, and anything else as `null`.
   @override
-  String? convert(value) => serialize(value);
+  String? convert(value) =>
+      values.firstWhereOrNull((v) => v.value == value)?.name ??
+      (value is String ? value : null);
 
   @override
   Value deserialize(String serialized) {
     return values.firstWhere((v) => v.name == serialized).value;
   }
 
+  /// Accepts only a value's name. Resolver output holding a Dart value is
+  /// passed through [convert] first.
   @override
-  ValidationResult<String> validate(String key, String input) {
-    if (!values.any((v) => v.name == input)) {
-      //if (input == null) {
-      //  return new ValidationResult<String>._failure(
-      //      ['The enum "$name" does not accept null values.']);
-      //}
-
+  ValidationResult<String> validate(String key, input) {
+    if (input is! String || !values.any((v) => v.name == input)) {
       return ValidationResult<String>._failure([
         '"$input" is not a valid value for the enum "$name".',
       ]);
@@ -86,7 +83,11 @@ class GraphQLEnumType<Value> extends GraphQLScalarType<Value, String>
       const ListEquality<GraphQLEnumValue>().equals(other.values, values);
 
   @override
-  int get hashCode => hash3(name, description, values);
+  int get hashCode => hash3(
+    name,
+    description,
+    const ListEquality<GraphQLEnumValue>().hash(values),
+  );
 
   @override
   GraphQLType<Value, String> coerceToInputObject() => this;

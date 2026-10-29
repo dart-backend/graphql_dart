@@ -1,5 +1,24 @@
 # Change Log
 
+## 8.0.0
+
+### Breaking changes in 8.0.0
+
+* **Breaking:** Requires `angel3_model` and `angel3_serialize_generator` 10.0.0, and `graphql_schema2` 8.0.0.
+* **Breaking:** The `id` field of a `Model` is generated as `graphQLId` instead of `graphQLString`.
+* **Breaking:** Computed getters inherited from a parent class, such as `Model.idAsInt` and `idAsString`, are no longer generated as fields.
+* **Breaking:** `@GraphQLDocumentation` and `@Deprecated` on a field declared as a field (not as a getter) are applied, so its description, deprecation reason and `typeName` now appear in the generated type.
+
+### New in 8.0.0
+
+* The generator no longer imports `dart:mirrors`; `typeName` symbols are read through the analyzer.
+
+### Fixes in 8.0.0
+
+* **Types:** A reference to another generated type is named after the class the serializer generates, so a field of type `TodoEntity` refers to `todoGraphQLType`, as `_Todo` already did.
+* **Types:** A nullable field of a generated class or enum type, such as `CompletionStatus?`, generates valid code instead of `completionStatus?GraphQLType`.
+* **Deprecation:** The `@Deprecated` message is used as the deprecation reason instead of "Expires: next release.".
+
 ## 7.0.0
 
 * Require Dart >= 3.13

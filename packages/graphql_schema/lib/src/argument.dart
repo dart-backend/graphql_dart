@@ -53,7 +53,7 @@ class GraphQLFieldInput<Value, Serialized> {
       other is GraphQLFieldInput &&
       other.name == name &&
       other.type == type &&
-      other.defaultValue == other.defaultValue &&
+      other.defaultValue == defaultValue &&
       other.defaultsToNull == defaultsToNull &&
       other.description == description;
 

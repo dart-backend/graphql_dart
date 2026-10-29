@@ -1,18 +1,16 @@
-// ignore_for_file: deprecated_member_use
-import 'package:angel3_container/mirrors.dart';
 import 'package:angel3_framework/angel3_framework.dart';
 import 'package:angel3_framework/http.dart';
 import 'package:angel3_graphql/angel3_graphql.dart';
 import 'package:angel3_serialize/angel3_serialize.dart';
 import 'package:graphql_schema2/graphql_schema2.dart';
 import 'package:graphql_server2/graphql_server2.dart';
-import 'package:graphql_server2/mirrors.dart';
 import 'package:logging/logging.dart';
+
+part 'main.g.dart';
 
 void main() async {
   var logger = Logger('angel3_graphql');
   var app = Angel(
-    reflector: MirrorsReflector(),
     logger: logger
       ..onRecord.listen((rec) {
         print(rec);
@@ -30,12 +28,12 @@ void main() async {
     fields: [
       field(
         'todos',
-        listOf(convertDartType(Todo)!.nonNullable()),
+        listOf(todoGraphQLType.nonNullable()),
         resolve: resolveViaServiceIndex(todoService),
       ),
       field(
         'todo',
-        convertDartType(Todo)!,
+        todoGraphQLType,
         resolve: resolveViaServiceRead(todoService),
         inputs: [GraphQLFieldInput('id', graphQLId.nonNullable())],
       ),
@@ -48,12 +46,9 @@ void main() async {
     fields: [
       field(
         'createTodo',
-        convertDartType(Todo)!,
+        todoGraphQLType,
         inputs: [
-          GraphQLFieldInput(
-            'data',
-            convertDartType(Todo)!.coerceToInputObject(),
-          ),
+          GraphQLFieldInput('data', todoGraphQLType.coerceToInputObject()),
         ],
         resolve: resolveViaServiceCreate(todoService),
       ),
@@ -94,21 +89,23 @@ abstract class HasText {
   String? get text;
 }
 
+// Generates the `Todo` model (angel3_serialize_generator) and
+// `todoGraphQLType` (graphql_generator2), so no mirrors are needed.
 @serializable
+@graphQLClass
 @GraphQLDocumentation(
   description: 'A task that might not be completed yet. **Yay! Markdown!**',
 )
-class Todo extends Model implements HasText {
+abstract class TodoEntity extends Model implements HasText {
   @override
-  String? text;
+  String? get text;
 
-  @GraphQLDocumentation(deprecationReason: 'Use `completion_status` instead.')
-  bool? completed;
+  @Deprecated('Use `completion_status` instead.')
+  bool? get completed;
 
-  CompletionStatus? completionStatus;
-
-  Todo({this.text, this.completed, this.completionStatus});
+  CompletionStatus? get completionStatus;
 }
 
+@graphQLClass
 @GraphQLDocumentation(description: 'The completion status of a to-do item.')
 enum CompletionStatus { COMPLETE, INCOMPLETE }

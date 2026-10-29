@@ -7,17 +7,20 @@ import 'token_type.dart';
 final RegExp _comment = RegExp(r'#[^\n]*');
 final RegExp _whitespace = RegExp('[ \t\n\r]+');
 // final RegExp _boolean = RegExp(r'true|false');
-final RegExp _number = RegExp(r'-?[0-9]+(\.[0-9]+)?(E|e(\+|-)?[0-9]+)?');
+// No leading zeros, and a number cannot run straight into a digit, "." or name.
+final RegExp _number = RegExp(
+  r'-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?(?![0-9._A-Za-z])',
+);
 final RegExp _string = RegExp(
   r'"((\\(["\\/bfnrt]|(u[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])))|([^"\\]))*"',
 );
-final RegExp _blockString = RegExp(r'"""(([^"])|(\\"""))*"""');
+// Any characters up to the closing quotes; an escaped \""" does not close it.
+final RegExp _blockString = RegExp(r'"""(\\"""|(?!""")[\s\S])*"""');
 final RegExp _name = RegExp(r'[_A-Za-z][_0-9A-Za-z]*');
 
 final Map<Pattern, TokenType> _patterns = {
   '@': TokenType.ARROBA,
   ':': TokenType.COLON,
-  ',': TokenType.COMMA,
   r'$': TokenType.DOLLAR,
   '...': TokenType.ELLIPSIS,
   '=': TokenType.EQUALS,

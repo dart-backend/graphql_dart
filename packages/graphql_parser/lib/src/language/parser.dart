@@ -45,6 +45,7 @@ class Parser {
 
   Token? maybe(TokenType type) => next(type) ? current : null;
 
+  @Deprecated('Commas are skipped by the lexer, so this does nothing.')
   void eatCommas() {
     while (next(TokenType.COMMA)) {
       continue;
@@ -58,6 +59,12 @@ class Parser {
     while (def != null) {
       defs.add(def);
       def = parseDefinition();
+    }
+
+    // Report leftover tokens, unless a failed definition already explains them.
+    var leftover = peek();
+    if (leftover != null && errors.isEmpty) {
+      errors.add(SyntaxError('Unexpected "${leftover.text}".', leftover.span));
     }
 
     return DocumentContext()..definitions.addAll(defs);
@@ -85,7 +92,7 @@ class Parser {
         } else {
           errors.add(
             SyntaxError(
-              'Missing selection set in fragment definition.',
+              'Missing selection set in operation definition.',
               NAME?.span ?? TYPE?.span,
             ),
           );
@@ -158,6 +165,7 @@ class Parser {
   }
 
   FragmentSpreadContext? parseFragmentSpread() {
+    var previous = current;
     if (next(TokenType.ELLIPSIS) && current != null) {
       var ELLIPSIS = current!;
       if (next(TokenType.NAME, exclude: ['on'])) {
@@ -165,7 +173,9 @@ class Parser {
         return FragmentSpreadContext(ELLIPSIS, NAME)
           ..directives.addAll(parseDirectives());
       } else {
+        // Not a spread; step back so an inline fragment can be parsed.
         _index--;
+        _current = previous;
         return null;
       }
     } else {
@@ -176,29 +186,14 @@ class Parser {
   InlineFragmentContext? parseInlineFragment() {
     if (next(TokenType.ELLIPSIS) && current != null) {
       var ELLIPSIS = current!;
+      Token? ON;
+      TypeConditionContext? typeCondition;
+
+      // The type condition is optional.
       if (nextName('on')) {
-        var ON = current!;
-        var typeCondition = parseTypeCondition();
-        if (typeCondition != null) {
-          var directives = parseDirectives();
-          var selectionSet = parseSelectionSet();
-          if (selectionSet != null) {
-            return InlineFragmentContext(
-              ELLIPSIS,
-              ON,
-              typeCondition,
-              selectionSet,
-            )..directives.addAll(directives);
-          } else {
-            errors.add(
-              SyntaxError(
-                'Missing selection set in inline fragment.',
-                directives.isEmpty ? typeCondition.span : directives.last.span,
-              ),
-            );
-            return null;
-          }
-        } else {
+        ON = current!;
+        typeCondition = parseTypeCondition();
+        if (typeCondition == null) {
           errors.add(
             SyntaxError(
               'Missing type condition after "on" in inline fragment.',
@@ -207,11 +202,20 @@ class Parser {
           );
           return null;
         }
+      }
+
+      var directives = parseDirectives();
+      var selectionSet = parseSelectionSet();
+      if (selectionSet != null) {
+        return InlineFragmentContext(ELLIPSIS, ON, typeCondition, selectionSet)
+          ..directives.addAll(directives);
       } else {
         errors.add(
           SyntaxError(
-            'Missing "on" after "..." in inline fragment.',
-            ELLIPSIS.span,
+            'Missing selection set in inline fragment.',
+            directives.isNotEmpty
+                ? directives.last.span
+                : typeCondition?.span ?? ELLIPSIS.span,
           ),
         );
         return null;
@@ -229,11 +233,9 @@ class Parser {
 
       while (selection != null) {
         selections.add(selection);
-        eatCommas();
         selection = parseSelection();
       }
 
-      eatCommas();
       if (next(TokenType.RBRACE)) {
         return SelectionSetContext(LBRACE, current)
           ..selections.addAll(selections);
@@ -307,7 +309,6 @@ class Parser {
 
       while (def != null) {
         defs.add(def);
-        eatCommas();
         def = parseVariableDefinition();
       }
 
@@ -419,8 +420,15 @@ class Parser {
           }
         } else if (next(TokenType.LPAREN)) {
           var LPAREN = current!;
+          var args = <ArgumentContext>[];
           var arg = parseArgument();
-          if (arg != null) {
+
+          while (arg != null) {
+            args.add(arg);
+            arg = parseArgument();
+          }
+
+          if (args.isNotEmpty) {
             if (next(TokenType.RPAREN)) {
               return DirectiveContext(
                 ARROBA,
@@ -428,11 +436,11 @@ class Parser {
                 null,
                 LPAREN,
                 current,
-                arg,
+                args.first,
                 null,
-              );
+              )..arguments.addAll(args);
             } else {
-              errors.add(SyntaxError('Missing \')\'', arg.value.span));
+              errors.add(SyntaxError('Missing \')\'', args.last.value.span));
               return null;
             }
           } else {
@@ -461,7 +469,6 @@ class Parser {
 
       while (arg != null) {
         out.add(arg);
-        eatCommas();
         arg = parseArgument();
       }
 
@@ -598,11 +605,9 @@ class Parser {
       while (value != null) {
         lastSpan = value.span;
         values.add(value);
-        eatCommas();
         value = parseInputValue();
       }
 
-      eatCommas();
       if (next(TokenType.RBRACKET) && current != null) {
         return ListValueContext(LBRACKET, current!)..values.addAll(values);
       } else {
@@ -624,11 +629,8 @@ class Parser {
       while (field != null) {
         fields.add(field);
         lastSpan = field.span;
-        eatCommas();
         field = parseObjectField();
       }
-
-      eatCommas();
 
       if (next(TokenType.RBRACE) && current != null) {
         return ObjectValueContext(LBRACE, fields, current!);

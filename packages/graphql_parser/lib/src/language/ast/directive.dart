@@ -10,8 +10,11 @@ class DirectiveContext extends Node {
   /// The source tokens.
   final Token? arrobaToken, nameToken, colonToken, lParenToken, rParenToken;
 
-  /// The argument being passed as the directive.
+  /// The first of [arguments], if any.
   final ArgumentContext? argument;
+
+  /// The arguments passed to the directive in parentheses.
+  final List<ArgumentContext> arguments = [];
 
   /// The (optional) value being passed with the directive.
   final InputValueContext? value;
@@ -59,10 +62,7 @@ class DirectiveContext extends Node {
     if (colonToken != null) {
       out = out.expand(colonToken!.span!).expand(value!.span!);
     } else if (lParenToken != null) {
-      out = out
-          .expand(lParenToken!.span!)
-          .expand(argument!.span)
-          .expand(rParenToken!.span!);
+      out = out.expand(lParenToken!.span!).expand(rParenToken!.span!);
     }
 
     return out;
