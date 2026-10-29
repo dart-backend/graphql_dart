@@ -41,71 +41,104 @@ class GraphQLObjectType
     this.polymorphicName,
   });
 
-  /// The input object [toInputObject] is building, so a field that refers back
-  /// to this type reuses it instead of recursing forever.
-  GraphQLInputObjectType? _inputObjectInProgress;
+  /// The input type [coerceToInputObject] built for this type, set before its
+  /// fields are filled in, so a field that refers back to this type reuses it.
+  GraphQLInputObjectType? _inputObject;
 
+  /// The types whose input types are being built by the outermost running
+  /// [coerceToInputObject] call, in the order they were started.
+  static List<GraphQLObjectType>? _converting;
+
+  /// Returns this type's input type, named `${name}Input`.
+  ///
+  /// It is built once and reused, so fields added to this type after the first
+  /// call are not included. See [toInputObject] for which fields are kept.
   @override
   GraphQLType<Map<String, dynamic>, Map<String, dynamic>>
   coerceToInputObject() {
-    return _inputObjectInProgress ??
-        toInputObject('${name}Input', description: description);
-  }
+    var cached = _inputObject;
+    if (cached != null) return cached;
+    _checkCanBeInput();
 
-  /// Converts [this] into a [GraphQLInputObjectType].
-  ///
-  /// Nullable fields of a union or interface type are left out, as those
-  /// cannot be input types. A non-null one throws an [UnsupportedError], as
-  /// does an object left with no input fields.
-  GraphQLInputObjectType toInputObject(String name, {String? description}) {
-    var input = GraphQLInputObjectType(
-      name,
-      description: description ?? this.description,
+    var outermost = _converting == null;
+    var converting = _converting ??= [];
+    var start = converting.length;
+    var input = _inputObject = GraphQLInputObjectType(
+      '${name}Input',
+      description: description,
     );
-    var previous = _inputObjectInProgress;
-    _inputObjectInProgress = input;
+    converting.add(this);
 
     try {
-      for (var f in fields) {
-        if (!_canBeInput(f.type)) {
-          if (f.type is GraphQLNonNullableType) {
-            throw UnsupportedError(
-              'Cannot convert "${this.name}" to an input type: its non-null '
-              'field "${f.name}", of type ${f.type}, cannot be an input.',
-            );
-          }
-          continue;
-        }
-
-        input.inputFields.add(
-          GraphQLInputObjectField(
-            f.name,
-            f.type.coerceToInputObject(),
-            description: f.description,
-          ),
-        );
+      input.inputFields.addAll(_inputFields());
+      return input;
+    } catch (_) {
+      // Types started since this one may refer to its unfinished input type.
+      for (var type in converting.sublist(start)) {
+        type._inputObject = null;
       }
+      converting.length = start;
+      rethrow;
     } finally {
-      _inputObjectInProgress = previous;
+      if (outermost) _converting = null;
+    }
+  }
+
+  /// Converts [this] into a [GraphQLInputObjectType] named [name].
+  ///
+  /// A nullable field whose type cannot be an input, such as a union or
+  /// interface, is left out. A non-null one throws an [UnsupportedError], as
+  /// does an interface, or an object left with no input fields. A field that
+  /// refers to an object type uses that type's [coerceToInputObject].
+  GraphQLInputObjectType toInputObject(String name, {String? description}) {
+    if (name == '${this.name}Input' &&
+        (description == null || description == this.description)) {
+      return coerceToInputObject() as GraphQLInputObjectType;
     }
 
-    if (input.inputFields.isEmpty && fields.isNotEmpty) {
+    _checkCanBeInput();
+    return GraphQLInputObjectType(
+      name,
+      description: description ?? this.description,
+      inputFields: _inputFields(),
+    );
+  }
+
+  void _checkCanBeInput() {
+    if (isInterface) {
       throw UnsupportedError(
-        'Cannot convert "${this.name}" to an input type: none of its fields '
-        'can be an input.',
+        'The interface type "$name" cannot be used as an input type.',
+      );
+    }
+  }
+
+  List<GraphQLInputObjectField> _inputFields() {
+    var out = <GraphQLInputObjectField>[];
+
+    for (var f in fields) {
+      GraphQLType type;
+      try {
+        type = f.type.coerceToInputObject();
+      } on UnsupportedError catch (e) {
+        if (f.type is! GraphQLNonNullableType) continue;
+        throw UnsupportedError(
+          'Cannot convert "$name" to an input type: its non-null field '
+          '"${f.name}", of type ${f.type}, cannot be an input. ${e.message}',
+        );
+      }
+      out.add(
+        GraphQLInputObjectField(f.name, type, description: f.description),
       );
     }
 
-    return input;
+    if (out.isEmpty) {
+      throw UnsupportedError(
+        'Cannot convert "$name" to an input type: none of its fields can be an '
+        'input.',
+      );
+    }
+    return out;
   }
-
-  static bool _canBeInput(GraphQLType type) => switch (type) {
-    GraphQLUnionType() => false,
-    GraphQLObjectType(:var isInterface) => !isInterface,
-    GraphQLNonNullableType(:var ofType) => _canBeInput(ofType),
-    GraphQLListType(:var ofType) => _canBeInput(ofType),
-    _ => true,
-  };
 
   /// Declares that this type inherits from another parent type.
   ///
@@ -232,6 +265,8 @@ class GraphQLObjectType
 
   @override
   bool operator ==(other) {
+    // Checked first, so comparing a self-referencing type to itself ends.
+    if (identical(this, other)) return true;
     return other is GraphQLObjectType &&
         other.name == name &&
         other.description == description &&
@@ -398,6 +433,7 @@ class GraphQLInputObjectType
 
   @override
   bool operator ==(other) {
+    if (identical(this, other)) return true;
     return other is GraphQLInputObjectType &&
         other.name == name &&
         other.description == description &&

@@ -9,7 +9,8 @@
 * **Breaking:** An enum's `validate` accepts only value names. Dart values are converted with `convert`, which `GraphQLObjectType.validate` applies to resolver output.
 * **Breaking:** `GraphQLType.convert` returns `null` for a value it cannot convert, instead of throwing.
 * **Breaking:** `GraphQLUnionType.coerceToInputObject` throws an `UnsupportedError`, as a union cannot be an input type.
-* **Breaking:** `toInputObject` and `coerceToInputObject` on an object type leave out nullable fields of a union or interface type, which cannot be input types. They throw an `UnsupportedError` for such a field that is non-null, or when no field is left.
+* **Breaking:** `toInputObject` and `coerceToInputObject` on an object type leave out a nullable field whose type cannot be an input, such as a union, an interface or an object with no input fields. They throw an `UnsupportedError` for such a field that is non-null, for an interface, and for an object left with no input fields.
+* **Breaking:** `coerceToInputObject` on an object type builds its `${name}Input` type once and returns the same instance after that, so fields added to the object type later are not included. `toInputObject` with that name returns it too.
 * **Breaking:** Type hash codes no longer include fields, so equal types have equal hash codes and self-referencing types can be hashed.
 
 ### New in 8.0.0
@@ -25,9 +26,10 @@
 * **Numbers:** `Float` accepts and converts `Int` input.
 * **Unions:** Resolving a union or interface member handles enum, list-of-enum and `Date` fields holding Dart values.
 * **Equality:** `GraphQLFieldInput` equality compares `defaultValue`.
-* **Input objects:** `toInputObject` and `coerceToInputObject` handle object types that refer to themselves or to each other, instead of overflowing the stack.
+* **Input objects:** `toInputObject` and `coerceToInputObject` handle object types that refer to themselves or to each other, instead of overflowing the stack. A failed conversion leaves no partly built input types behind.
 * **Lists:** Resolver output for a list of enum or `Date` values is converted item by item, so a `null` item is reported on its own instead of failing every other item too.
-* **Lists:** `serialize` keeps a `null` item the list can hold, and throws an `ArgumentError` for one it cannot, instead of passing it to the item type.
+* **Lists:** `serialize` and `deserialize` keep a `null` item the list can hold, and throw an `ArgumentError` for one it cannot, such as a `null` item for a non-null item type, instead of passing it to the item type.
+* **Equality:** Comparing object or input object types that refer to themselves no longer overflows the stack.
 
 ## 7.0.0
 

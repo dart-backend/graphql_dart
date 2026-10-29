@@ -357,6 +357,60 @@ void main() {
       expect(bInput.name, 'BInput');
       expect(bInput.inputFields.single.type, same(aInput));
     });
+
+    test('builds one input type per object type', () {
+      var todo = objectType('Todo', fields: [field('text', graphQLString)]);
+      todo.fields.add(field('parent', todo));
+      var input = todo.coerceToInputObject();
+      expect(todo.coerceToInputObject(), same(input));
+      expect(todo.toInputObject('TodoInput'), same(input));
+      expect({input, todo.coerceToInputObject()}, hasLength(1));
+    });
+
+    test('a custom input type refers to the shared one', () {
+      var todo = objectType('Todo', fields: [field('text', graphQLString)]);
+      todo.fields.add(field('parent', todo));
+      var create = todo.toInputObject('CreateTodo');
+      expect(create.name, 'CreateTodo');
+      expect(create.inputFields.last.type, same(todo.coerceToInputObject()));
+    });
+
+    test('leaves out a nullable field whose object cannot be an input', () {
+      var inner = objectType('Inner', fields: [field('u', union)]);
+      var outer = objectType(
+        'Outer',
+        fields: [field('n', graphQLString), field('inner', inner)],
+      );
+      expect(outer.toInputObject('OuterInput').inputFields.map((f) => f.name), [
+        'n',
+      ]);
+    });
+
+    test('rejects an object with no fields', () {
+      expect(objectType('Empty').coerceToInputObject, throwsUnsupportedError);
+    });
+
+    test('rejects an interface', () {
+      var shape = objectType(
+        'Shape',
+        isInterface: true,
+        fields: [field('name', graphQLString)],
+      );
+      expect(shape.coerceToInputObject, throwsUnsupportedError);
+      expect(() => shape.toInputObject('S'), throwsUnsupportedError);
+    });
+
+    test('a failed conversion leaves no half-built input types', () {
+      var a = objectType('A', fields: [field('n', graphQLInt)]);
+      var b = objectType('B', fields: [field('n', graphQLInt), field('a', a)]);
+      a.fields
+        ..add(field('b', b))
+        ..add(field('u', union.nonNullable()));
+
+      expect(a.coerceToInputObject, throwsUnsupportedError);
+      var bInput = b.coerceToInputObject() as GraphQLInputObjectType;
+      expect(bInput.inputFields.map((f) => f.name), ['n']);
+    });
   });
 
   group('lists with null items', () {
