@@ -182,6 +182,42 @@ void main() {
     await expectLater(pending, throwsStateError);
     expect(() => loader.load(2), throwsStateError);
   });
+
+  test('close does not report loads nobody awaits as uncaught', () async {
+    var loader = DataLoader<int, int>((ids) => ids);
+    loader.load(1);
+    loader.close();
+    // The test fails if the cancelled load is reported as an uncaught error.
+    await Future<void>.delayed(Duration.zero);
+  });
+
+  test('prime does nothing after close', () {
+    var loader = DataLoader<int, int>((ids) => ids)..close();
+    loader.prime(1, 1);
+    expect(() => loader.load(1), throwsStateError);
+  });
+
+  test('a failed batch keeps a newer cache entry for its key', () async {
+    var calls = 0;
+    var release = Completer<void>();
+    var loader = DataLoader<int, int>((ids) async {
+      if (++calls == 1) {
+        await release.future;
+        throw StateError('db down');
+      }
+      return ids;
+    });
+
+    var stale = loader.load(1);
+    await Future<void>.delayed(Duration.zero);
+    loader.clear(1);
+    expect(await loader.load(1), 1);
+
+    release.complete();
+    await expectLater(stale, throwsStateError);
+    expect(await loader.load(1), 1);
+    expect(calls, 2);
+  });
 }
 
 class _Unique {

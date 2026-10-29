@@ -82,3 +82,22 @@ jobs:
         working-directory: packages/graphql_server
         run: dart test        
         
+
+      # Graphql Data Loader
+      - id: graphql_data_loader2_upgrade
+        name: graphql_data_loader2; Upgrade depedencies
+        working-directory: packages/graphql_data_loader
+        run: dart pub upgrade
+
+      - name: graphql_data_loader2; Verify formatting
+        working-directory: packages/graphql_data_loader
+        run: dart format --output=none --set-exit-if-changed .
+
+      # Consider passing '--fatal-infos' for slightly stricter analysis.
+      - name: graphql_data_loader2; Analyze project source
+        working-directory: packages/graphql_data_loader
+        run: dart analyze
+
+      - name: graphql_data_loader2; Run tests
+        working-directory: packages/graphql_data_loader
+        run: dart test
