@@ -38,6 +38,8 @@ class _MergedSelectionSetContext extends SelectionSetContext {
   }
 
   @override
-  FileSpan? get span =>
-      selections.map((s) => s.span).reduce((a, b) => a!.expand(b!));
+  FileSpan? get span {
+    var spans = selections.map((s) => s.span).nonNulls;
+    return spans.isEmpty ? null : spans.reduce((a, b) => a.expand(b));
+  }
 }

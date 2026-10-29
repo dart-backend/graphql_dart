@@ -11,8 +11,9 @@ final RegExp _whitespace = RegExp('[ \t\n\r]+');
 final RegExp _number = RegExp(
   r'-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?(?![0-9._A-Za-z])',
 );
+// A string cannot hold a line break or other control character except a tab.
 final RegExp _string = RegExp(
-  r'"((\\(["\\/bfnrt]|(u[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])))|([^"\\]))*"',
+  r'"((\\(["\\/bfnrt]|(u[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])))|([^"\\\x00-\x08\x0A-\x1F]))*"',
 );
 // Any characters up to the closing quotes; an escaped \""" does not close it.
 final RegExp _blockString = RegExp(r'"""(\\"""|(?!""")[\s\S])*"""');
@@ -70,6 +71,9 @@ List<Token> scan(String text, {sourceUrl}) {
 
     if (potential.isEmpty) {
       var ch = String.fromCharCode(scanner.readChar());
+      if (ch == '"') {
+        throw SyntaxError('Unterminated string.', scanner.emptySpan);
+      }
       throw SyntaxError("Unexpected token '$ch'.", scanner.emptySpan);
     } else {
       // Choose longest token

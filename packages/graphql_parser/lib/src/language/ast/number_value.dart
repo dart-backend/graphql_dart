@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:source_span/source_span.dart';
 
 import '../token.dart';
@@ -13,16 +11,14 @@ class NumberValueContext extends InputValueContext<num> {
   NumberValueContext(this.numberToken);
 
   /// The [num] value of the [numberToken].
+  ///
+  /// A fractional part or exponent makes the literal a Float, so it is a
+  /// [double]; otherwise it is an [int].
   num get numberValue {
     var text = numberToken.text;
-    if (!text.contains('E') && !text.contains('e')) {
-      return num.parse(text);
-    } else {
-      var split = text.split(RegExp('[eE]'));
-      var base = num.parse(split[0]);
-      var exp = num.parse(split[1]);
-      return base * math.pow(10, exp);
-    }
+    return text.contains(RegExp('[.eE]'))
+        ? double.parse(text)
+        : int.parse(text);
   }
 
   // Use [numberToken] instead.

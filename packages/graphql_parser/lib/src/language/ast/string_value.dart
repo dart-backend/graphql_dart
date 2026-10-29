@@ -86,7 +86,7 @@ class StringValueContext extends InputValueContext<String> {
 
     int? commonIndent;
     for (var line in lines.skip(1)) {
-      var indent = line.length - line.trimLeft().length;
+      var indent = _indentOf(line);
       if (indent < line.length &&
           (commonIndent == null || indent < commonIndent)) {
         commonIndent = indent;
@@ -102,7 +102,7 @@ class StringValueContext extends InputValueContext<String> {
       }
     }
 
-    bool isBlank(String line) => line.trim().isEmpty;
+    bool isBlank(String line) => _indentOf(line) == line.length;
     while (lines.isNotEmpty && isBlank(lines.first)) {
       lines.removeAt(0);
     }
@@ -115,4 +115,14 @@ class StringValueContext extends InputValueContext<String> {
 
   @override
   String computeValue(Map<String, dynamic> variables) => stringValue;
+
+  /// The length of [line]'s leading white space, which the spec limits to
+  /// spaces and tabs.
+  static int _indentOf(String line) {
+    var i = 0;
+    while (i < line.length && (line[i] == ' ' || line[i] == '\t')) {
+      i++;
+    }
+    return i;
+  }
 }
