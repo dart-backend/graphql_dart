@@ -1,5 +1,21 @@
 # Change Log
 
+## 8.0.0
+
+### Breaking changes in 8.0.0
+
+* **Breaking:** `load` throws a `StateError` after `close`, and `close` also clears the cache.
+* **Breaking:** If `loadMany` throws, or returns a different number of values than keys, every load in that batch fails with the error. Before, those loads never completed and the loader stopped working.
+* **Breaking:** Loading a key again while it is being loaded returns the same `Future` instead of fetching it a second time.
+
+### Fixes in 8.0.0
+
+* **Batching:** A `load` made while a batch is running is sent in the next batch. Before, it never completed unless another load came later.
+* **Errors:** A failed lookup is not cached, so loading the key again retries it.
+* **Cache:** `prime` does nothing when `cache` is `false`, instead of keeping values that are never read.
+* **Performance:** A batch's results are read once and matched to their keys directly, instead of scanning the queue for each key.
+* **Example:** The `todo` field returns a single `Todo`, matching its resolver.
+
 ## 7.0.0
 
 * Require Dart >= 3.13

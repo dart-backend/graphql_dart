@@ -14,7 +14,7 @@ In your pubspec.yaml:
 
 ```yaml
 dependencies:
-  graphql_data_loader2: ^7.0.0
+  graphql_data_loader2: ^8.0.0
 ```
 
 ## Usage
@@ -22,7 +22,8 @@ dependencies:
 Complete example: [`Source code`](https://github.com/dart-backend/graphql_dart/tree/master/graphql_data_loader/example/main.dart)
 
 ```dart
-var userLoader = DataLoader((key) => myBatchGetUsers(keys));
-var invitedBy = await userLoader.load(1)then(user => userLoader.load(user.invitedByID))
-print('User 1 was invited by $invitedBy'));
+var userLoader = DataLoader((ids) => myBatchGetUsers(ids));
+var user = await userLoader.load(1);
+var invitedBy = await userLoader.load(user.invitedById);
+print('User 1 was invited by $invitedBy');
 ```

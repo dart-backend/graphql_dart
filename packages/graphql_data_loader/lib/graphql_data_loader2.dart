@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 
 /// A utility for batching multiple requests together, to improve application performance.
 ///
@@ -14,35 +13,44 @@ class DataLoader<Id, Data> {
   /// Whether to use a memoization cache to store the results of past lookups.
   final bool cache;
 
-  final _cache = <Id, Data>{};
-  final _queue = Queue<_QueueItem<Id, Data>>();
-  bool _started = false;
+  /// Cached lookups, including ones still being loaded, so a key requested
+  /// again while its batch runs is not fetched twice.
+  final _cache = <Id, Future<Data>>{};
+
+  /// Keys waiting for the next batch, in the order they were requested.
+  final _queue = <Id, Completer<Data>>{};
+  bool _scheduled = false;
+  bool _closed = false;
 
   DataLoader(this.loadMany, {this.cache = true});
 
-  Future<void> _onTick() async {
-    if (_queue.isNotEmpty) {
-      var current = _queue.toList();
-      _queue.clear();
+  Future<void> _dispatch() async {
+    // Cleared first, so a load during this batch schedules the next one.
+    _scheduled = false;
+    if (_queue.isEmpty) return;
 
-      var loadIds = current.map((i) => i.id).toSet().toList(growable: false);
+    var batch = Map.of(_queue);
+    _queue.clear();
+    var ids = batch.keys.toList(growable: false);
 
-      var data = await loadMany(loadIds);
+    try {
+      var data = (await loadMany(ids)).toList(growable: false);
+      if (data.length != ids.length) {
+        throw StateError(
+          'loadMany returned ${data.length} values for ${ids.length} keys.',
+        );
+      }
 
-      for (var i = 0; i < loadIds.length; i++) {
-        var id = loadIds[i];
-        var value = data.elementAt(i);
-
-        if (cache) _cache[id] = value;
-
-        current
-            .where((item) => item.id == id)
-            .forEach((item) => item.completer.complete(value));
+      for (var i = 0; i < ids.length; i++) {
+        batch[ids[i]]!.complete(data[i]);
+      }
+    } catch (e, st) {
+      for (var MapEntry(key: id, value: completer) in batch.entries) {
+        // A failed lookup is not cached, so it can be retried.
+        if (identical(_cache[id], completer.future)) _cache.remove(id);
+        completer.completeError(e, st);
       }
     }
-
-    _started = false;
-    // if (!_closed) scheduleMicrotask(_onTick);
   }
 
   /// Clears the value at [key], if it exists.
@@ -55,38 +63,47 @@ class DataLoader<Id, Data> {
   ///
   /// To forcefully prime the cache, clear the key first with
   /// `loader..clear(key)..prime(key, value)`.
-  void prime(Id key, Data value) => _cache.putIfAbsent(key, () => value);
+  ///
+  /// Does nothing if [cache] is `false`.
+  void prime(Id key, Data value) {
+    if (cache) _cache.putIfAbsent(key, () => Future<Data>.value(value));
+  }
 
-  /// Closes this [DataLoader], cancelling all pending requests.
+  /// Closes this [DataLoader], cancelling all pending requests and clearing
+  /// the cache. A batch already passed to [loadMany] still completes.
+  ///
+  /// Calling [load] afterwards throws a [StateError].
   void close() {
-    while (_queue.isNotEmpty) {
-      _queue.removeFirst().completer.completeError(
-        StateError('The DataLoader was closed before the item was loaded.'),
-      );
+    _closed = true;
+    var error = StateError(
+      'The DataLoader was closed before the item was loaded.',
+    );
+    for (var completer in _queue.values) {
+      completer.completeError(error);
     }
-
     _queue.clear();
+    _cache.clear();
   }
 
   /// Returns a [Future] that completes when the next batch of requests completes.
+  ///
+  /// Throws a [StateError] if this loader is closed.
   Future<Data> load(Id id) {
-    if (cache && _cache.containsKey(id)) {
-      return Future<Data>.value(_cache[id]);
-    } else {
-      var item = _QueueItem<Id, Data>(id);
-      _queue.add(item);
-      if (!_started) {
-        _started = true;
-        scheduleMicrotask(_onTick);
-      }
-      return item.completer.future;
+    if (_closed) throw StateError('Cannot load from a closed DataLoader.');
+
+    if (cache) {
+      var cached = _cache[id];
+      if (cached != null) return cached;
     }
+
+    var future = _queue.putIfAbsent(id, Completer<Data>.new).future;
+    if (cache) _cache[id] = future;
+
+    if (!_scheduled) {
+      _scheduled = true;
+      scheduleMicrotask(_dispatch);
+    }
+
+    return future;
   }
-}
-
-class _QueueItem<Id, Data> {
-  final Id id;
-  final Completer<Data> completer = Completer();
-
-  _QueueItem(this.id);
 }
