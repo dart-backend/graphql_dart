@@ -1,8 +1,13 @@
 part of 'schema.dart';
 
 /// Typedef for a function that resolves the value of a [GraphQLObjectField], whether asynchronously or not.
+///
+/// It receives the [parent] value the field is resolved on, such as a model
+/// object returned by the parent field's resolver, and the field's
+/// [argumentValues]. [Serialized] does not affect the signature; it is kept so
+/// that existing type arguments still compile.
 typedef GraphQLFieldResolver<Value, Serialized> = FutureOr<Value> Function(
-  Serialized serialized,
+  dynamic parent,
   Map<String, dynamic> argumentValues,
 );
 

@@ -11,6 +11,7 @@
 * **Breaking:** `GraphQLUnionType.coerceToInputObject` throws an `UnsupportedError`, as a union cannot be an input type.
 * **Breaking:** `toInputObject` and `coerceToInputObject` on an object type leave out a nullable field whose type cannot be an input, such as a union, an interface or an object with no input fields. They throw an `UnsupportedError` for such a field that is non-null, for an interface, and for an object left with no input fields.
 * **Breaking:** `coerceToInputObject` on an object type builds its `${name}Input` type once and returns the same instance after that, so fields added to the object type later are not included. `toInputObject` with that name returns it too.
+* **Breaking:** A `GraphQLFieldResolver`'s first parameter is the parent value the field is resolved on, typed `dynamic`, instead of the field's own `Serialized` type, which it never received. A resolver can read a model object with `(todo, _) => todo.text` or `(todo, _) => (todo as Todo).text`. One that declares a type for that parameter, such as `(Todo todo, _) => ...`, no longer compiles.
 * **Breaking:** Type hash codes no longer include fields, so equal types have equal hash codes and self-referencing types can be hashed.
 
 ### New in 8.0.0

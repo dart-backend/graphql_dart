@@ -789,7 +789,13 @@ class GraphQL {
           argumentValues,
         );
       }
-      return null;
+      if (objectValue == null) return null;
+      throw GraphQLException.fromMessage(
+        'Cannot resolve field "$fieldName" of type "${objectType.name}" from '
+        'a ${objectValue.runtimeType}: it is not a Map, and the field has no '
+        'resolver. Return a Map, give the field a resolve callback, or pass a '
+        'defaultFieldResolver to GraphQL.',
+      );
     } else {
       return await fieldResolve(objectValue, argumentValues) as T?;
     }
