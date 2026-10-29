@@ -186,16 +186,37 @@ final GraphQLObjectType todoGraphQLType = objectType(
   description: 'A task that might not be completed yet. **Yay! Markdown!**',
   interfaces: [],
   fields: [
-    field('id', graphQLId),
-    field('created_at', graphQLDate),
-    field('updated_at', graphQLDate),
-    field('text', graphQLString),
-    field(
+    field<dynamic, dynamic>(
+      'id',
+      graphQLId,
+      resolve: (obj, _) => (obj as TodoEntity).id,
+    ),
+    field<dynamic, dynamic>(
+      'created_at',
+      graphQLDate,
+      resolve: (obj, _) => (obj as TodoEntity).createdAt,
+    ),
+    field<dynamic, dynamic>(
+      'updated_at',
+      graphQLDate,
+      resolve: (obj, _) => (obj as TodoEntity).updatedAt,
+    ),
+    field<dynamic, dynamic>(
+      'text',
+      graphQLString,
+      resolve: (obj, _) => (obj as TodoEntity).text,
+    ),
+    field<dynamic, dynamic>(
       'completed',
       graphQLBoolean,
       deprecationReason: 'Use `completion_status` instead.',
+      resolve: (obj, _) => (obj as TodoEntity).completed,
     ),
-    field('completion_status', completionStatusGraphQLType),
+    field<dynamic, dynamic>(
+      'completion_status',
+      completionStatusGraphQLType,
+      resolve: (obj, _) => (obj as TodoEntity).completionStatus?.name,
+    ),
   ],
 );
 

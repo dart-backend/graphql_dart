@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:angel3_model/angel3_model.dart';
 import 'package:angel3_serialize_generator/angel3_serialize_generator.dart';
@@ -117,6 +118,25 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
 
     // Nothing else is allowed.
     throw 'Cannot infer the GraphQL type for field $className.$name (type=$type).';
+  }
+
+  /// The code for a field's resolved value, read with [getter]. A GraphQL enum
+  /// is matched by name, so an enum value, or a list of them, becomes names.
+  String _resolvedValue(String getter, DartType type) {
+    String q(DartType t) =>
+        t.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
+
+    if (type.element is EnumElement) return '$getter${q(type)}.name';
+
+    if (type is InterfaceType &&
+        type.typeArguments.length == 1 &&
+        type.typeArguments.single.element is EnumElement &&
+        TypeChecker.typeNamed(Iterable).isAssignableFromType(type)) {
+      var item = type.typeArguments.single;
+      return '$getter${q(type)}.map((e) => e${q(item)}.name).toList()';
+    }
+
+    return getter;
   }
 
   void _applyDescription(
@@ -285,15 +305,29 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
               type ??= refer('graphQLId');
             }
 
+            // Resolve the field from a model object; a Map is read by the
+            // server before the resolver is called.
+            named['resolve'] = CodeExpression(
+              Code(
+                '(obj, _) => ${_resolvedValue('(obj as ${clazz.displayName}).${field.displayName}', field.type)}',
+              ),
+            );
+
+            // The resolver returns the getter's value, which may be null or a
+            // model object, rather than the field type's Dart value.
             fields.add(
-              refer('field').call([
-                literalString(ctx.resolveFieldName(field.displayName)!),
-                type ??= _inferType(
-                  clazz.displayName,
-                  field.displayName,
-                  field.type,
-                ),
-              ], named),
+              refer('field').call(
+                [
+                  literalString(ctx.resolveFieldName(field.displayName)!),
+                  type ??= _inferType(
+                    clazz.displayName,
+                    field.displayName,
+                    field.type,
+                  ),
+                ],
+                named,
+                [refer('dynamic'), refer('dynamic')],
+              ),
             );
           }
 

@@ -12,12 +12,21 @@ final GraphQLObjectType todoItemGraphQLType = objectType(
   isInterface: false,
   interfaces: [],
   fields: [
-    field('id', graphQLId),
-    field('text', graphQLString),
-    field(
+    field<dynamic, dynamic>(
+      'id',
+      graphQLId,
+      resolve: (obj, _) => (obj as TodoItem).id,
+    ),
+    field<dynamic, dynamic>(
+      'text',
+      graphQLString,
+      resolve: (obj, _) => (obj as TodoItem).text,
+    ),
+    field<dynamic, dynamic>(
       'isComplete',
       graphQLBoolean,
       description: 'Whether this item is complete.',
+      resolve: (obj, _) => (obj as TodoItem).isComplete,
     ),
   ],
 );

@@ -12,6 +12,7 @@
 ### New in 8.0.0
 
 * The generator no longer imports `dart:mirrors`; `typeName` symbols are read through the analyzer.
+* Each generated field has a `resolve` callback that reads it from a model object, so a resolver can return a model instead of a `Map`. An enum field resolves to the value's name. A `Map` is still read by key, as before. Fields are generated as `field<dynamic, dynamic>(...)`, as a getter's value may be `null` or a model object.
 
 ### Fixes in 8.0.0
 

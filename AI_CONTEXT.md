@@ -57,7 +57,7 @@ app.all('/graphql', graphQLHttp(GraphQL(schema)));  // angel3_graphql
 app.get('/graphiql', graphiQL());
 ```
 
-Generator usage: annotate a class with `@graphQLClass` (optionally `@GraphQLDocumentation(...)` on fields), add `part 'x.g.dart';`, run `dart run build_runner build`, then use the generated `<camelName>GraphQLType`.
+Generator usage: annotate a class with `@graphQLClass` (optionally `@GraphQLDocumentation(...)` on fields), add `part 'x.g.dart';`, run `dart run build_runner build`, then use the generated `<camelName>GraphQLType`. Its fields have generated resolvers, so resolvers can return model objects or `Map`s.
 
 ## Development Workflow
 
