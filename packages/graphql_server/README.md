@@ -92,13 +92,8 @@ Introspection of a GraphQL schema allows clients to query the schema itself, and
 
 However, you can call the `reflectSchema` method to manually reflect a schema: [`API Document`](https://pub.dev/documentation/graphql_server2/latest/introspection/reflectSchema.html)
 
-## Mirrors Usage
+## Defining Types
 
-By default, `dart:mirrors` is not required, but it can be optionally used.
+`package:graphql_server2` does not use `dart:mirrors`, so it runs on the VM and in AOT-compiled executables.
 
-The `mirrorsFieldResolver` can resolve fields from concrete objects, instead of you first having to serialize them: [`API Document`](https://pub.dev/documentation/graphql_server2/latest/graphql_server2.mirrorsmirrorsFieldResolver.html)
-
-You can also use `convertDartType` to convert a concrete Dart type into a `GraphQLType`. However, the ideal choice is `package:graphql_generator2`.
-
-* [`API Document`](https://pub.dev/documentation/graphql_server2/latest/graphql_server2/mirrors/convertDartType.html)
-* [`package:graphql_generator2`](https://pub.dev/packages/graphql_generator2)
+Define your types with the helpers in [`package:graphql_schema2`](https://pub.dev/packages/graphql_schema2) (`objectType`, `field`, `enumTypeFromStrings`, ...), or generate them from concrete Dart classes with [`package:graphql_generator2`](https://pub.dev/packages/graphql_generator2). Resolvers can return `Map`s (for example from `toJson()`), and each field can take its own `resolve` callback.

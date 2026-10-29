@@ -14,7 +14,6 @@
   - [Subscriptions](#subscriptions)
   - [Using Services](#using-services)
   - [Documentation](#documentation)
-  - [Mirrors](#mirrors)
 
 A complete implementation of the official [GraphQL specification](https://facebook.github.io/graphql/October2016/#sec-Language) - these are the [Angel3 framework](https://pub.dev/packages/angel3_framework)-specific bindings.
 
@@ -38,14 +37,13 @@ Firstly, define your schema. A GraphQL schema contains an *object type* that def
 
 A GraphQL schema may also have a *mutation* object type, which defines operations that change the backend's state, and optionally a *subscription* type, which defines real-time interactions (coming soon!).
 
-You can use the `convertDartType` helper to wrap your existing `Model`/PODO classes, and make GraphQL aware of them without duplicated effort.
+Use `package:graphql_generator2` to generate GraphQL types from your existing `Model`/PODO classes (here, `todoGraphQLType` for a `Todo` class annotated with `@graphQLClass`), so GraphQL is aware of them without duplicated effort. See [Documentation](#documentation).
 
 ```dart
 import 'package:angel3_framework/angel3_framework.dart';
 import 'package:angel3_graphql/angel3_graphql.dart';
 import 'package:graphql_schema2/graphql_schema2.dart';
 import 'package:graphql_server2/graphql_server2.dart';
-import 'package:graphql_server2/mirrors.dart';
 
 Future configureServer(Angel app) async {
     var queryType = objectType(
@@ -54,12 +52,12 @@ Future configureServer(Angel app) async {
         fields: [
             field(
                 'todos',
-                listOf(convertDartType(Todo).nonNullable()),
+                listOf(todoGraphQLType.nonNullable()),
                 resolve: resolveViaServiceIndex(todoService),
             ),
             field(
                 'todo',
-                convertDartType(Todo),
+                todoGraphQLType,
                 resolve: resolveViaServiceRead(todoService),
                 inputs: [
                     GraphQLFieldInput('id', graphQLId.nonNullable()),
@@ -177,12 +175,12 @@ var queryType = objectType(
     fields: [
       field(
         'todos',
-        listOf(convertDartType(Todo).nonNullable()),
+        listOf(todoGraphQLType.nonNullable()),
         resolve: resolveViaServiceIndex(todoService),
       ),
       field(
         'todo',
-        convertDartType(Todo),
+        todoGraphQLType,
         resolve: resolveViaServiceRead(todoService),
         inputs: [
           GraphQLFieldInput('id', graphQLId.nonNullable()),
@@ -227,36 +225,6 @@ class Todo {
 ```
 
 For more documentation, see: [`package:graphql_generator2`](https://pub.dev/packages/graphql_generator2)
-
-## Mirrors
-
-**NOTE: Mirrors support is deprecated, and will not be updated further.**
-
-The `convertDartType` function can automatically read the documentation from a type like the following:
-
-```dart
-@GraphQLDocumentation(description: 'Any object with a .text (String) property.')
-abstract class HasText {
-  String get text;
-}
-
-@serializable
-@GraphQLDocumentation(
-    description: 'A task that might not be completed yet. **Yay! Markdown!**')
-class Todo extends Model implements HasText {
-  String text;
-
-  @GraphQLDocumentation(deprecationReason: 'Use `completion_status` instead.')
-  bool completed;
-
-  CompletionStatus completionStatus;
-
-  Todo({this.text, this.completed, this.completionStatus});
-}
-
-@GraphQLDocumentation(description: 'The completion status of a to-do item.')
-enum CompletionStatus { COMPLETE, INCOMPLETE }
-```
 
 You can also manually provide documentation for parameters and endpoints, via a `description` parameter on almost all related functions.
 

@@ -1,5 +1,5 @@
 name: graphql_server2
-version: 8.0.0
+version: 9.0.0
 description: Base package for implementing GraphQL servers. You might prefer `package:angel3_graphql`, the fastest way to implement GraphQL backends in Dart.
 homepage: https://angel3-framework.web.app/
 repository: https://github.com/dart-backend/graphql_dart/
@@ -10,14 +10,11 @@ environment:
 resolution: workspace
 
 dependencies:
-  angel3_serialize: ^10.0.0
   graphql_schema2: ^8.0.0
   graphql_parser2: ^8.0.0
   collection: ^1.17.0
-  meta: ^1.9.0
   recase: ^4.1.0
   stream_channel: ^2.1.0
-  tuple: ^2.0.0
 
 dev_dependencies:
   lints: ^6.0.0

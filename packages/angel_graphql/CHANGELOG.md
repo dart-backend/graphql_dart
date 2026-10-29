@@ -10,7 +10,7 @@
 * Updated `angel3_validate` to `9.0.0`
 * Updated `graphql_parser2` to `7.0.0`
 * Updated `graphql_schema2` to `7.0.0`
-* Updated `graphql_server2` to `7.0.0`
+* Updated `graphql_server2` to `9.0.0`
 
 ## 8.5.0
 

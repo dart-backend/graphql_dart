@@ -1,5 +1,22 @@
 # Change Log
 
+## 9.0.0
+
+### Breaking changes in 9.0.0
+
+* **Breaking:** The `package:graphql_server2/mirrors.dart` library is removed, so the package no longer uses `dart:mirrors`. `convertDartType`, `convertDartClass`, `objectTypeFromClassMirror`, `enumTypeFromClassMirror`, `fieldFromGetter` and `mirrorsFieldResolver` are gone. Generate types with `graphql_generator2` or define them with the `graphql_schema2` helpers, and return `Map`s from resolvers or give fields their own `resolve` callbacks.
+* **Breaking:** No longer depends on `angel3_serialize`, `meta` or `tuple`. Add them to your own `pubspec.yaml` if you used them through this package.
+
+To keep resolving fields from model objects instead of `mirrorsFieldResolver`, pass a `defaultFieldResolver` that reads them, for example from `toJson()`:
+
+```dart
+var graphQL = GraphQL(
+  schema,
+  defaultFieldResolver: <T>(T obj, String? name, Map<String, dynamic> _) =>
+      (obj as dynamic).toJson()[name] as T,
+);
+```
+
 ## 8.0.0
 
 ### Breaking changes in 8.0.0

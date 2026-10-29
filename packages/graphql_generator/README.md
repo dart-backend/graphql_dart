@@ -8,7 +8,7 @@
 
 Generates `package:graphql_schema2` schemas for annotated class.
 
-Replaces `convertDartType` from `package:graphql_server2`.
+Replaces `convertDartType`, which was removed from `package:graphql_server2` in 9.0.0.
 
 ## Usage
 
