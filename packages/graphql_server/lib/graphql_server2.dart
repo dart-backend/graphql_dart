@@ -868,6 +868,13 @@ class GraphQL {
 
         return ret;
       } on TypeError {
+        // A value already in its serialized form, such as a Date's ISO 8601
+        // string from a service that stores dates as text, is kept if valid.
+        final converted = fieldType.convert(result);
+        if (converted != null &&
+            fieldType.validate(fieldName ?? '', converted).successful) {
+          return converted;
+        }
         throw GraphQLException.fromMessage(
           'Value of field "$fieldName" must be ${fieldType.valueType}, got $result (${result.runtimeType}) instead.',
         );

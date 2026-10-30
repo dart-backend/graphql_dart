@@ -205,6 +205,20 @@ void main() {
       expect(paint.validate('x', {'color': 'GREEN'}).successful, false);
     });
 
+    test('a Dart enum value is matched by name', () {
+      var status = enumTypeFromStrings('Status', ['done', 'open']);
+      expect(status.convert(_Status.done), 'done');
+      expect(
+        enumType<dynamic>('Status', {'done': 1}).serialize(_Status.done),
+        'done',
+      );
+      expect(status.convert(_Status.other), isNull);
+      expect(
+        () => enumType<dynamic>('Status', {'done': 1}).serialize(_Status.other),
+        throwsStateError,
+      );
+    });
+
     test('non-null enum accepts a Dart value', () {
       var type = objectType(
         'Paint',
@@ -495,3 +509,5 @@ void main() {
     });
   });
 }
+
+enum _Status { done, other }

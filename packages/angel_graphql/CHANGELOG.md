@@ -8,6 +8,10 @@
 * **Breaking:** Requires `graphql_parser2` 8.0.0, `graphql_schema2` 8.0.0 and `graphql_server2` 9.0.0. See their change logs for the breaking changes in parsing, validation and execution.
 * **Breaking:** `graphql_server2` 9.0.0 removes `package:graphql_server2/mirrors.dart`, so `convertDartType` is gone. Generate GraphQL types with `graphql_generator2` instead, as the README and example now do.
 
+### Fixes in 10.0.0
+
+* **Docs:** The README's `graphql_generator2` example compiles, and uses a `@serializable` model like the package's example.
+
 ## 9.0.0
 
 * Require Dart >= 3.13

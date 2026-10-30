@@ -49,11 +49,7 @@ void main() {
   });
 
   test('a generated type still resolves fields from a Map', () async {
-    expect(
-      await graphQLFor(todo.toJson()).parseAndExecute('{ todo { id text } }'),
-      {
-        'todo': {'id': '1', 'text': 'Mock Todo'},
-      },
-    );
+    // toJson() keeps the CompletionStatus enum value; it is output by name.
+    expect(await graphQLFor(todo.toJson()).parseAndExecute(query), expected);
   });
 }

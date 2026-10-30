@@ -207,22 +207,28 @@ As one might imagine, using these convenience helpers makes it much quicker to i
 Using `package:graphql_generator2`, you can generate GraphQL schemas for concrete Dart types:
 
 ```dart
-configureServer(Angel app) async {
-  var schema = graphQLSchema(
-    queryType: objectType('Query', fields: [
-      field('todos', listOf(todoGraphQLType), resolve: (_, __) => ...)
-    ]);
-  );
-}
+part 'todo.g.dart';
 
+@serializable
 @graphQLClass
-class Todo {
-  String text;
+abstract class TodoEntity extends Model {
+  String? get text;
 
   @GraphQLDocumentation(description: 'Whether this item is complete.')
-  bool isComplete;
+  bool? get isComplete;
+}
+
+Future configureServer(Angel app) async {
+  var schema = graphQLSchema(
+    queryType: objectType('Query', fields: [
+      // Resolvers can return `Todo` models or maps.
+      field('todos', listOf(todoGraphQLType), resolve: (_, _) => [Todo(text: 'Clean your room!')]),
+    ]),
+  );
 }
 ```
+
+`dart run build_runner build` generates the `Todo` model and `todoGraphQLType`, whose fields resolve from a `Todo` or a map.
 
 For more documentation, see: [`package:graphql_generator2`](https://pub.dev/packages/graphql_generator2)
 

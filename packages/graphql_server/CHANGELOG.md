@@ -20,6 +20,7 @@ var graphQL = GraphQL(
 
 ### Fixes in 9.0.0
 
+* **Scalars:** A scalar field whose value is already in its serialized form, and valid, is output as it is, so a `Date` field accepts an ISO 8601 string, as a `MapService` stores dates, instead of failing with "must be DateTime".
 * **Arguments:** Arguments and variables are deserialized from their validated value, so an `Int` given for `Float!`, `[Float]` or a `Float!` input field is coerced instead of throwing a `TypeError`.
 
 ## 8.0.0
