@@ -121,4 +121,37 @@ void main() {
       expect(() => node.hashCode, returnsNormally);
     });
   });
+
+  group('types that refer to themselves', () {
+    GraphQLObjectType todo({String text = 'text'}) {
+      var type = objectType('Todo', fields: [field(text, graphQLString)]);
+      return type..fields.add(field('parent', type));
+    }
+
+    test('equal ones built apart are equal', () {
+      expect(todo(), todo());
+      expect(todo().coerceToInputObject(), todo().coerceToInputObject());
+      expect({todo(), todo()}, hasLength(1));
+    });
+
+    test('ones built apart that differ are not equal', () {
+      expect(todo(), isNot(todo(text: 'title')));
+      expect(
+        todo().coerceToInputObject(),
+        isNot(todo(text: 'title').coerceToInputObject()),
+      );
+    });
+
+    test('types that refer to each other are compared', () {
+      (GraphQLObjectType, GraphQLObjectType) pair() {
+        var a = objectType('A', fields: [field('n', graphQLInt)]);
+        var b = objectType('B', fields: [field('a', a)]);
+        a.fields.add(field('b', b));
+        return (a, b);
+      }
+
+      expect(pair().$1, pair().$1);
+      expect(pair().$1.coerceToInputObject(), pair().$1.coerceToInputObject());
+    });
+  });
 }

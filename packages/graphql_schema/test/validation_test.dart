@@ -381,6 +381,37 @@ void main() {
       expect({input, todo.coerceToInputObject()}, hasLength(1));
     });
 
+    test('the shared input type keeps its description', () {
+      var todo = objectType(
+        'Todo',
+        description: 'A task',
+        fields: [field('text', graphQLString)],
+      );
+      expect(
+        todo.toInputObject('TodoInput', description: 'A task'),
+        same(todo.coerceToInputObject()),
+      );
+      expect(
+        () => todo.toInputObject('TodoInput', description: 'Create a todo'),
+        throwsArgumentError,
+      );
+      expect(
+        todo.toInputObject('CreateTodo', description: 'Create a todo').name,
+        'CreateTodo',
+      );
+    });
+
+    test('a rejected description does not build the shared type', () {
+      var todo = objectType('Todo', fields: [field('text', graphQLString)]);
+      expect(
+        () => todo.toInputObject('TodoInput', description: 'Create a todo'),
+        throwsArgumentError,
+      );
+      todo.fields.add(field('done', graphQLBoolean));
+      var input = todo.coerceToInputObject() as GraphQLInputObjectType;
+      expect(input.inputFields.map((f) => f.name), ['text', 'done']);
+    });
+
     test('a custom input type refers to the shared one', () {
       var todo = objectType('Todo', fields: [field('text', graphQLString)]);
       todo.fields.add(field('parent', todo));

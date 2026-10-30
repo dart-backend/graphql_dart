@@ -90,9 +90,23 @@ class GraphQLObjectType
   /// interface, is left out. A non-null one throws an [UnsupportedError], as
   /// does an interface, or an object left with no input fields. A field that
   /// refers to an object type uses that type's [coerceToInputObject].
+  ///
+  /// With the name `${this.name}Input`, it is the input type of
+  /// [coerceToInputObject], shared with the fields that refer to this type; a
+  /// different [description] throws an [ArgumentError], as two input types
+  /// cannot have one name.
   GraphQLInputObjectType toInputObject(String name, {String? description}) {
-    if (name == '${this.name}Input' &&
-        (description == null || description == this.description)) {
+    if (name == '${this.name}Input') {
+      // Checked first, so a call that throws does not build the shared type.
+      if (description != null && description != this.description) {
+        throw ArgumentError.value(
+          description,
+          'description',
+          'The input type "$name" is shared by the fields that refer to '
+              '"${this.name}", so it keeps its own description; give another '
+              'name for another description',
+        );
+      }
       return coerceToInputObject() as GraphQLInputObjectType;
     }
 
@@ -265,18 +279,25 @@ class GraphQLObjectType
 
   @override
   bool operator ==(other) {
-    // Checked first, so comparing a self-referencing type to itself ends.
     if (identical(this, other)) return true;
     return other is GraphQLObjectType &&
         other.name == name &&
         other.description == description &&
         other.isInterface == isInterface &&
-        const ListEquality<GraphQLObjectField>().equals(other.fields, fields) &&
-        //        const ListEquality<GraphQLObjectType>() Removed, as it causes a stack overflow :(
-        //            .equals(other.interfaces, interfaces) &&
-        const ListEquality<GraphQLObjectType>().equals(
-          other.possibleTypes,
-          possibleTypes,
+        _compareOnce(
+          this,
+          other,
+          () =>
+              const ListEquality<GraphQLObjectField>().equals(
+                other.fields,
+                fields,
+              ) &&
+              //        const ListEquality<GraphQLObjectType>() Removed, as it causes a stack overflow :(
+              //            .equals(other.interfaces, interfaces) &&
+              const ListEquality<GraphQLObjectType>().equals(
+                other.possibleTypes,
+                possibleTypes,
+              ),
         );
   }
 
@@ -284,6 +305,28 @@ class GraphQLObjectType
   // Fields are left out: hashing them would recurse forever on self-referencing
   // types. Equal objects still share these values, so they hash equally.
   int get hashCode => hash3(name, description, isInterface);
+}
+
+/// The types whose fields are being compared, each to the types it is being
+/// compared with, by identity, as comparing them by `==` would recurse.
+final _comparing = Map<Object, Set<Object>>.identity();
+
+/// Runs [compare] on the fields of [a] and [b], or returns `true` if they are
+/// already being compared further up, in either order: types that refer to
+/// themselves, or to each other, are equal when all else about them is.
+bool _compareOnce(Object a, Object b, bool Function() compare) {
+  if ((_comparing[a]?.contains(b) ?? false) ||
+      (_comparing[b]?.contains(a) ?? false)) {
+    return true;
+  }
+  var others = _comparing[a] ??= Set.identity();
+  others.add(b);
+  try {
+    return compare();
+  } finally {
+    others.remove(b);
+    if (others.isEmpty) _comparing.remove(a);
+  }
 }
 
 /// Converts resolver output [value] for validation against [type]. Lists are
@@ -437,9 +480,13 @@ class GraphQLInputObjectType
     return other is GraphQLInputObjectType &&
         other.name == name &&
         other.description == description &&
-        const ListEquality<GraphQLInputObjectField>().equals(
-          other.inputFields,
-          inputFields,
+        _compareOnce(
+          this,
+          other,
+          () => const ListEquality<GraphQLInputObjectField>().equals(
+            other.inputFields,
+            inputFields,
+          ),
         );
   }
 
