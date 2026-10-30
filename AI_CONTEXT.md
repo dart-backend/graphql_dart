@@ -74,7 +74,7 @@ Generator usage: annotate a class with `@graphQLClass` (optionally `@GraphQLDocu
   ```
 
   Across all packages: `melos exec -- "dart analyze ."` and `melos exec -- "dart test"`. Run examples from their package directory too, as some read files relative to it (e.g. `angel_graphql/example/subscription.dart` reads `posts.json`).
-- **CI**: GitHub Actions (`.github/workflows/dart.yml`, SDK pinned to `3.13.0`) runs format, analyze and test for `graphql_schema`, `graphql_parser`, `graphql_server` and `graphql_data_loader` only. `graphql_generator` and `angel_graphql` are not checked by CI, so run their checks locally. CI fails on any `dart format` diff.
+- **CI**: GitHub Actions (`.github/workflows/dart.yml`, SDK pinned to `3.13.0`) runs format, analyze and test for `graphql_schema`, `graphql_parser`, `graphql_server`, `graphql_data_loader` and `graphql_generator` only. `angel_graphql` is not checked by CI, so run its checks locally. CI fails on any `dart format` diff.
 - **Lints**: Each package uses `package:lints/recommended.yaml`; some disable `non_constant_identifier_names` / `constant_identifier_names`.
 - **Tests**: `graphql_parser` has the most tests (one file per construct, shared helpers in `test/common.dart`), `graphql_schema` has a few, and the other packages have about one `all_test.dart` each. When fixing a reported bug, add a regression test named after the issue (see `graphql_parser/test/issue23_test.dart`).
 - **Releases**: Bump `version` in the package's `pubspec.yaml`, update sibling packages' constraints to match on a major bump, and add a `## <version>` entry to its `CHANGELOG.md` (see **Changelog**). SDK upgrades bump the min SDK in every package and the root `pubspec.yaml` together.

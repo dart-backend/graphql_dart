@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:angel3_model/angel3_model.dart';
 import 'package:angel3_serialize_generator/angel3_serialize_generator.dart';
@@ -120,25 +119,6 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
     throw 'Cannot infer the GraphQL type for field $className.$name (type=$type).';
   }
 
-  /// The code for a field's resolved value, read with [getter]. A GraphQL enum
-  /// is matched by name, so an enum value, or a list of them, becomes names.
-  String _resolvedValue(String getter, DartType type) {
-    String q(DartType t) =>
-        t.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
-
-    if (type.element is EnumElement) return '$getter${q(type)}.name';
-
-    if (type is InterfaceType &&
-        type.typeArguments.length == 1 &&
-        type.typeArguments.single.element is EnumElement &&
-        TypeChecker.typeNamed(Iterable).isAssignableFromType(type)) {
-      var item = type.typeArguments.single;
-      return '$getter${q(type)}.map((e) => e${q(item)}.name).toList()';
-    }
-
-    return getter;
-  }
-
   void _applyDescription(
     Map<String, Expression> named,
     Element element,
@@ -242,6 +222,16 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
           var fields = <Expression>[];
 
           for (var field in ctxFields) {
+            // Static and private fields are not the model's data (and a
+            // private one of another library cannot be read), and a field the
+            // serializer leaves out, such as a password hash, must not be
+            // given out either.
+            if (field.isStatic ||
+                field.isPrivate ||
+                ctx.excluded[field.name]?.canSerialize == false) {
+              continue;
+            }
+
             var named = <String, Expression>{};
             var originalField = clazz.fields.firstWhereOrNull(
               (f) => f.name == field.name,
@@ -306,10 +296,11 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
             }
 
             // Resolve the field from a model object; a Map is read by the
-            // server before the resolver is called.
+            // server before the resolver is called. An enum value is given as
+            // it is, for the field's GraphQL enum type to name.
             named['resolve'] = CodeExpression(
               Code(
-                '(obj, _) => ${_resolvedValue('(obj as ${clazz.displayName}).${field.displayName}', field.type)}',
+                '(obj, _) => (obj as ${clazz.displayName}).${field.displayName}',
               ),
             );
 

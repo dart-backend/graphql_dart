@@ -8,11 +8,12 @@
 * **Breaking:** The `id` field of a `Model` is generated as `graphQLId` instead of `graphQLString`.
 * **Breaking:** Computed getters inherited from a parent class, such as `Model.idAsInt` and `idAsString`, are no longer generated as fields.
 * **Breaking:** `@GraphQLDocumentation` and `@Deprecated` on a field declared as a field (not as a getter) are applied, so its description, deprecation reason and `typeName` now appear in the generated type.
+* **Breaking:** Each generated field has a `resolve` callback that reads it from a model object, so a resolver can return a model instead of a `Map`; a `Map` is still read by key, as before. Fields are generated as `field<dynamic, dynamic>(...)`, as a getter's value may be `null` or a model object, and a generated type no longer uses the server's `defaultFieldResolver`.
+* **Breaking:** Static and private fields, and fields the serializer excludes (`@SerializableField(exclude: true)` or `@exclude`, unless `canSerialize`), are not generated, where they were, so an excluded field such as a password hash is no longer part of the schema.
 
 ### New in 8.0.0
 
 * The generator no longer imports `dart:mirrors`; `typeName` symbols are read through the analyzer.
-* Each generated field has a `resolve` callback that reads it from a model object, so a resolver can return a model instead of a `Map`. An enum field resolves to the value's name. A `Map` is still read by key, as before. Fields are generated as `field<dynamic, dynamic>(...)`, as a getter's value may be `null` or a model object.
 
 ### Fixes in 8.0.0
 

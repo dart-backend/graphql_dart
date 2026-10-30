@@ -215,7 +215,7 @@ final GraphQLObjectType todoGraphQLType = objectType(
     field<dynamic, dynamic>(
       'completion_status',
       completionStatusGraphQLType,
-      resolve: (obj, _) => (obj as TodoEntity).completionStatus?.name,
+      resolve: (obj, _) => (obj as TodoEntity).completionStatus,
     ),
   ],
 );
