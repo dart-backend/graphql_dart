@@ -92,10 +92,12 @@ class GraphQLObjectType
   /// refers to an object type uses that type's [coerceToInputObject].
   ///
   /// With the name `${this.name}Input`, it is the input type of
-  /// [coerceToInputObject], shared with the fields that refer to this type; a
-  /// different [description] throws an [ArgumentError], as two input types
-  /// cannot have one name.
+  /// [coerceToInputObject], shared with the fields that refer to this type,
+  /// which keeps this type's description: another [description] throws an
+  /// [ArgumentError]. Other names are not checked against the input types of
+  /// other object types.
   GraphQLInputObjectType toInputObject(String name, {String? description}) {
+    _checkCanBeInput();
     if (name == '${this.name}Input') {
       // Checked first, so a call that throws does not build the shared type.
       if (description != null && description != this.description) {
@@ -110,7 +112,6 @@ class GraphQLObjectType
       return coerceToInputObject() as GraphQLInputObjectType;
     }
 
-    _checkCanBeInput();
     return GraphQLInputObjectType(
       name,
       description: description ?? this.description,
@@ -292,8 +293,10 @@ class GraphQLObjectType
                 other.fields,
                 fields,
               ) &&
-              //        const ListEquality<GraphQLObjectType>() Removed, as it causes a stack overflow :(
-              //            .equals(other.interfaces, interfaces) &&
+              const ListEquality<GraphQLObjectType>().equals(
+                other.interfaces,
+                interfaces,
+              ) &&
               const ListEquality<GraphQLObjectType>().equals(
                 other.possibleTypes,
                 possibleTypes,
@@ -311,21 +314,36 @@ class GraphQLObjectType
 /// compared with, by identity, as comparing them by `==` would recurse.
 final _comparing = Map<Object, Set<Object>>.identity();
 
+/// The pairs of types found equal in the outermost comparison running, so
+/// that types many fields refer to are compared once, not once per path.
+///
+/// A pair may have been found equal by assuming that a pair still being
+/// compared is; if that one turns out unequal, so does the outermost
+/// comparison, as all of it must hold. So the pairs are kept only until that
+/// comparison ends.
+final _provenEqual = Map<Object, Set<Object>>.identity();
+var _comparisonDepth = 0;
+
+bool _pairIn(Map<Object, Set<Object>> pairs, Object a, Object b) =>
+    (pairs[a]?.contains(b) ?? false) || (pairs[b]?.contains(a) ?? false);
+
 /// Runs [compare] on the fields of [a] and [b], or returns `true` if they are
 /// already being compared further up, in either order: types that refer to
 /// themselves, or to each other, are equal when all else about them is.
 bool _compareOnce(Object a, Object b, bool Function() compare) {
-  if ((_comparing[a]?.contains(b) ?? false) ||
-      (_comparing[b]?.contains(a) ?? false)) {
-    return true;
-  }
+  if (_pairIn(_comparing, a, b) || _pairIn(_provenEqual, a, b)) return true;
+
   var others = _comparing[a] ??= Set.identity();
   others.add(b);
+  _comparisonDepth++;
   try {
-    return compare();
+    var equal = compare();
+    if (equal) (_provenEqual[a] ??= Set.identity()).add(b);
+    return equal;
   } finally {
     others.remove(b);
     if (others.isEmpty) _comparing.remove(a);
+    if (--_comparisonDepth == 0) _provenEqual.clear();
   }
 }
 

@@ -443,6 +443,10 @@ void main() {
       );
       expect(shape.coerceToInputObject, throwsUnsupportedError);
       expect(() => shape.toInputObject('S'), throwsUnsupportedError);
+      expect(
+        () => shape.toInputObject('ShapeInput', description: 'other'),
+        throwsUnsupportedError,
+      );
     });
 
     test('a failed conversion leaves no half-built input types', () {

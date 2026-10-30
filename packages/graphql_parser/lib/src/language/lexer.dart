@@ -70,9 +70,20 @@ List<Token> scan(String text, {sourceUrl}) {
     }
 
     if (potential.isEmpty) {
+      var start = scanner.state;
       var ch = String.fromCharCode(scanner.readChar());
       if (ch == '"') {
-        throw SyntaxError('Unterminated string.', scanner.emptySpan);
+        // A `""` just before was read as an empty string: of a `"""` not closed.
+        var empty = out.lastOrNull;
+        if (empty != null &&
+            empty.text == '""' &&
+            empty.span?.end.offset == start.position) {
+          throw SyntaxError(
+            'Unterminated block string.',
+            empty.span!.expand(scanner.spanFrom(start)),
+          );
+        }
+        throw SyntaxError(_stringError(scanner.rest), scanner.spanFrom(start));
       }
       throw SyntaxError("Unexpected token '$ch'.", scanner.emptySpan);
     } else {
@@ -85,4 +96,21 @@ List<Token> scan(String text, {sourceUrl}) {
   }
 
   return out;
+}
+
+/// Why a string, of which [rest] follows the opening quote, could not be read.
+///
+/// A `"..."` string ends on its line, so one closed on it has an invalid
+/// escape or character, and one that is not, no end.
+String _stringError(String rest) {
+  for (var i = 0; i < rest.length; i++) {
+    var c = rest[i];
+    if (c == '\n' || c == '\r') break;
+    if (c == '\\') {
+      i++;
+    } else if (c == '"') {
+      return 'Invalid escape sequence or character in string.';
+    }
+  }
+  return 'Unterminated string.';
 }

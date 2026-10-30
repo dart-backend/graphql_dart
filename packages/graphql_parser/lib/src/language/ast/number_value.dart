@@ -3,6 +3,9 @@ import 'package:source_span/source_span.dart';
 import '../token.dart';
 import 'input_value.dart';
 
+/// A fractional part or an exponent, which makes a literal a Float.
+final _floatPart = RegExp('[.eE]');
+
 /// A GraphQL number literal.
 class NumberValueContext extends InputValueContext<num> {
   /// The source token.
@@ -13,12 +16,13 @@ class NumberValueContext extends InputValueContext<num> {
   /// The [num] value of the [numberToken].
   ///
   /// A fractional part or exponent makes the literal a Float, so it is a
-  /// [double]; otherwise it is an [int].
+  /// [double]; otherwise it is an [int], or a [double] if it is too large
+  /// for one, for an `Int` argument to reject and a `Float` to accept.
   num get numberValue {
     var text = numberToken.text;
-    return text.contains(RegExp('[.eE]'))
+    return text.contains(_floatPart)
         ? double.parse(text)
-        : int.parse(text);
+        : int.tryParse(text) ?? double.parse(text);
   }
 
   // Use [numberToken] instead.

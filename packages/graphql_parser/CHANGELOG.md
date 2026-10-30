@@ -9,8 +9,8 @@
 * **Breaking:** Leftover tokens after the last definition are reported as a syntax error.
 * **Breaking:** Integers with leading zeros, such as `007`, and numbers followed directly by a digit, `.` or letter are rejected.
 * **Breaking:** Block strings keep backslashes and are not trimmed. Their value is computed as in the GraphQL spec: common indentation and leading and trailing blank lines are removed.
-* **Breaking:** A number with a fractional part or exponent is a `double`, so `1e3` is `1000.0`, not the `int` `1000`.
-* **Breaking:** A `"..."` string cannot hold a line break or a control character other than a tab. An unclosed string is reported as "Unterminated string." instead of running on to the next quote.
+* **Breaking:** A number with a fractional part or exponent is a `double`, so `1e3` is `1000.0`, not the `int` `1000`. An integer too large for an `int` is a `double` too.
+* **Breaking:** A `"..."` string cannot hold a line break or a control character other than a tab. An unclosed string is reported as "Unterminated string." (or "Unterminated block string."), and one closed on its line with an invalid escape or character as "Invalid escape sequence or character in string.", at its opening quote, instead of running on to the next quote.
 * **Breaking:** A fragment cannot be named `on`.
 * **Breaking:** A variable's default value cannot use a variable, such as `$a: Int = $b`.
 * **Breaking:** `BooleanValueContext.localValueCache` is removed. It was never read.
