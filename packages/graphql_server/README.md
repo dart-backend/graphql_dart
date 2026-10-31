@@ -94,13 +94,40 @@ field(
 );
 ```
 
-To work with existing tools, such as JavaScript clients, `package:graphql_server2` implements Apollo's [`subscriptions-transport-ws`](https://github.com/apollographql/subscriptions-transport-ws) protocol (`package:graphql_server2/subscriptions_transport_ws.dart`).
+`package:graphql_server2` implements both WebSocket protocols for GraphQL. They are built on `package:stream_channel`, so they can run over any two-way transport: WebSockets, TCP sockets, isolates or others.
 
-**NOTE: Apollo's specification of the protocol is out of date with what its client expects. See <https://github.com/apollographql/subscriptions-transport-ws/issues/551>.**
+* **`graphql-transport-ws`** (`package:graphql_server2/graphql_transport_ws.dart`), the protocol of the [`graphql-ws`](https://github.com/enisdenjo/graphql-ws) library, which current clients use, such as Apollo Client 3, urql and GraphiQL 2. Its WebSocket subprotocol is `graphql-transport-ws`.
+* **`subscriptions-transport-ws`** (`package:graphql_server2/subscriptions_transport_ws.dart`), Apollo's older protocol, for older clients. Its WebSocket subprotocol is `graphql-ws`. **NOTE: Apollo's specification of it is out of date with what its client expects. See <https://github.com/apollographql/subscriptions-transport-ws/issues/551>.**
 
-The implementation is built on `package:stream_channel`, so it can run over any two-way transport: WebSockets, TCP sockets, isolates or others. Extend the `Server` class: it handles the transport and the protocol, and emitting subscription events is up to your implementation.
+For `graphql-transport-ws`, extend `TransportWSServer`, give it the connection's text messages and a way to close it with a close code, and run each operation in `onSubscribe`:
 
-This is how `graphQLWS` in `package:angel3_graphql` serves one WebSocket:
+```dart
+class MyServer extends TransportWSServer {
+  final GraphQL graphQL;
+
+  MyServer(super.channel, this.graphQL, {required super.close});
+
+  @override
+  Future<Object?> onSubscribe(
+    String id,
+    String query, {
+    Map<String, dynamic>? variables,
+    String? operationName,
+    Map<String, dynamic>? extensions,
+  }) => graphQL.parseAndExecute(
+    query,
+    variableValues: variables ?? const {},
+    operationName: operationName,
+  );
+}
+
+// With a `WebSocketChannel` of `package:web_socket_channel`:
+// MyServer(webSocket.cast<String>(), graphQL, close: webSocket.sink.close);
+```
+
+It acknowledges connections (override `onConnect` to authenticate them), answers pings, stops an operation when the client completes it or the connection ends, and closes the connection with the protocol's close codes when it is broken, such as an operation before the connection is acknowledged.
+
+For the older protocol, extend the `Server` class in the same way. This is how `graphQLWS` in `package:angel3_graphql` serves one WebSocket with it:
 
 ```dart
 var channel = IOWebSocketChannel(socket);

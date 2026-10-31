@@ -455,17 +455,20 @@ class GraphQL {
     initialValue,
     Map<String, dynamic> variableValues,
     Map<String, dynamic> globalVariables,
-  ) async* {
-    await for (var event in sourceStream) {
-      yield await executeSubscriptionEvent(
+  ) {
+    // Not an `async*` loop, whose cancellation would wait for the source's
+    // next event: a cancelled subscription stops listening to its source at
+    // once.
+    return sourceStream.asyncMap(
+      (event) => executeSubscriptionEvent(
         document,
         subscription,
         schema,
         event,
         variableValues,
         globalVariables,
-      );
-    }
+      ),
+    );
   }
 
   Future<Map<String, dynamic>> executeSubscriptionEvent(
@@ -496,10 +499,7 @@ class GraphQL {
       );
       return {'data': data};
     } on GraphQLException catch (e) {
-      return {
-        'data': null,
-        'errors': [e.errors.map((e) => e.toJson()).toList()],
-      };
+      return {'data': null, 'errors': e.errors.map((e) => e.toJson()).toList()};
     }
   }
 
