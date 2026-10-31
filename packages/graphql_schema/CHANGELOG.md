@@ -9,10 +9,14 @@
 * **Breaking:** An enum's `validate` accepts only value names. Dart values are converted with `convert`, which `GraphQLObjectType.validate` applies to resolver output.
 * **Breaking:** `GraphQLType.convert` returns `null` for a value it cannot convert, instead of throwing.
 * **Breaking:** `GraphQLUnionType.coerceToInputObject` throws an `UnsupportedError`, as a union cannot be an input type.
+* **Breaking:** `toInputObject` and `coerceToInputObject` on an object type leave out a nullable field whose type cannot be an input, such as a union, an interface or an object with no input fields. They throw an `UnsupportedError` for such a field that is non-null, for an interface, and for an object left with no input fields.
+* **Breaking:** `coerceToInputObject` on an object type builds its `${name}Input` type once and returns the same instance after that, so fields added to the object type later are not included. `toInputObject` with that name returns it too, and throws an `ArgumentError` for another description, which the shared input type cannot have.
+* **Breaking:** A `GraphQLFieldResolver`'s first parameter is the parent value the field is resolved on, typed `dynamic`, instead of the field's own `Serialized` type, which it never received. A resolver can read a model object with `(todo, _) => todo.text` or `(todo, _) => (todo as Todo).text`. One that declares a type for that parameter, such as `(Todo todo, _) => ...`, no longer compiles.
 * **Breaking:** Type hash codes no longer include fields, so equal types have equal hash codes and self-referencing types can be hashed.
 
 ### New in 8.0.0
 
+* `ValidationResult.ok` and `ValidationResult.failure`, so a custom type, such as a scalar, can return the result of its `validate`.
 * `field()` accepts arguments of any type, not only the field's own type.
 
 ### Fixes in 8.0.0
@@ -24,6 +28,11 @@
 * **Numbers:** `Float` accepts and converts `Int` input.
 * **Unions:** Resolving a union or interface member handles enum, list-of-enum and `Date` fields holding Dart values.
 * **Equality:** `GraphQLFieldInput` equality compares `defaultValue`.
+* **Enums:** A Dart `Enum` value named after one of an enum type's values is serialized and converted to that name, so a model serialized to a map, which keeps its enum values, can be output.
+* **Input objects:** `toInputObject` and `coerceToInputObject` handle object types that refer to themselves or to each other, instead of overflowing the stack. A failed conversion leaves no partly built input types behind.
+* **Lists:** Resolver output for a list of enum or `Date` values is converted item by item, so a `null` item is reported on its own instead of failing every other item too.
+* **Lists:** `serialize` and `deserialize` keep a `null` item the list can hold, and throw an `ArgumentError` for one it cannot, such as a `null` item for a non-null item type, instead of passing it to the item type.
+* **Equality:** Comparing object or input object types that refer to themselves, or to each other, no longer overflows the stack, including two such types built apart, which are equal when all else about them is. Their interfaces are compared too, where they were left out, and types that many fields refer to are compared once, not once per path to them.
 
 ## 7.0.0
 

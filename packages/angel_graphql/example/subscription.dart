@@ -88,10 +88,7 @@ void main() async {
     '/subscriptions',
     graphQLWS(GraphQL(schema), keepAliveInterval: Duration(seconds: 3)),
   );
-  app.get(
-    '/graphiql',
-    graphiQL(subscriptionsEndpoint: 'ws://localhost:3000/subscriptions'),
-  );
+  app.get('/graphiql', graphiQL(subscriptionsEndpoint: '/subscriptions'));
 
   var server = await http.startServer('127.0.0.1', 3000);
   var uri = Uri(

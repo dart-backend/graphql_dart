@@ -12,7 +12,12 @@ class ValidationResult<Value> {
   /// A list of errors that caused validation to fail.
   final List<String> errors;
 
-  //ValidationResult._(this.successful, this.value, this.errors);
+  /// A successful validation, of the validated [value], for the `validate`
+  /// of a custom [GraphQLType], such as a scalar.
+  ValidationResult.ok(Value value) : this._ok(value);
+
+  /// A failed validation, of its [errors].
+  ValidationResult.failure(List<String> errors) : this._failure(errors);
 
   ValidationResult._ok(this.value) : errors = [], successful = true;
 

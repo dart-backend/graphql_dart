@@ -9,6 +9,11 @@
 * **Breaking:** Leftover tokens after the last definition are reported as a syntax error.
 * **Breaking:** Integers with leading zeros, such as `007`, and numbers followed directly by a digit, `.` or letter are rejected.
 * **Breaking:** Block strings keep backslashes and are not trimmed. Their value is computed as in the GraphQL spec: common indentation and leading and trailing blank lines are removed.
+* **Breaking:** A number with a fractional part or exponent is a `double`, so `1e3` is `1000.0`, not the `int` `1000`. An integer too large for an `int` is a `double` too.
+* **Breaking:** A `"..."` string cannot hold a line break or a control character other than a tab. An unclosed string is reported as "Unterminated string." (or "Unterminated block string."), and one closed on its line with an invalid escape or character as "Invalid escape sequence or character in string.", at its opening quote, instead of running on to the next quote.
+* **Breaking:** A fragment cannot be named `on`.
+* **Breaking:** A variable's default value cannot use a variable, such as `$a: Int = $b`.
+* **Breaking:** `BooleanValueContext.localValueCache` is removed. It was never read.
 
 ### New in 8.0.0
 
@@ -19,6 +24,9 @@
 * **Directives:** A directive with several arguments, such as `@dir(x: 1, y: 2)`, is parsed.
 * **Fragments:** An inline fragment without a type condition, such as `... @include(if: $x) { a }`, is parsed.
 * **Numbers:** Exponents with an uppercase `E` or a sign, such as `1E10` and `1E+5`, are parsed.
+* **Numbers:** Exponents are parsed exactly, so `1e19` no longer overflows to a negative number and `1.1e2` is `110.0`.
+* **Strings:** Block-string indentation counts only spaces and tabs, so other white space, such as a non-breaking space, is kept.
+* **Selections:** The span of an empty merged selection set is `null`, instead of throwing.
 * **Strings:** A block string may contain `"` characters.
 * **Errors:** An operation without a selection set reports "Missing selection set in operation definition." instead of naming a fragment definition.
 * **Parser:** `parseFragmentSpread` restores `current` when it backtracks.

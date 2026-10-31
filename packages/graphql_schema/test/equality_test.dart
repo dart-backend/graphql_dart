@@ -121,4 +121,62 @@ void main() {
       expect(() => node.hashCode, returnsNormally);
     });
   });
+
+  group('types that refer to themselves', () {
+    GraphQLObjectType todo({String text = 'text'}) {
+      var type = objectType('Todo', fields: [field(text, graphQLString)]);
+      return type..fields.add(field('parent', type));
+    }
+
+    test('equal ones built apart are equal', () {
+      expect(todo(), todo());
+      expect(todo().coerceToInputObject(), todo().coerceToInputObject());
+      expect({todo(), todo()}, hasLength(1));
+    });
+
+    test('ones built apart that differ are not equal', () {
+      expect(todo(), isNot(todo(text: 'title')));
+      expect(
+        todo().coerceToInputObject(),
+        isNot(todo(text: 'title').coerceToInputObject()),
+      );
+    });
+
+    test('interfaces are compared', () {
+      var node = objectType('Node', isInterface: true);
+      expect(objectType('Todo', interfaces: [node]), isNot(objectType('Todo')));
+      expect(
+        objectType('Todo', interfaces: [node]),
+        objectType('Todo', interfaces: [node]),
+      );
+    });
+
+    test('types that many fields refer to are compared once', () {
+      List<GraphQLObjectType> build() {
+        var types = [for (var i = 0; i < 12; i++) objectType('T$i')];
+        for (var t in types) {
+          for (var (i, u) in types.indexed) {
+            t.fields.add(field('f$i', u));
+          }
+        }
+        return types;
+      }
+
+      var sw = Stopwatch()..start();
+      expect(build().first, build().first);
+      expect(sw.elapsed, lessThan(const Duration(seconds: 5)));
+    });
+
+    test('types that refer to each other are compared', () {
+      (GraphQLObjectType, GraphQLObjectType) pair() {
+        var a = objectType('A', fields: [field('n', graphQLInt)]);
+        var b = objectType('B', fields: [field('a', a)]);
+        a.fields.add(field('b', b));
+        return (a, b);
+      }
+
+      expect(pair().$1, pair().$1);
+      expect(pair().$1.coerceToInputObject(), pair().$1.coerceToInputObject());
+    });
+  });
 }

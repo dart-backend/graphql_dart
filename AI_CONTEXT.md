@@ -20,8 +20,8 @@ Directory names differ from published package names; most published names carry 
 | `packages/graphql_schema` | `graphql_schema2` | 8.0.0 | Type system: scalars, object/input/enum/union types, schema, validation, annotations |
 | `packages/graphql_server` | `graphql_server2` | 9.0.0 | Execution engine (`GraphQL` class), introspection, Apollo `subscriptions-transport-ws` |
 | `packages/graphql_generator` | `graphql_generator2` | 8.0.0 | `build_runner` builder: Dart classes → `GraphQLObjectType`s |
-| `packages/graphql_data_loader` | `graphql_data_loader2` | 7.0.0 | Port of JS `graphql/dataloader` (batching + caching); no runtime deps |
-| `packages/angel_graphql` | `angel3_graphql` | 9.0.0 | Angel3 integration: HTTP handler, WebSocket handler, GraphiQL, service resolvers |
+| `packages/graphql_data_loader` | `graphql_data_loader2` | 8.0.0 | Port of JS `graphql/dataloader` (batching + caching); no runtime deps |
+| `packages/angel_graphql` | `angel3_graphql` | 10.0.0 | Angel3 integration: HTTP handler, WebSocket handler, GraphiQL, service resolvers |
 
 ### Dependency graph
 
@@ -39,7 +39,7 @@ graphql_parser2   graphql_schema2        graphql_data_loader2 (standalone)
 
 - **Executor**: `packages/graphql_server/lib/graphql_server2.dart` (~1100 lines, the largest file). Class `GraphQL` with `parseAndExecute`, `executeRequest`, `executeField`, `completeValue`, `createSourceEventStream` (subscriptions). Follows the spec's algorithm names closely; keep that correspondence when editing.
 - **Introspection**: `packages/graphql_server/lib/introspection.dart` (`__Schema`, `__Type`, etc.).
-- **Apollo WS transport**: `packages/graphql_server/lib/subscriptions_transport_ws.dart` and `lib/src/apollo/`.
+- **WebSocket transports**: `graphql-transport-ws` (the `graphql-ws` library's protocol, which current clients use) in `packages/graphql_server/lib/graphql_transport_ws.dart` and `lib/src/transport_ws/`; Apollo's legacy `subscriptions-transport-ws` in `lib/subscriptions_transport_ws.dart` and `lib/src/apollo/`. Note the names: the legacy protocol's WebSocket subprotocol is `graphql-ws`, the modern one's `graphql-transport-ws`.
 - **Parser**: `packages/graphql_parser/lib/src/language/` (`lexer.dart`, `parser.dart`, `ast/*.dart`, one file per AST node).
 - **Type system**: `packages/graphql_schema/lib/src/`. `schema.dart` is the `part`-root (contains `GraphQLSchema`, `GraphQLException`, annotations `GraphQLDocumentation`/`GraphQLClass`/`graphQLClass`); other files are `part of 'schema.dart'`. `gen.dart` holds the DSL helpers (`objectType`, `inputObjectType`, `field`, `listOf`, ...).
 - **Generator**: `packages/graphql_generator/lib/src/graphql_generator.dart`; builder config in `packages/graphql_generator/build.yaml` (builder `graphql`, factory `graphQLBuilder`, output `.graphql_generator2.g.part`, requires `angel3_serialize.g.part`, combined via `source_gen|combining_builder`).
@@ -57,11 +57,11 @@ app.all('/graphql', graphQLHttp(GraphQL(schema)));  // angel3_graphql
 app.get('/graphiql', graphiQL());
 ```
 
-Generator usage: annotate a class with `@graphQLClass` (optionally `@GraphQLDocumentation(...)` on fields), add `part 'x.g.dart';`, run `dart run build_runner build`, then use the generated `<camelName>GraphQLType`.
+Generator usage: annotate a class with `@graphQLClass` (optionally `@GraphQLDocumentation(...)` on fields), add `part 'x.g.dart';`, run `dart run build_runner build`, then use the generated `<camelName>GraphQLType`. Its fields have generated resolvers, so resolvers can return model objects or `Map`s.
 
 ## Development Workflow
 
-- **Master Branch**: Stable release branch (`graphql_parser2`, `graphql_schema2` and `graphql_generator2` 8.x, `graphql_server2` 9.x, `graphql_data_loader2` 7.x, `angel3_graphql` 9.x). All PRs target `master`.
+- **Master Branch**: Stable release branch (`graphql_parser2`, `graphql_schema2` and `graphql_generator2` 8.x, `graphql_server2` 9.x, `graphql_data_loader2` 8.x, `angel3_graphql` 10.x). All PRs target `master`.
 - **Feature Branches**: Work is done on `feature/<name>` branches (e.g. `feature/dart3.13` for the SDK 3.13 upgrade) and bug fixes on `bugfix/<name>`. Contributors fork the repo, then branch from `master`.
 - **Setup**: Install melos (`dart pub global activate melos`), then run `dart pub get` at the root. That resolves the whole workspace into the root `pubspec.lock`, which is tracked in git. Upgrade all packages with `melos exec "dart pub upgrade"`.
 - **Code generation**: After changing `graphql_generator2`, regenerate its example with `dart run build_runner build --delete-conflicting-outputs` in `packages/graphql_generator`. The output, `example/main.g.dart`, is committed and must not be edited by hand.
@@ -74,7 +74,7 @@ Generator usage: annotate a class with `@graphQLClass` (optionally `@GraphQLDocu
   ```
 
   Across all packages: `melos exec -- "dart analyze ."` and `melos exec -- "dart test"`. Run examples from their package directory too, as some read files relative to it (e.g. `angel_graphql/example/subscription.dart` reads `posts.json`).
-- **CI**: GitHub Actions (`.github/workflows/dart.yml`, SDK pinned to `3.13.0`) runs format, analyze and test for `graphql_schema`, `graphql_parser` and `graphql_server` only. `graphql_generator`, `graphql_data_loader` and `angel_graphql` are not checked by CI, so run their checks locally. CI fails on any `dart format` diff.
+- **CI**: GitHub Actions (`.github/workflows/dart.yml`, SDK pinned to `3.13.0`) runs format, analyze and test for `graphql_schema`, `graphql_parser`, `graphql_server`, `graphql_data_loader` and `graphql_generator` only. `angel_graphql` is not checked by CI, so run its checks locally. CI fails on any `dart format` diff.
 - **Lints**: Each package uses `package:lints/recommended.yaml`; some disable `non_constant_identifier_names` / `constant_identifier_names`.
 - **Tests**: `graphql_parser` has the most tests (one file per construct, shared helpers in `test/common.dart`), `graphql_schema` has a few, and the other packages have about one `all_test.dart` each. When fixing a reported bug, add a regression test named after the issue (see `graphql_parser/test/issue23_test.dart`).
 - **Releases**: Bump `version` in the package's `pubspec.yaml`, update sibling packages' constraints to match on a major bump, and add a `## <version>` entry to its `CHANGELOG.md` (see **Changelog**). SDK upgrades bump the min SDK in every package and the root `pubspec.yaml` together.
@@ -85,7 +85,7 @@ Generator usage: annotate a class with `@graphQLClass` (optionally `@GraphQLDocu
 
 - Each package uses `resolution: workspace`; don't add per-package lockfiles or `dependency_overrides` for sibling packages, since the workspace already links them.
 - Inter-package constraints use caret versions (`graphql_schema2: ^8.0.0`). When bumping a package's major version, update dependents' constraints and the root workspace together.
-- Version scheme: `graphql_parser2`, `graphql_schema2` and `graphql_generator2` are on 8.x, `graphql_server2` on 9.x and `graphql_data_loader2` on 7.x; `angel3_graphql` tracks Angel3 on 9.x.
+- Version scheme: `graphql_parser2`, `graphql_schema2` and `graphql_generator2` are on 8.x, `graphql_server2` on 9.x and `graphql_data_loader2` on 8.x; `angel3_graphql` tracks Angel3 on 10.x.
 - Null safety throughout; prefer explicit types on public APIs.
 - Public API is exported from each package's top-level `lib/<package_name>.dart`; implementation lives in `lib/src/`.
 

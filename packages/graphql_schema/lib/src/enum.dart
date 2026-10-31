@@ -46,8 +46,13 @@ class GraphQLEnumType<Value> extends GraphQLScalarType<Value, String> {
 
   @override
   String serialize(Value value) {
-    //if (value == null) return null;
-    return values.firstWhere((v) => v.value == value).name;
+    var found =
+        values.firstWhereOrNull((v) => v.value == value)?.name ??
+        _nameOfDartEnum(value);
+    if (found == null) {
+      throw StateError('"$value" is not a value of the enum "$name".');
+    }
+    return found;
   }
 
   /// Converts a Dart value to its name; a value that is already a name is
@@ -55,7 +60,15 @@ class GraphQLEnumType<Value> extends GraphQLScalarType<Value, String> {
   @override
   String? convert(value) =>
       values.firstWhereOrNull((v) => v.value == value)?.name ??
+      _nameOfDartEnum(value) ??
       (value is String ? value : null);
+
+  /// The name of a Dart [Enum] value that one of [values] is named after, as
+  /// in a model serialized to a map, which keeps its enum values as they are.
+  String? _nameOfDartEnum(Object? value) =>
+      value is Enum && values.any((v) => v.name == value.name)
+      ? value.name
+      : null;
 
   @override
   Value deserialize(String serialized) {

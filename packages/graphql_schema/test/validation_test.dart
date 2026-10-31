@@ -205,6 +205,20 @@ void main() {
       expect(paint.validate('x', {'color': 'GREEN'}).successful, false);
     });
 
+    test('a Dart enum value is matched by name', () {
+      var status = enumTypeFromStrings('Status', ['done', 'open']);
+      expect(status.convert(_Status.done), 'done');
+      expect(
+        enumType<dynamic>('Status', {'done': 1}).serialize(_Status.done),
+        'done',
+      );
+      expect(status.convert(_Status.other), isNull);
+      expect(
+        () => enumType<dynamic>('Status', {'done': 1}).serialize(_Status.other),
+        throwsStateError,
+      );
+    });
+
     test('non-null enum accepts a Dart value', () {
       var type = objectType(
         'Paint',
@@ -299,12 +313,270 @@ void main() {
   });
 
   test('union cannot be coerced to an input type', () {
-    var holder = objectType(
-      'Holder',
-      fields: [
-        field('u', GraphQLUnionType('U', [pokemonType])),
-      ],
-    );
-    expect(holder.coerceToInputObject, throwsUnsupportedError);
+    var union = GraphQLUnionType('U', [pokemonType]);
+    expect(union.coerceToInputObject, throwsUnsupportedError);
   });
+
+  group('toInputObject', () {
+    var union = GraphQLUnionType('U', [pokemonType]);
+
+    test('leaves out nullable union and interface fields', () {
+      var shape = objectType(
+        'Shape',
+        isInterface: true,
+        fields: [field('name', graphQLString)],
+      );
+      var holder = objectType(
+        'Holder',
+        fields: [
+          field('name', graphQLString),
+          field('u', union),
+          field('us', listOf(union.nonNullable())),
+          field('shape', shape),
+        ],
+      );
+      var input = holder.toInputObject('HolderInput');
+      expect(input.inputFields.map((f) => f.name), ['name']);
+    });
+
+    test('rejects a non-null union field', () {
+      var holder = objectType(
+        'Holder',
+        fields: [
+          field('name', graphQLString),
+          field('us', listOf(union).nonNullable()),
+        ],
+      );
+      expect(() => holder.toInputObject('HolderInput'), throwsUnsupportedError);
+    });
+
+    test('rejects an object with no input fields left', () {
+      var holder = objectType('Holder', fields: [field('u', union)]);
+      expect(holder.coerceToInputObject, throwsUnsupportedError);
+    });
+
+    test('handles a type that refers to itself', () {
+      var todo = objectType('Todo', fields: [field('text', graphQLString)]);
+      todo.fields.add(field('parent', todo));
+      var input = todo.toInputObject('TodoInput');
+      expect(input.inputFields.last.type, same(input));
+    });
+
+    test('handles types that refer to each other', () {
+      var a = objectType('A', fields: [field('n', graphQLInt)]);
+      var b = objectType('B', fields: [field('a', a)]);
+      a.fields.add(field('b', b));
+      var aInput = a.coerceToInputObject() as GraphQLInputObjectType;
+      var bInput = aInput.inputFields.last.type as GraphQLInputObjectType;
+      expect(bInput.name, 'BInput');
+      expect(bInput.inputFields.single.type, same(aInput));
+    });
+
+    test('builds one input type per object type', () {
+      var todo = objectType('Todo', fields: [field('text', graphQLString)]);
+      todo.fields.add(field('parent', todo));
+      var input = todo.coerceToInputObject();
+      expect(todo.coerceToInputObject(), same(input));
+      expect(todo.toInputObject('TodoInput'), same(input));
+      expect({input, todo.coerceToInputObject()}, hasLength(1));
+    });
+
+    test('the shared input type keeps its description', () {
+      var todo = objectType(
+        'Todo',
+        description: 'A task',
+        fields: [field('text', graphQLString)],
+      );
+      expect(
+        todo.toInputObject('TodoInput', description: 'A task'),
+        same(todo.coerceToInputObject()),
+      );
+      expect(
+        () => todo.toInputObject('TodoInput', description: 'Create a todo'),
+        throwsArgumentError,
+      );
+      expect(
+        todo.toInputObject('CreateTodo', description: 'Create a todo').name,
+        'CreateTodo',
+      );
+    });
+
+    test('a rejected description does not build the shared type', () {
+      var todo = objectType('Todo', fields: [field('text', graphQLString)]);
+      expect(
+        () => todo.toInputObject('TodoInput', description: 'Create a todo'),
+        throwsArgumentError,
+      );
+      todo.fields.add(field('done', graphQLBoolean));
+      var input = todo.coerceToInputObject() as GraphQLInputObjectType;
+      expect(input.inputFields.map((f) => f.name), ['text', 'done']);
+    });
+
+    test('a custom input type refers to the shared one', () {
+      var todo = objectType('Todo', fields: [field('text', graphQLString)]);
+      todo.fields.add(field('parent', todo));
+      var create = todo.toInputObject('CreateTodo');
+      expect(create.name, 'CreateTodo');
+      expect(create.inputFields.last.type, same(todo.coerceToInputObject()));
+    });
+
+    test('leaves out a nullable field whose object cannot be an input', () {
+      var inner = objectType('Inner', fields: [field('u', union)]);
+      var outer = objectType(
+        'Outer',
+        fields: [field('n', graphQLString), field('inner', inner)],
+      );
+      expect(outer.toInputObject('OuterInput').inputFields.map((f) => f.name), [
+        'n',
+      ]);
+    });
+
+    test('rejects an object with no fields', () {
+      expect(objectType('Empty').coerceToInputObject, throwsUnsupportedError);
+    });
+
+    test('rejects an interface', () {
+      var shape = objectType(
+        'Shape',
+        isInterface: true,
+        fields: [field('name', graphQLString)],
+      );
+      expect(shape.coerceToInputObject, throwsUnsupportedError);
+      expect(() => shape.toInputObject('S'), throwsUnsupportedError);
+      expect(
+        () => shape.toInputObject('ShapeInput', description: 'other'),
+        throwsUnsupportedError,
+      );
+    });
+
+    test('a failed conversion leaves no half-built input types', () {
+      var a = objectType('A', fields: [field('n', graphQLInt)]);
+      var b = objectType('B', fields: [field('n', graphQLInt), field('a', a)]);
+      a.fields
+        ..add(field('b', b))
+        ..add(field('u', union.nonNullable()));
+
+      expect(a.coerceToInputObject, throwsUnsupportedError);
+      var bInput = b.coerceToInputObject() as GraphQLInputObjectType;
+      expect(bInput.inputFields.map((f) => f.name), ['n']);
+    });
+  });
+
+  group('lists with null items', () {
+    var color = enumType('Color', {'RED': 1, 'BLUE': 2});
+
+    test('convert keeps null items the list can hold', () {
+      var palette = objectType(
+        'Palette',
+        fields: [field('colors', listOf<dynamic, dynamic>(color))],
+      );
+      expect(
+        palette.validate('x', {
+          'colors': [1, null],
+        }).value,
+        {
+          'colors': ['RED', null],
+        },
+      );
+    });
+
+    test('serialize keeps null items the list can hold', () {
+      expect(listOf<dynamic, dynamic>(color).serialize([1, null]), [
+        'RED',
+        null,
+      ]);
+    });
+
+    test(
+      'only the null item is reported for a list of non-nullable values',
+      () {
+        var palette = objectType(
+          'Palette',
+          fields: [field('colors', listOf(color))],
+        );
+        expect(
+          palette.validate('x', {
+            'colors': [1, null],
+          }).errors,
+          ['x: Expected "colors" at index 1 to be a non-null value.'],
+        );
+      },
+    );
+
+    test('serialize rejects a null item for a non-null item type', () {
+      expect(
+        () =>
+            listOf<dynamic, dynamic>(color.nonNullable()).serialize([1, null]),
+        throwsArgumentError,
+      );
+    });
+
+    test('serialize rejects a null item the list cannot hold', () {
+      expect(
+        () => GraphQLListType<int?, String>(
+          GraphQLEnumType<int?>('C', [GraphQLEnumValue('RED', 1)]),
+        ).serialize([1, null]),
+        throwsArgumentError,
+      );
+    });
+  });
+
+  group('Int given for Float', () {
+    test('deserializes for Float!', () {
+      var type = graphQLFloat.nonNullable();
+      var value = type.validate('x', 1).value;
+      expect(type.deserialize(value!), 1.0);
+    });
+
+    test('deserializes for [Float]', () {
+      var type = listOf(graphQLFloat);
+      var value = type.validate('x', [1, 2]).value;
+      expect(type.deserialize(value!), [1.0, 2.0]);
+    });
+
+    test('deserializes for an input field of type Float!', () {
+      var type = GraphQLInputObjectType(
+        'I',
+        inputFields: [GraphQLInputObjectField('f', graphQLFloat.nonNullable())],
+      );
+      var value = type.validate('x', {'f': 1}).value;
+      expect(type.deserialize(value!), {'f': 1.0});
+    });
+  });
+
+  test('a custom scalar validates with the public results', () {
+    var even = _Even();
+    var ok = even.validate('n', 2);
+    expect(ok.successful, isTrue);
+    expect(ok.value, 2);
+    var failed = even.validate('n', 3);
+    expect(failed.successful, isFalse);
+    expect(failed.errors, ['Expected "n" to be even.']);
+  });
+}
+
+enum _Status { done, other }
+
+/// A custom scalar, of even integers.
+class _Even extends GraphQLScalarType<int, int> {
+  @override
+  String get name => 'Even';
+
+  @override
+  String get description => 'An even integer.';
+
+  @override
+  int serialize(int value) => value;
+
+  @override
+  int deserialize(int serialized) => serialized;
+
+  @override
+  ValidationResult<int> validate(String key, input) =>
+      input is int && input.isEven
+      ? ValidationResult.ok(input)
+      : ValidationResult.failure(['Expected "$key" to be even.']);
+
+  @override
+  GraphQLType<int, int> coerceToInputObject() => this;
 }

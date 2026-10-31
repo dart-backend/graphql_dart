@@ -13,11 +13,55 @@ final ContentType graphQlContentType = ContentType('application', 'graphql');
 
 final Validator graphQlPostBody = Validator({
   'query*': isNonEmptyString,
+  'operationName': isNonEmptyString,
+  // The name it was read by before 10.0.0, still accepted.
   'operation_name': isNonEmptyString,
   'variables': predicate((dynamic v) => v == null || v is String || v is Map),
 });
 
 final RegExp _num = RegExp(r'^[0-9]+$');
+
+/// Puts [file] at [path], such as `variables.files.0`, of the multipart
+/// request's [variables], replacing the `null` there.
+void _setFile(Map<String, dynamic> variables, Object? path, UploadedFile file) {
+  if (path is! String || !path.startsWith('variables.')) {
+    throw AngelHttpException.badRequest(
+      message:
+          'All array values in the "map" field must begin with "variables.".',
+    );
+  }
+  var names = path.split('.').skip(1).toList();
+  Object? current = variables;
+  for (var (i, name) in names.indexed) {
+    var parent = ['variables', ...names.take(i)].join('.');
+    var last = i == names.length - 1;
+    if (current is List && _num.hasMatch(name)) {
+      var index = int.parse(name);
+      if (index >= current.length) {
+        throw AngelHttpException.badRequest(
+          message: 'The array "$parent" has no index $index.',
+        );
+      }
+      if (last) {
+        current[index] = file;
+      } else {
+        current = current[index];
+      }
+    } else if (current is Map) {
+      if (last) {
+        current[name] = file;
+      } else {
+        current = current[name];
+      }
+    } else {
+      throw AngelHttpException.badRequest(
+        message:
+            'The "map" field contained a mapping to $parent.$name, but '
+            '"$parent" is not a JSON object or array.',
+      );
+    }
+  }
+}
 
 /// A [RequestHandler] that serves a spec-compliant GraphQL backend.
 ///
@@ -48,25 +92,101 @@ RequestHandler graphQLHttp(
       return {'data': result};
     }
 
-    Future executeMap(Map map) async {
-      var body = await req.parseBody().then((_) => req.bodyAsMap);
-      var text = body['query'] as String;
-      var operationName = body['operation_name'] as String?;
-      var variables = body['variables'];
-
-      if (variables is String) {
-        variables = json.decode(variables);
+    /// Runs the request of [map], a request body or the query parameters of
+    /// a GET: its `query`, `operationName` and `variables`, which may be a
+    /// JSON string.
+    Future executeMap(Map map, {Map<String, dynamic>? variables}) async {
+      var text = map['query'];
+      if (text is! String) {
+        throw AngelHttpException.badRequest(
+          message: 'Missing a string "query".',
+        );
+      }
+      var operationName = map['operationName'] ?? map['operation_name'];
+      if (operationName != null && operationName is! String) {
+        throw AngelHttpException.badRequest(
+          message: '"operationName" must be a string.',
+        );
+      }
+      if (variables == null) {
+        var given = map['variables'];
+        if (given is String) given = given.isEmpty ? null : json.decode(given);
+        if (given != null && given is! Map) {
+          throw AngelHttpException.badRequest(
+            message: '"variables" must be a JSON object.',
+          );
+        }
+        variables = foldToStringDynamic(given as Map?);
       }
 
       return await sendGraphQLResponse(
         await graphQL.parseAndExecute(
           text,
           sourceUrl: 'input',
-          operationName: operationName,
-          variableValues: foldToStringDynamic(variables as Map?),
+          operationName: operationName as String?,
+          variableValues: variables,
           globalVariables: globalVariables,
         ),
       );
+    }
+
+    /// Runs a request of the GraphQL multipart request specification: its
+    /// `operations` are a JSON object of `query`, `operationName` and
+    /// `variables`, and its `map` gives, for each uploaded file, the paths in
+    /// `variables` to put it at.
+    ///
+    /// See: https://github.com/jaydenseric/graphql-multipart-request-spec
+    Future executeMultipart() async {
+      var fields = await req.parseBody().then((_) => req.bodyAsMap);
+      var operations = fields['operations'];
+      if (operations is! String) {
+        throw AngelHttpException.badRequest(
+          message: 'Missing "operations" field.',
+        );
+      }
+      var operation = json.decode(operations);
+      if (operation is! Map) {
+        throw AngelHttpException.badRequest(
+          message: '"operations" field must decode to a JSON object.',
+        );
+      }
+      var given = operation['variables'];
+      if (given != null && given is! Map) {
+        throw AngelHttpException.badRequest(
+          message: 'The "variables" of "operations" must be a JSON object.',
+        );
+      }
+      var variables = foldToStringDynamic(given as Map?);
+
+      var map = fields.containsKey('map')
+          ? json.decode(fields['map'] as String)
+          : const {};
+      if (map is! Map) {
+        throw AngelHttpException.badRequest(
+          message: '"map" field must decode to a JSON object.',
+        );
+      }
+      for (var MapEntry(:key, :value) in map.entries) {
+        var file = req.uploadedFiles?.firstWhereOrNull((f) => f.name == key);
+        if (file == null) {
+          throw AngelHttpException.badRequest(
+            message:
+                '"map" contained key "$key", but no uploaded file has that '
+                'name.',
+          );
+        }
+        if (value is! List) {
+          throw AngelHttpException.badRequest(
+            message:
+                'The value for "$key" in the "map" field was not a JSON array.',
+          );
+        }
+        for (var path in value) {
+          _setFile(variables, path, file);
+        }
+      }
+
+      return await executeMap(operation, variables: variables);
     }
 
     try {
@@ -76,7 +196,7 @@ RequestHandler graphQLHttp(
         }
       } else if (req.method == 'POST') {
         if (req.headers!.contentType?.mimeType == graphQlContentType.mimeType) {
-          var text = await req.body!.transform(utf8.decoder).join();
+          var text = await utf8.decoder.bind(req.body!).join();
           return await sendGraphQLResponse(
             await graphQL.parseAndExecute(
               text,
@@ -90,81 +210,7 @@ RequestHandler graphQLHttp(
           }
         } else if (req.headers!.contentType?.mimeType ==
             'multipart/form-data') {
-          var fields = await req.parseBody().then((_) => req.bodyAsMap);
-          var operations = fields['operations'] as String?;
-          if (operations == null) {
-            throw AngelHttpException.badRequest(
-              message: 'Missing "operations" field.',
-            );
-          }
-          var map = fields.containsKey('map')
-              ? json.decode(fields['map'] as String)
-              : null;
-          if (map is! Map) {
-            throw AngelHttpException.badRequest(
-              message: '"map" field must decode to a JSON object.',
-            );
-          }
-          var variables = Map<String, dynamic>.from(globalVariables);
-          for (var entry in map.entries) {
-            var file = req.uploadedFiles!.firstWhereOrNull(
-              (f) => f.name == entry.key,
-            );
-            if (file == null) {
-              throw AngelHttpException.badRequest(
-                message:
-                    '"map" contained key "${entry.key}", but no uploaded file '
-                    'has that name.',
-              );
-            }
-            if (entry.value is! List) {
-              throw AngelHttpException.badRequest(
-                message:
-                    'The value for "${entry.key}" in the "map" field was not a JSON array.',
-              );
-            }
-            var objectPaths = entry.value as List;
-            for (var objectPath in objectPaths) {
-              var subPaths = (objectPath as String).split('.');
-              if (subPaths[0] == 'variables') {
-                Object current = variables;
-                for (var i = 1; i < subPaths.length; i++) {
-                  var name = subPaths[i];
-                  var parent = subPaths.take(i).join('.');
-                  if (_num.hasMatch(name)) {
-                    if (current is! List) {
-                      throw AngelHttpException.badRequest(
-                        message:
-                            'Object "$parent" is not a JSON array, but the '
-                            '"map" field contained a mapping to $parent.$name.',
-                      );
-                    }
-                    current[int.parse(name)] = file;
-                  } else {
-                    if (current is! Map) {
-                      throw AngelHttpException.badRequest(
-                        message:
-                            'Object "$parent" is not a JSON object, but the '
-                            '"map" field contained a mapping to $parent.$name.',
-                      );
-                    }
-                    current[name] = file;
-                  }
-                }
-              } else {
-                throw AngelHttpException.badRequest(
-                  message: 'All array values in the "map" field must begin with "variables.".',
-                );
-              }
-            }
-          }
-          return await sendGraphQLResponse(
-            await graphQL.parseAndExecute(
-              operations,
-              sourceUrl: 'input',
-              globalVariables: variables,
-            ),
-          );
+          return await executeMultipart();
         } else {
           throw AngelHttpException.badRequest();
         }

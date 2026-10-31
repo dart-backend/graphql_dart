@@ -39,6 +39,17 @@ void main() {
       expect(argumentValue('{ a(x: -0.5) }'), -0.5);
     });
 
+    test('exponents are exact doubles', () {
+      expect(argumentValue('{ a(x: 1e19) }'), 1e19);
+      expect(argumentValue('{ a(x: 1.1e2) }'), 110.0);
+      expect(argumentValue('{ a(x: 1e3) }'), isA<double>());
+      expect(argumentValue('{ a(x: 3) }'), isA<int>());
+    });
+
+    test('an integer too large for an int is a double', () {
+      expect(argumentValue('{ a(x: 99999999999999999999) }'), 1e20);
+    });
+
     test('rejects leading zeros and incomplete numbers', () {
       for (var bad in ['007', '1E', '1.', '1.5.5', '1x']) {
         expect(
@@ -65,6 +76,78 @@ void main() {
         'Hello,\n  World!\n\nYours',
       );
     });
+
+    test('only spaces and tabs are indentation', () {
+      expect(argumentValue('{ a(x: """\n   a\n  b\n   \n""") }'), ' a\nb\n ');
+    });
+  });
+
+  group('strings', () {
+    test('cannot hold a line break', () {
+      expect(
+        () => parse('{ a(x: "foo\n") }').parseDocument(),
+        throwsA(
+          isA<SyntaxError>().having(
+            (e) => e.message,
+            'message',
+            'Unterminated string.',
+          ),
+        ),
+      );
+    });
+
+    test('report a bad escape in a closed string, at its quote', () {
+      for (var bad in [r'"\q"', r'"a\u12"']) {
+        expect(
+          () => parse('{ a(x: $bad) }').parseDocument(),
+          throwsA(
+            isA<SyntaxError>()
+                .having(
+                  (e) => e.message,
+                  'message',
+                  'Invalid escape sequence or character in string.',
+                )
+                .having((e) => e.span?.start.column, 'column', 7),
+          ),
+          reason: bad,
+        );
+      }
+    });
+
+    test('report an unterminated block string', () {
+      expect(
+        () => parse('{ a(x: """open) }').parseDocument(),
+        throwsA(
+          isA<SyntaxError>().having(
+            (e) => e.message,
+            'message',
+            'Unterminated block string.',
+          ),
+        ),
+      );
+    });
+
+    test('allow a tab', () {
+      expect(argumentValue('{ a(x: "a\tb") }'), 'a\tb');
+    });
+  });
+
+  test('a fragment cannot be named "on"', () {
+    expect(errorsOf('fragment on on User { id }'), isNotEmpty);
+  });
+
+  test('a default value cannot use a variable', () {
+    expect(errorsOf(r'query($a: Int = $b) { f(x: $a) }'), [
+      'A default value cannot use a variable.',
+    ]);
+    expect(errorsOf(r'query($a: [Int] = [1, $b]) { f(x: $a) }'), [
+      'A default value cannot use a variable.',
+    ]);
+    expect(errorsOf(r'query($a: Int = 1) { f(x: $a) }'), isEmpty);
+  });
+
+  test('an empty merged selection set has no span', () {
+    expect(SelectionSetContext.merged([]).span, isNull);
   });
 
   test('directive with several arguments', () {

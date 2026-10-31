@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:graphql_data_loader2/graphql_data_loader2.dart';
 import 'package:graphql_schema2/graphql_schema2.dart';
 
-external Future<List<Todo>> fetchTodos(Iterable<int?> ids);
+external Future<List<Todo>> fetchTodos(Iterable<int> ids);
 
 void main() async {
   // Create a DataLoader. By default, it caches lookups.
@@ -27,9 +27,9 @@ void main() async {
       fields: [
         field(
           'todo',
-          listOf(todoType),
+          todoType,
           inputs: [GraphQLFieldInput('id', graphQLInt.nonNullable())],
-          resolve: (_, args) => todoLoader.load(args['id'] as int?),
+          resolve: (_, args) => todoLoader.load(args['id'] as int),
         ),
       ],
     ),

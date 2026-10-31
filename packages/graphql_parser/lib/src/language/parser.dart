@@ -107,7 +107,8 @@ class Parser {
   FragmentDefinitionContext? parseFragmentDefinition() {
     if (nextName('fragment') && current != null) {
       var FRAGMENT = current!;
-      if (next(TokenType.NAME)) {
+      // A fragment cannot be named "on".
+      if (next(TokenType.NAME, exclude: ['on'])) {
         var NAME = current;
         if (nextName('on')) {
           var ON = current;
@@ -531,7 +532,12 @@ class Parser {
     if (next(TokenType.EQUALS) && current != null) {
       var EQUALS = current!;
       var value = parseInputValue();
-      if (value != null) {
+      if (value != null && _hasVariable(value)) {
+        errors.add(
+          SyntaxError('A default value cannot use a variable.', value.span),
+        );
+        return null;
+      } else if (value != null) {
         return DefaultValueContext(EQUALS, value);
       } else {
         errors.add(SyntaxError('Missing value after "=" sign.', EQUALS.span));
@@ -541,6 +547,13 @@ class Parser {
       return null;
     }
   }
+
+  static bool _hasVariable(InputValueContext value) => switch (value) {
+    VariableContext() => true,
+    ListValueContext(:var values) => values.any(_hasVariable),
+    ObjectValueContext(:var fields) => fields.any((f) => _hasVariable(f.value)),
+    _ => false,
+  };
 
   TypeConditionContext? parseTypeCondition() {
     var name = parseTypeName();

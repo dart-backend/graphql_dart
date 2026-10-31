@@ -94,6 +94,129 @@ void main() {
       var a = await uniqueLoader.load(3);
       expect(a.value, 'hey');
     });
+
+    test('prime does nothing when the cache is disabled', () async {
+      noCache.prime(3, _Unique('hey'));
+      expect((await noCache.load(3)).value, '3.00');
+    });
+  });
+
+  test('load during a running batch is sent in the next batch', () async {
+    var batches = <List<int>>[];
+    var release = Completer<void>();
+    var loader = DataLoader<int, int>((ids) async {
+      batches.add(ids.toList());
+      if (batches.length == 1) await release.future;
+      return ids;
+    });
+
+    var first = loader.load(1);
+    await Future<void>.delayed(Duration.zero);
+    var second = loader.load(2);
+    release.complete();
+
+    expect(await Future.wait([first, second]), [1, 2]);
+    expect(batches, [
+      [1],
+      [2],
+    ]);
+  });
+
+  test('a key loading in a running batch is not fetched again', () async {
+    var calls = 0;
+    var release = Completer<void>();
+    var loader = DataLoader<int, int>((ids) async {
+      calls++;
+      await release.future;
+      return ids;
+    });
+
+    var first = loader.load(1);
+    await Future<void>.delayed(Duration.zero);
+    var second = loader.load(1);
+    release.complete();
+
+    expect(await Future.wait([first, second]), [1, 1]);
+    expect(calls, 1);
+  });
+
+  test('a failed batch rejects its loads and is not cached', () async {
+    var fail = true;
+    var loader = DataLoader<int, int>((ids) {
+      if (fail) throw StateError('db down');
+      return ids;
+    });
+
+    expect(loader.load(1), throwsStateError);
+    expect(loader.load(2), throwsStateError);
+    await Future<void>.delayed(Duration.zero);
+
+    fail = false;
+    expect(await loader.load(1), 1);
+  });
+
+  test('a result of the wrong length rejects the batch', () async {
+    var loader = DataLoader<int, int>((ids) => ids.skip(1));
+    var loads = [loader.load(1), loader.load(2)];
+    for (var load in loads) {
+      await expectLater(load, throwsStateError);
+    }
+  });
+
+  test('a lazy result is evaluated once per key', () async {
+    var evaluated = 0;
+    var loader = DataLoader<int, int>(
+      (ids) => ids.map((i) {
+        evaluated++;
+        return i;
+      }),
+    );
+    await Future.wait([loader.load(1), loader.load(2), loader.load(3)]);
+    expect(evaluated, 3);
+  });
+
+  test('close rejects pending loads and later loads', () async {
+    var loader = DataLoader<int, int>((ids) => ids);
+    var pending = loader.load(1);
+    loader.close();
+    await expectLater(pending, throwsStateError);
+    expect(() => loader.load(2), throwsStateError);
+  });
+
+  test('close does not report loads nobody awaits as uncaught', () async {
+    var loader = DataLoader<int, int>((ids) => ids);
+    loader.load(1);
+    loader.close();
+    // The test fails if the cancelled load is reported as an uncaught error.
+    await Future<void>.delayed(Duration.zero);
+  });
+
+  test('prime does nothing after close', () {
+    var loader = DataLoader<int, int>((ids) => ids)..close();
+    loader.prime(1, 1);
+    expect(() => loader.load(1), throwsStateError);
+  });
+
+  test('a failed batch keeps a newer cache entry for its key', () async {
+    var calls = 0;
+    var release = Completer<void>();
+    var loader = DataLoader<int, int>((ids) async {
+      if (++calls == 1) {
+        await release.future;
+        throw StateError('db down');
+      }
+      return ids;
+    });
+
+    var stale = loader.load(1);
+    await Future<void>.delayed(Duration.zero);
+    loader.clear(1);
+    expect(await loader.load(1), 1);
+
+    release.complete();
+    await expectLater(stale, throwsStateError);
+    expect(await loader.load(1), 1);
+    expect(calls, 2);
   });
 }
 

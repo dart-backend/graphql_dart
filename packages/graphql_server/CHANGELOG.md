@@ -5,6 +5,7 @@
 ### Breaking changes in 9.0.0
 
 * **Breaking:** The `package:graphql_server2/mirrors.dart` library is removed, so the package no longer uses `dart:mirrors`. `convertDartType`, `convertDartClass`, `objectTypeFromClassMirror`, `enumTypeFromClassMirror`, `fieldFromGetter` and `mirrorsFieldResolver` are gone. Generate types with `graphql_generator2` or define them with the `graphql_schema2` helpers, and return `Map`s from resolvers or give fields their own `resolve` callbacks.
+* **Breaking:** A field that has no resolver, on a parent value that is not a `Map`, such as a model object, is reported as an error naming the field, instead of resolving to `null`. Pass a `defaultFieldResolver` to resolve such fields.
 * **Breaking:** No longer depends on `angel3_serialize`, `meta` or `tuple`. Add them to your own `pubspec.yaml` if you used them through this package.
 
 To keep resolving fields from model objects instead of `mirrorsFieldResolver`, pass a `defaultFieldResolver` that reads them, for example from `toJson()`:
@@ -16,6 +17,21 @@ var graphQL = GraphQL(
       (obj as dynamic).toJson()[name] as T,
 );
 ```
+
+### New in 9.0.0
+
+* `package:graphql_server2/graphql_transport_ws.dart` implements the `graphql-transport-ws` protocol of the `graphql-ws` library, which current clients such as Apollo Client 3 and urql use for subscriptions over WebSockets. Extend `TransportWSServer` with an `onSubscribe` that runs operations; it enforces the protocol's rules with its close codes (`TransportWSCloseCode`), answers pings, and stops an operation when the client completes it or the connection ends. An error of the connection, such as a binary message, closes it as an invalid message. A subscription's stream that comes after its operation was stopped is cancelled at once, on both protocols, so that its source cleans up.
+
+### Fixes in 9.0.0
+
+* **Operations:** A document of several operations, run without an operation name, fails with "Must provide operation name if query contains multiple operations.", where it said "This document does not define any operations.", which is now said only of a document without any.
+* **Types:** A custom scalar, such as `angel3_graphql`'s `Upload`, can be the type of a variable, and is listed by introspection, where it was an unknown type.
+* **Subscriptions:** Cancelling a subscription's stream stops its source at once, where it waited for the source's next event, so a quiet source was never cancelled.
+* **Subscriptions:** The `errors` of a failed subscription event are a list of errors, where they were a list of one list.
+* **subscriptions_transport_ws:** `RemoteClient` of a `StreamChannel<String>`, such as a WebSocket's, reads and writes JSON, where its sink failed with a `TypeError` on the first message, so the protocol could not be served over text. A message that is not a JSON object with a string `type` is left out, where one without it threw. The end of the connection, and its errors, reach the server, which never knew the connection had ended, and a message sent after it has closed is dropped, where it was an uncaught error.
+* **subscriptions_transport_ws:** `stop` cancels an operation, as do `connection_terminate` and the end of the connection, where operations ran until their streams ended, and `done` completes, also after `connection_terminate` or an error of the connection, which closes the connection. A connection that ends while `onConnect` runs is not acknowledged, and starts no keep-alive timer. A `start` of an id in use stops its operation first. An invalid `start` is answered with an `error` message, where it threw, and an operation that throws, or a stream that fails, with its errors, those of a `GraphQLException` one by one. An event keeps its `errors`.
+* **Scalars:** A scalar field whose value is already in its serialized form, and valid, is output as it is, so a `Date` field accepts an ISO 8601 string, as a `MapService` stores dates, instead of failing with "must be DateTime". It is written as the type writes its values, so a `Date` has one format whatever form it came in; an enum keeps the name it was given.
+* **Arguments:** Arguments and variables are deserialized from their validated value, so an `Int` given for `Float!`, `[Float]` or a `Float!` input field is coerced instead of throwing a `TypeError`.
 
 ## 8.0.0
 

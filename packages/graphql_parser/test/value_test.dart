@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:graphql_parser2/graphql_parser2.dart';
 import 'package:test/test.dart';
 
@@ -16,9 +14,9 @@ void main() {
     expect('1.0', isValue(1.0));
     expect('-1', isValue(-1));
     expect('-1.0', isValue(-1.0));
-    expect('6.26e-34', isValue(6.26 * math.pow(10, -34)));
-    expect('-6.26e-34', isValue(-6.26 * math.pow(10, -34)));
-    expect('-6.26e34', isValue(-6.26 * math.pow(10, 34)));
+    expect('6.26e-34', isValue(6.26e-34));
+    expect('-6.26e-34', isValue(-6.26e-34));
+    expect('-6.26e34', isValue(-6.26e34));
   });
 
   test('array', () {

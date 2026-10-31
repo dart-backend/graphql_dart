@@ -8,6 +8,8 @@
 * **Breaking:** The `id` field of a `Model` is generated as `graphQLId` instead of `graphQLString`.
 * **Breaking:** Computed getters inherited from a parent class, such as `Model.idAsInt` and `idAsString`, are no longer generated as fields.
 * **Breaking:** `@GraphQLDocumentation` and `@Deprecated` on a field declared as a field (not as a getter) are applied, so its description, deprecation reason and `typeName` now appear in the generated type.
+* **Breaking:** Each generated field has a `resolve` callback that reads it from a model object, so a resolver can return a model instead of a `Map`; a `Map` is still read by key, as before. Fields are generated as `field<dynamic, dynamic>(...)`, as a getter's value may be `null` or a model object, and a generated type no longer uses the server's `defaultFieldResolver`. A parent value that is neither a `Map` nor an instance of the class is a GraphQL error naming the field; a `null` one resolves to `null`.
+* **Breaking:** Static and private fields, and fields the serializer excludes (`@SerializableField(exclude: true)` or `@exclude`, unless `canSerialize`), are not generated, where they were, so an excluded field such as a password hash is no longer part of the schema; this covers `final` fields too.
 
 ### New in 8.0.0
 
@@ -18,6 +20,7 @@
 * **Types:** A reference to another generated type is named after the class the serializer generates, so a field of type `TodoEntity` refers to `todoGraphQLType`, as `_Todo` already did.
 * **Types:** A nullable field of a generated class or enum type, such as `CompletionStatus?`, generates valid code instead of `completionStatus?GraphQLType`.
 * **Deprecation:** The `@Deprecated` message is used as the deprecation reason instead of "Expires: next release.".
+* **Names:** A `$` in the name of a class, field or enum value, or in a doc comment or deprecation message, is escaped in the generated code, which did not compile.
 
 ## 7.0.0
 

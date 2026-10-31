@@ -28,23 +28,12 @@ class GraphQLUploadType extends GraphQLScalarType<UploadedFile, UploadedFile> {
   @override
   UploadedFile serialize(UploadedFile value) => value;
 
+  /// Accepts an [UploadedFile], as a multipart request's variables hold.
   @override
-  ValidationResult<UploadedFile> validate(String key, UploadedFile input) {
-    //if (input is! UploadedFile) {
-    //  return _Vr(false, errors: ['Expected "$key" to be a boolean.']);
-    //}
-    return _Vr(true, value: input, errors: []);
+  ValidationResult<UploadedFile> validate(String key, input) {
+    if (input is UploadedFile) return ValidationResult.ok(input);
+    return ValidationResult.failure([
+      'Expected "$key" to be an uploaded file.',
+    ]);
   }
-}
-
-// TODO: Really need to make the validation result constructors *public*
-class _Vr<T> implements ValidationResult<T> {
-  @override
-  final bool successful;
-  @override
-  final List<String> errors;
-  @override
-  final T? value;
-
-  _Vr(this.successful, {required this.errors, this.value});
 }

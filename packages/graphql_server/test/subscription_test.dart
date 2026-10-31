@@ -54,4 +54,54 @@ void main() {
     print(asList);
     expect(asList, episodesAsData);
   });
+
+  test('cancelling a subscription stops its source at once', () async {
+    var cancelled = Completer<void>();
+    var source = StreamController<int>(onCancel: cancelled.complete);
+    var graphQL = GraphQL(
+      graphQLSchema(
+        queryType: objectType('Q', fields: [field('a', graphQLInt)]),
+        subscriptionType: objectType(
+          'S',
+          fields: [
+            field(
+              'n',
+              graphQLInt,
+              resolve: (_, _) => source.stream.map((n) => {'n': n}),
+            ),
+          ],
+        ),
+      ),
+    );
+    var stream = await graphQL.parseAndExecute('subscription { n }') as Stream;
+    var subscription = stream.listen(null);
+    await Future<void>.delayed(Duration.zero);
+    // No event has come, so the source is cancelled without one.
+    await subscription.cancel();
+    await cancelled.future.timeout(const Duration(seconds: 1));
+  });
+
+  test('the errors of a failed event are a list of errors', () async {
+    var graphQL = GraphQL(
+      graphQLSchema(
+        queryType: objectType('Q', fields: [field('a', graphQLInt)]),
+        subscriptionType: objectType(
+          'S',
+          fields: [
+            field(
+              'n',
+              graphQLInt.nonNullable(),
+              resolve: (_, _) => Stream.value({'n': null}),
+            ),
+          ],
+        ),
+      ),
+    );
+    var stream = await graphQL.parseAndExecute('subscription { n }') as Stream;
+    var event = await stream.first as Map;
+    expect(event['data'], isNull);
+    expect(event['errors'], [
+      isA<Map>().having((e) => e['message'], 'message', isA<String>()),
+    ]);
+  });
 }

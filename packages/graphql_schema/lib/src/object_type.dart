@@ -41,25 +41,118 @@ class GraphQLObjectType
     this.polymorphicName,
   });
 
+  /// The input type [coerceToInputObject] built for this type, set before its
+  /// fields are filled in, so a field that refers back to this type reuses it.
+  GraphQLInputObjectType? _inputObject;
+
+  /// The types whose input types are being built by the outermost running
+  /// [coerceToInputObject] call, in the order they were started.
+  static List<GraphQLObjectType>? _converting;
+
+  /// Returns this type's input type, named `${name}Input`.
+  ///
+  /// It is built once and reused, so fields added to this type after the first
+  /// call are not included. See [toInputObject] for which fields are kept.
   @override
   GraphQLType<Map<String, dynamic>, Map<String, dynamic>>
   coerceToInputObject() {
-    return toInputObject('${name}Input', description: description);
+    var cached = _inputObject;
+    if (cached != null) return cached;
+    _checkCanBeInput();
+
+    var outermost = _converting == null;
+    var converting = _converting ??= [];
+    var start = converting.length;
+    var input = _inputObject = GraphQLInputObjectType(
+      '${name}Input',
+      description: description,
+    );
+    converting.add(this);
+
+    try {
+      input.inputFields.addAll(_inputFields());
+      return input;
+    } catch (_) {
+      // Types started since this one may refer to its unfinished input type.
+      for (var type in converting.sublist(start)) {
+        type._inputObject = null;
+      }
+      converting.length = start;
+      rethrow;
+    } finally {
+      if (outermost) _converting = null;
+    }
   }
 
-  /// Converts [this] into a [GraphQLInputObjectType].
+  /// Converts [this] into a [GraphQLInputObjectType] named [name].
+  ///
+  /// A nullable field whose type cannot be an input, such as a union or
+  /// interface, is left out. A non-null one throws an [UnsupportedError], as
+  /// does an interface, or an object left with no input fields. A field that
+  /// refers to an object type uses that type's [coerceToInputObject].
+  ///
+  /// With the name `${this.name}Input`, it is the input type of
+  /// [coerceToInputObject], shared with the fields that refer to this type,
+  /// which keeps this type's description: another [description] throws an
+  /// [ArgumentError]. Other names are not checked against the input types of
+  /// other object types.
   GraphQLInputObjectType toInputObject(String name, {String? description}) {
+    _checkCanBeInput();
+    if (name == '${this.name}Input') {
+      // Checked first, so a call that throws does not build the shared type.
+      if (description != null && description != this.description) {
+        throw ArgumentError.value(
+          description,
+          'description',
+          'The input type "$name" is shared by the fields that refer to '
+              '"${this.name}", so it keeps its own description; give another '
+              'name for another description',
+        );
+      }
+      return coerceToInputObject() as GraphQLInputObjectType;
+    }
+
     return GraphQLInputObjectType(
       name,
       description: description ?? this.description,
-      inputFields: fields.map(
-        (f) => GraphQLInputObjectField(
-          f.name,
-          f.type.coerceToInputObject(),
-          description: f.description,
-        ),
-      ),
+      inputFields: _inputFields(),
     );
+  }
+
+  void _checkCanBeInput() {
+    if (isInterface) {
+      throw UnsupportedError(
+        'The interface type "$name" cannot be used as an input type.',
+      );
+    }
+  }
+
+  List<GraphQLInputObjectField> _inputFields() {
+    var out = <GraphQLInputObjectField>[];
+
+    for (var f in fields) {
+      GraphQLType type;
+      try {
+        type = f.type.coerceToInputObject();
+      } on UnsupportedError catch (e) {
+        if (f.type is! GraphQLNonNullableType) continue;
+        throw UnsupportedError(
+          'Cannot convert "$name" to an input type: its non-null field '
+          '"${f.name}", of type ${f.type}, cannot be an input. ${e.message}',
+        );
+      }
+      out.add(
+        GraphQLInputObjectField(f.name, type, description: f.description),
+      );
+    }
+
+    if (out.isEmpty) {
+      throw UnsupportedError(
+        'Cannot convert "$name" to an input type: none of its fields can be an '
+        'input.',
+      );
+    }
+    return out;
   }
 
   /// Declares that this type inherits from another parent type.
@@ -128,7 +221,7 @@ class GraphQLObjectType
         // may be a Dart value (such as an enum's) to convert first.
         var result = field.type.validate(
           k.toString(),
-          field.type.convert(v) ?? v,
+          _convertOutput(field.type, v),
         );
 
         if (!result.successful) {
@@ -187,16 +280,27 @@ class GraphQLObjectType
 
   @override
   bool operator ==(other) {
+    if (identical(this, other)) return true;
     return other is GraphQLObjectType &&
         other.name == name &&
         other.description == description &&
         other.isInterface == isInterface &&
-        const ListEquality<GraphQLObjectField>().equals(other.fields, fields) &&
-        //        const ListEquality<GraphQLObjectType>() Removed, as it causes a stack overflow :(
-        //            .equals(other.interfaces, interfaces) &&
-        const ListEquality<GraphQLObjectType>().equals(
-          other.possibleTypes,
-          possibleTypes,
+        _compareOnce(
+          this,
+          other,
+          () =>
+              const ListEquality<GraphQLObjectField>().equals(
+                other.fields,
+                fields,
+              ) &&
+              const ListEquality<GraphQLObjectType>().equals(
+                other.interfaces,
+                interfaces,
+              ) &&
+              const ListEquality<GraphQLObjectType>().equals(
+                other.possibleTypes,
+                possibleTypes,
+              ),
         );
   }
 
@@ -205,6 +309,54 @@ class GraphQLObjectType
   // types. Equal objects still share these values, so they hash equally.
   int get hashCode => hash3(name, description, isInterface);
 }
+
+/// The types whose fields are being compared, each to the types it is being
+/// compared with, by identity, as comparing them by `==` would recurse.
+final _comparing = Map<Object, Set<Object>>.identity();
+
+/// The pairs of types found equal in the outermost comparison running, so
+/// that types many fields refer to are compared once, not once per path.
+///
+/// A pair may have been found equal by assuming that a pair still being
+/// compared is; if that one turns out unequal, so does the outermost
+/// comparison, as all of it must hold. So the pairs are kept only until that
+/// comparison ends.
+final _provenEqual = Map<Object, Set<Object>>.identity();
+var _comparisonDepth = 0;
+
+bool _pairIn(Map<Object, Set<Object>> pairs, Object a, Object b) =>
+    (pairs[a]?.contains(b) ?? false) || (pairs[b]?.contains(a) ?? false);
+
+/// Runs [compare] on the fields of [a] and [b], or returns `true` if they are
+/// already being compared further up, in either order: types that refer to
+/// themselves, or to each other, are equal when all else about them is.
+bool _compareOnce(Object a, Object b, bool Function() compare) {
+  if (_pairIn(_comparing, a, b) || _pairIn(_provenEqual, a, b)) return true;
+
+  var others = _comparing[a] ??= Set.identity();
+  others.add(b);
+  _comparisonDepth++;
+  try {
+    var equal = compare();
+    if (equal) (_provenEqual[a] ??= Set.identity()).add(b);
+    return equal;
+  } finally {
+    others.remove(b);
+    if (others.isEmpty) _comparing.remove(a);
+    if (--_comparisonDepth == 0) _provenEqual.clear();
+  }
+}
+
+/// Converts resolver output [value] for validation against [type]. Lists are
+/// converted item by item, so one item that cannot be converted is reported on
+/// its own instead of leaving the whole list unconverted.
+dynamic _convertOutput(GraphQLType type, dynamic value) => switch (type) {
+  GraphQLNonNullableType(:var ofType) => _convertOutput(ofType, value),
+  GraphQLListType(:var ofType) when value is Iterable => [
+    for (var v in value) v == null ? null : _convertOutput(ofType, v),
+  ],
+  _ => type.convert(value) ?? value,
+};
 
 Map<String, dynamic> _foldToStringDynamic(Map map) {
   return map.keys.fold<Map<String, dynamic>>(
@@ -342,12 +494,17 @@ class GraphQLInputObjectType
 
   @override
   bool operator ==(other) {
+    if (identical(this, other)) return true;
     return other is GraphQLInputObjectType &&
         other.name == name &&
         other.description == description &&
-        const ListEquality<GraphQLInputObjectField>().equals(
-          other.inputFields,
-          inputFields,
+        _compareOnce(
+          this,
+          other,
+          () => const ListEquality<GraphQLInputObjectField>().equals(
+            other.inputFields,
+            inputFields,
+          ),
         );
   }
 

@@ -230,11 +230,16 @@ class GraphQL {
     String? operationName,
   ) {
     var ops = document.definitions.whereType<OperationDefinitionContext>();
-    if (operationName == null) {
+    if (ops.isEmpty) {
+      throw GraphQLException.fromMessage(
+        'This document does not define any operations.',
+      );
+    } else if (operationName == null) {
       return ops.length == 1
           ? ops.first
           : throw GraphQLException.fromMessage(
-              'This document does not define any operations.',
+              'Must provide operation name if query contains multiple '
+              'operations.',
             );
     } else {
       return ops.firstWhere(
@@ -302,7 +307,9 @@ class GraphQL {
                 .toList(),
           );
         } else {
-          toSet = type.deserialize(value);
+          // Deserialize the validated value, which carries coercions such as
+          // Int to Float, rather than the raw input.
+          toSet = type.deserialize(validation.value);
         }
       }
 
@@ -316,19 +323,13 @@ class GraphQL {
     return coercedValues;
   }
 
-  List<List> makeLazy(Map<String, dynamic> map) {
-    final lazy = <List>[];
-
-    for (final val in map.values) {
-      if (val is JsonPathArgument) {
-        lazy.add([...val.splitted, val]);
-      } else if (val is Map<String, dynamic>) {
-        makeLazy(val);
-      }
-    }
-
-    return lazy;
-  }
+  /// The `@jsonpath` variables in [map], each as its path followed by the
+  /// [JsonPathArgument] to complete. They are only ever top-level variable
+  /// values: nested values come from the client's input.
+  List<List> makeLazy(Map<String, dynamic> map) => [
+    for (final val in map.values)
+      if (val is JsonPathArgument) [...val.splitted, val],
+  ];
 
   Future<Map<String, dynamic>> executeQuery(
     DocumentContext document,
@@ -459,17 +460,20 @@ class GraphQL {
     initialValue,
     Map<String, dynamic> variableValues,
     Map<String, dynamic> globalVariables,
-  ) async* {
-    await for (var event in sourceStream) {
-      yield await executeSubscriptionEvent(
+  ) {
+    // Not an `async*` loop, whose cancellation would wait for the source's
+    // next event: a cancelled subscription stops listening to its source at
+    // once.
+    return sourceStream.asyncMap(
+      (event) => executeSubscriptionEvent(
         document,
         subscription,
         schema,
         event,
         variableValues,
         globalVariables,
-      );
-    }
+      ),
+    );
   }
 
   Future<Map<String, dynamic>> executeSubscriptionEvent(
@@ -500,10 +504,7 @@ class GraphQL {
       );
       return {'data': data};
     } on GraphQLException catch (e) {
-      return {
-        'data': null,
-        'errors': [e.errors.map((e) => e.toJson()).toList()],
-      };
+      return {'data': null, 'errors': e.errors.map((e) => e.toJson()).toList()};
     }
   }
 
@@ -743,7 +744,7 @@ class GraphQL {
 
             throw GraphQLException(errors);
           } else {
-            final coercedValue = argumentType.deserialize(inputValue);
+            final coercedValue = argumentType.deserialize(validation.value);
 
             coercedValues[argumentName] = coercedValue;
           }
@@ -787,7 +788,13 @@ class GraphQL {
           argumentValues,
         );
       }
-      return null;
+      if (objectValue == null) return null;
+      throw GraphQLException.fromMessage(
+        'Cannot resolve field "$fieldName" of type "${objectType.name}" from '
+        'a ${objectValue.runtimeType}: it is not a Map, and the field has no '
+        'resolver. Return a Map, give the field a resolve callback, or pass a '
+        'defaultFieldResolver to GraphQL.',
+      );
     } else {
       return await fieldResolve(objectValue, argumentValues) as T?;
     }
@@ -866,6 +873,22 @@ class GraphQL {
 
         return ret;
       } on TypeError {
+        // A value already in its serialized form, such as a Date's ISO 8601
+        // string from a service that stores dates as text, is accepted if
+        // valid, and written as the type writes its values, so that a Date
+        // is in one format whatever form it came in.
+        final converted = fieldType.convert(result);
+        if (converted != null &&
+            fieldType.validate(fieldName ?? '', converted).successful) {
+          // An enum's name is already as it is written; two names of one
+          // value keep theirs.
+          if (fieldType is GraphQLEnumType) return converted;
+          try {
+            return fieldType.serialize(fieldType.deserialize(converted));
+          } catch (_) {
+            return converted;
+          }
+        }
         throw GraphQLException.fromMessage(
           'Value of field "$fieldName" must be ${fieldType.valueType}, got $result (${result.runtimeType}) instead.',
         );

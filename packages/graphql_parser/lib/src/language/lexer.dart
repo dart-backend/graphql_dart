@@ -11,8 +11,9 @@ final RegExp _whitespace = RegExp('[ \t\n\r]+');
 final RegExp _number = RegExp(
   r'-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?(?![0-9._A-Za-z])',
 );
+// A string cannot hold a line break or other control character except a tab.
 final RegExp _string = RegExp(
-  r'"((\\(["\\/bfnrt]|(u[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])))|([^"\\]))*"',
+  r'"((\\(["\\/bfnrt]|(u[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])))|([^"\\\x00-\x08\x0A-\x1F]))*"',
 );
 // Any characters up to the closing quotes; an escaped \""" does not close it.
 final RegExp _blockString = RegExp(r'"""(\\"""|(?!""")[\s\S])*"""');
@@ -69,7 +70,21 @@ List<Token> scan(String text, {sourceUrl}) {
     }
 
     if (potential.isEmpty) {
+      var start = scanner.state;
       var ch = String.fromCharCode(scanner.readChar());
+      if (ch == '"') {
+        // A `""` just before was read as an empty string: of a `"""` not closed.
+        var empty = out.lastOrNull;
+        if (empty != null &&
+            empty.text == '""' &&
+            empty.span?.end.offset == start.position) {
+          throw SyntaxError(
+            'Unterminated block string.',
+            empty.span!.expand(scanner.spanFrom(start)),
+          );
+        }
+        throw SyntaxError(_stringError(scanner.rest), scanner.spanFrom(start));
+      }
       throw SyntaxError("Unexpected token '$ch'.", scanner.emptySpan);
     } else {
       // Choose longest token
@@ -81,4 +96,21 @@ List<Token> scan(String text, {sourceUrl}) {
   }
 
   return out;
+}
+
+/// Why a string, of which [rest] follows the opening quote, could not be read.
+///
+/// A `"..."` string ends on its line, so one closed on it has an invalid
+/// escape or character, and one that is not, no end.
+String _stringError(String rest) {
+  for (var i = 0; i < rest.length; i++) {
+    var c = rest[i];
+    if (c == '\n' || c == '\r') break;
+    if (c == '\\') {
+      i++;
+    } else if (c == '"') {
+      return 'Invalid escape sequence or character in string.';
+    }
+  }
+  return 'Unterminated string.';
 }
