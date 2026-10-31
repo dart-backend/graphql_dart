@@ -183,6 +183,40 @@ final todoInput = inputObjectType(
 
 `coerceToInputObject()` builds the input type of an object type, named `${name}Input`. It is built once, and shared by every field that refers to the object type, so a type that refers to itself works. A field whose type cannot be an input is left out if it is nullable, such as a union or an interface; a non-null one, an interface itself, or an object with no input fields left, throws an `UnsupportedError`.
 
+## Custom scalars
+
+Extend `GraphQLScalarType` for a scalar of your own. `validate` checks input and returns a `ValidationResult.ok` of its value or a `ValidationResult.failure` of its errors; `serialize` and `deserialize` convert between the Dart value and its form in requests and responses:
+
+```dart
+/// A URL, as a string in requests and responses.
+class GraphQLUrlType extends GraphQLScalarType<Uri, String> {
+  @override
+  String get name => 'Url';
+
+  @override
+  String get description => 'An absolute URL.';
+
+  @override
+  ValidationResult<String> validate(String key, input) {
+    if (input is String && (Uri.tryParse(input)?.isAbsolute ?? false)) {
+      return ValidationResult.ok(input);
+    }
+    return ValidationResult.failure(['Expected "$key" to be an absolute URL.']);
+  }
+
+  @override
+  Uri deserialize(String serialized) => Uri.parse(serialized);
+
+  @override
+  String serialize(Uri value) => value.toString();
+
+  @override
+  GraphQLType<Uri, String> coerceToInputObject() => this;
+}
+```
+
+Use it as any other type, for fields and arguments. A scalar used by the schema can be the type of a variable, as `$url: Url`, and introspection lists it.
+
 ## Serialization and validation
 
 A type can `serialize` a Dart value, `deserialize` it back, and `validate` input:

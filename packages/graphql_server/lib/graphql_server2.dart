@@ -230,11 +230,16 @@ class GraphQL {
     String? operationName,
   ) {
     var ops = document.definitions.whereType<OperationDefinitionContext>();
-    if (operationName == null) {
+    if (ops.isEmpty) {
+      throw GraphQLException.fromMessage(
+        'This document does not define any operations.',
+      );
+    } else if (operationName == null) {
       return ops.length == 1
           ? ops.first
           : throw GraphQLException.fromMessage(
-              'This document does not define any operations.',
+              'Must provide operation name if query contains multiple '
+              'operations.',
             );
     } else {
       return ops.firstWhere(
@@ -869,11 +874,20 @@ class GraphQL {
         return ret;
       } on TypeError {
         // A value already in its serialized form, such as a Date's ISO 8601
-        // string from a service that stores dates as text, is kept if valid.
+        // string from a service that stores dates as text, is accepted if
+        // valid, and written as the type writes its values, so that a Date
+        // is in one format whatever form it came in.
         final converted = fieldType.convert(result);
         if (converted != null &&
             fieldType.validate(fieldName ?? '', converted).successful) {
-          return converted;
+          // An enum's name is already as it is written; two names of one
+          // value keep theirs.
+          if (fieldType is GraphQLEnumType) return converted;
+          try {
+            return fieldType.serialize(fieldType.deserialize(converted));
+          } catch (_) {
+            return converted;
+          }
         }
         throw GraphQLException.fromMessage(
           'Value of field "$fieldName" must be ${fieldType.valueType}, got $result (${result.runtimeType}) instead.',

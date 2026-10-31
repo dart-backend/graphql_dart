@@ -105,6 +105,9 @@ Future<void> until(bool Function() condition) async {
 void main() {
   late StreamController<int> ticks;
   var cancelled = false;
+  // Opened to let the `slow` subscription's resolver return its stream.
+  var gate = Completer<void>();
+  var slowCancelled = false;
 
   var graphQL = GraphQL(
     graphQLSchema(
@@ -127,12 +130,24 @@ void main() {
             graphQLInt,
             resolve: (_, _) => ticks.stream.map((n) => {'tick': n}),
           ),
+          field(
+            'slow',
+            graphQLInt,
+            resolve: (_, _) async {
+              await gate.future;
+              return StreamController<Map<String, dynamic>>(
+                onCancel: () => slowCancelled = true,
+              ).stream;
+            },
+          ),
         ],
       ),
     ),
   );
 
   setUp(() {
+    gate = Completer<void>();
+    slowCancelled = false;
     cancelled = false;
     ticks = StreamController<int>(onCancel: () => cancelled = true);
   });
@@ -236,6 +251,21 @@ void main() {
       await until(() => cancelled);
     });
 
+    test('a stream given after a complete is cleaned up', () async {
+      var client = _Client(graphQL);
+      await client.connect();
+      client.send({
+        'id': 's',
+        'type': 'subscribe',
+        'payload': {'query': 'subscription { slow }'},
+      });
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      client.send({'id': 's', 'type': 'complete'});
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      gate.complete();
+      await until(() => slowCancelled);
+    });
+
     test('a complete of an unknown id is ignored', () async {
       var client = _Client(graphQL);
       await client.connect();
@@ -295,6 +325,12 @@ void main() {
       var other = _Client(graphQL);
       other._channel.foreign.sink.add('not json');
       await expectClose(other, TransportWSCloseCode.badRequest);
+    });
+
+    test('for an error of the connection, such as a binary message', () async {
+      var client = _Client(graphQL);
+      client._channel.foreign.sink.addError(TypeError());
+      await expectClose(client, TransportWSCloseCode.badRequest);
     });
 
     test('for a subscribe without a query', () async {

@@ -52,7 +52,10 @@ abstract class TransportWSServer {
     });
     _subscription = channel.stream.listen(
       _onText,
-      onError: (_) => _end(),
+      // An error, such as a binary message, is an invalid message: the
+      // connection is closed, rather than kept open unanswered.
+      onError: (_) =>
+          _closeWith(TransportWSCloseCode.badRequest, 'Invalid message'),
       onDone: _end,
     );
   }
@@ -213,7 +216,9 @@ abstract class TransportWSServer {
       return;
     }
     if (!operation.isActive(this, id)) {
-      // Stopped while it ran: a stream it gave is not listened to.
+      // Stopped while it ran: a stream it gave is listened to and cancelled
+      // at once, so that its source cleans up.
+      if (result is Stream) result.listen(null).cancel();
       return;
     }
 

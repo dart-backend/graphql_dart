@@ -13,6 +13,7 @@
   - [Usage](#usage)
   - [Subscriptions](#subscriptions)
   - [Using Services](#using-services)
+  - [File Uploads](#file-uploads)
   - [Generating Types](#generating-types)
 
 GraphQL for the [Angel3 framework](https://pub.dev/packages/angel3_framework): request handlers that serve a GraphQL API over HTTP and WebSockets, GraphiQL, and resolvers backed by Angel services. It builds on [`package:graphql_server2`](https://pub.dev/packages/graphql_server2), which implements the [GraphQL specification](https://spec.graphql.org/), so you can build a GraphQL backend with Dart and virtually any database.
@@ -199,6 +200,38 @@ In Angel, a `Service` implements CRUD operations, and is the database interface 
 - `resolveViaServiceRemove` (with an `id`)
 
 Arguments are passed to the service as its query, with the request's context, and `Providers.graphQL` as the provider, so hooks can tell GraphQL requests apart.
+
+## File Uploads
+
+`graphQLHttp` serves file uploads by the [GraphQL multipart request specification](https://github.com/jaydenseric/graphql-multipart-request-spec), which clients such as `apollo-upload-client` follow. Give an argument the `Upload` scalar, `graphQLUpload`; its value is the request's `UploadedFile`:
+
+```dart
+var mutationType = objectType(
+  'Mutation',
+  fields: [
+    field(
+      'upload',
+      graphQLString,
+      inputs: [GraphQLFieldInput('file', graphQLUpload.nonNullable())],
+      resolve: (_, args) async {
+        var file = args['file'] as UploadedFile;
+        var bytes = await file.data.fold<int>(0, (n, chunk) => n + chunk.length);
+        return '${file.filename}: $bytes bytes';
+      },
+    ),
+  ],
+);
+```
+
+A client sends a `multipart/form-data` request of three kinds of parts: `operations`, the JSON of the request with `null` for each file; `map`, which tells for each file part the variables it goes in; and the files:
+
+```
+operations: {"query": "mutation($file: Upload!) { upload(file: $file) }", "variables": {"file": null}}
+map:        {"0": ["variables.file"]}
+0:          (the file)
+```
+
+A file can also go in a list, as `variables.files.0`, or a nested input object.
 
 ## Generating Types
 

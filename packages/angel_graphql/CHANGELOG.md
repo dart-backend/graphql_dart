@@ -16,6 +16,10 @@
 
 ### Fixes in 10.0.0
 
+* **Uploads:** `graphQLUpload` rejects a value that is not an uploaded file with a validation error, where a string failed with a `TypeError`, and no longer needs to be given to `GraphQL(customTypes: ...)` to be the type of a variable ([#26](https://github.com/dart-backend/graphql_dart/issues/26)). The README tells how to upload files.
+* **HTTP:** `graphQLHttp` runs the operation of `operationName`, as GraphiQL and other clients name it, where it read only `operation_name`, so a document of several operations failed with "This document does not define any operations" ([#17](https://github.com/dart-backend/graphql_dart/issues/17)). `operation_name` is still accepted.
+* **HTTP:** A GET request reads its `query`, `operationName` and `variables` from its query parameters, where it failed with a `TypeError`. A POST of `application/graphql` reads its body as the query, where it failed with a `TypeError`.
+* **HTTP:** A `multipart/form-data` request follows the GraphQL multipart request specification: its `operations` are decoded, with their `query`, `operationName` and `variables`, where they were parsed as the query, and its files are put in the variables at the paths of `map`, also in lists and nested objects, where only paths of one name worked.
 * **WebSockets:** `graphQLWS` serves subscriptions, where every connection failed with a `TypeError`, and an operation without variables, where it threw. A subscription stops when the client stops it or disconnects.
 
 * **Docs:** The README's `graphql_generator2` example compiles, and uses a `@serializable` model like the package's example.

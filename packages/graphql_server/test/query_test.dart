@@ -74,6 +74,15 @@ void main() {
       );
     });
 
+    test('writes an ISO 8601 string as a DateTime is written', () async {
+      expect(
+        await graphQLFor('2026-01-02').parseAndExecute('{ event { at } }'),
+        {
+          'event': {'at': DateTime.parse('2026-01-02').toIso8601String()},
+        },
+      );
+    });
+
     test('rejects another string', () {
       expect(
         graphQLFor('not a date').parseAndExecute('{ event { at } }'),
@@ -81,6 +90,122 @@ void main() {
       );
     });
   });
+
+  test('an enum name of a shared value keeps its name', () async {
+    var color = GraphQLEnumType<int>('Color', [
+      GraphQLEnumValue('RED', 1),
+      GraphQLEnumValue('CRIMSON', 1),
+    ]);
+    var graphQL = GraphQL(
+      graphQLSchema(
+        queryType: objectType(
+          'Query',
+          fields: [field('color', color, resolve: (_, _) => 'CRIMSON')],
+        ),
+      ),
+    );
+    expect(await graphQL.parseAndExecute('{ color }'), {'color': 'CRIMSON'});
+  });
+
+  group('choosing the operation', () {
+    var graphQL = GraphQL(
+      graphQLSchema(
+        queryType: objectType(
+          'Query',
+          fields: [field('hello', graphQLString, resolve: (_, _) => 'world')],
+        ),
+        mutationType: objectType(
+          'Mutation',
+          fields: [field('add', graphQLString, resolve: (_, _) => 'added')],
+        ),
+      ),
+    );
+    const document = 'query todos { hello } mutation add { add }';
+
+    test('runs the one named', () async {
+      expect(await graphQL.parseAndExecute(document, operationName: 'add'), {
+        'add': 'added',
+      });
+    });
+
+    test('needs a name of several operations', () {
+      expect(
+        graphQL.parseAndExecute(document),
+        throwsA(
+          isA<GraphQLException>().having(
+            (e) => e.errors.single.message,
+            'message',
+            'Must provide operation name if query contains multiple '
+                'operations.',
+          ),
+        ),
+      );
+    });
+
+    test('rejects a name it does not define', () {
+      expect(
+        graphQL.parseAndExecute(document, operationName: 'nope'),
+        throwsA(isA<GraphQLException>()),
+      );
+    });
+  });
+
+  test(
+    'a variable can be of a custom scalar, which introspection lists',
+    () async {
+      var graphQL = GraphQL(
+        graphQLSchema(
+          queryType: objectType(
+            'Query',
+            fields: [
+              field(
+                'echo',
+                graphQLString,
+                inputs: [GraphQLFieldInput('v', _Shout())],
+                resolve: (_, args) => args['v'] as String,
+              ),
+            ],
+          ),
+        ),
+      );
+      expect(
+        await graphQL.parseAndExecute(
+          r'query($v: Shout) { echo(v: $v) }',
+          variableValues: {'v': 'hi'},
+        ),
+        {'echo': 'HI'},
+      );
+      var types = await graphQL.parseAndExecute(
+        '{ __schema { types { name } } }',
+      );
+      expect(
+        ((types as Map)['__schema']['types'] as List).map((t) => t['name']),
+        contains('Shout'),
+      );
+    },
+  );
+}
+
+/// A custom scalar, of upper-cased strings.
+class _Shout extends GraphQLScalarType<String, String> {
+  @override
+  String get name => 'Shout';
+
+  @override
+  String get description => 'An upper-cased string.';
+
+  @override
+  String serialize(String value) => value;
+
+  @override
+  String deserialize(String serialized) => serialized.toUpperCase();
+
+  @override
+  ValidationResult<String> validate(String key, input) =>
+      graphQLString.validate(key, input);
+
+  @override
+  GraphQLType<String, String> coerceToInputObject() => this;
 }
 
 class Todo {

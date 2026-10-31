@@ -543,6 +543,40 @@ void main() {
       expect(type.deserialize(value!), {'f': 1.0});
     });
   });
+
+  test('a custom scalar validates with the public results', () {
+    var even = _Even();
+    var ok = even.validate('n', 2);
+    expect(ok.successful, isTrue);
+    expect(ok.value, 2);
+    var failed = even.validate('n', 3);
+    expect(failed.successful, isFalse);
+    expect(failed.errors, ['Expected "n" to be even.']);
+  });
 }
 
 enum _Status { done, other }
+
+/// A custom scalar, of even integers.
+class _Even extends GraphQLScalarType<int, int> {
+  @override
+  String get name => 'Even';
+
+  @override
+  String get description => 'An even integer.';
+
+  @override
+  int serialize(int value) => value;
+
+  @override
+  int deserialize(int serialized) => serialized;
+
+  @override
+  ValidationResult<int> validate(String key, input) =>
+      input is int && input.isEven
+      ? ValidationResult.ok(input)
+      : ValidationResult.failure(['Expected "$key" to be even.']);
+
+  @override
+  GraphQLType<int, int> coerceToInputObject() => this;
+}

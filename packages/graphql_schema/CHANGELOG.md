@@ -16,6 +16,7 @@
 
 ### New in 8.0.0
 
+* `ValidationResult.ok` and `ValidationResult.failure`, so a custom type, such as a scalar, can return the result of its `validate`.
 * `field()` accepts arguments of any type, not only the field's own type.
 
 ### Fixes in 8.0.0

@@ -530,6 +530,12 @@ class CollectTypes {
       traversedTypes.add(type);
       return;
     }
+    // A custom scalar, such as `Upload`, so that variables can be of it and
+    // introspection lists it.
+    if (type is GraphQLScalarType) {
+      traversedTypes.add(type);
+      return;
+    }
     if (type is GraphQLUnionType) {
       traversedTypes.add(type);
       for (var t in type.possibleTypes) {
