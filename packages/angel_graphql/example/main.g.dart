@@ -189,33 +189,69 @@ final GraphQLObjectType todoGraphQLType = objectType(
     field<dynamic, dynamic>(
       'id',
       graphQLId,
-      resolve: (obj, _) => (obj as TodoEntity).id,
+      resolve: (obj, _) => obj is TodoEntity
+          ? obj.id
+          : obj == null
+          ? null
+          : throw GraphQLException.fromMessage(
+              'Cannot resolve field "id" of "Todo" from a value of type ${obj.runtimeType}: expected a Map or an instance of Todo.',
+            ),
     ),
     field<dynamic, dynamic>(
       'created_at',
       graphQLDate,
-      resolve: (obj, _) => (obj as TodoEntity).createdAt,
+      resolve: (obj, _) => obj is TodoEntity
+          ? obj.createdAt
+          : obj == null
+          ? null
+          : throw GraphQLException.fromMessage(
+              'Cannot resolve field "created_at" of "Todo" from a value of type ${obj.runtimeType}: expected a Map or an instance of Todo.',
+            ),
     ),
     field<dynamic, dynamic>(
       'updated_at',
       graphQLDate,
-      resolve: (obj, _) => (obj as TodoEntity).updatedAt,
+      resolve: (obj, _) => obj is TodoEntity
+          ? obj.updatedAt
+          : obj == null
+          ? null
+          : throw GraphQLException.fromMessage(
+              'Cannot resolve field "updated_at" of "Todo" from a value of type ${obj.runtimeType}: expected a Map or an instance of Todo.',
+            ),
     ),
     field<dynamic, dynamic>(
       'text',
       graphQLString,
-      resolve: (obj, _) => (obj as TodoEntity).text,
+      resolve: (obj, _) => obj is TodoEntity
+          ? obj.text
+          : obj == null
+          ? null
+          : throw GraphQLException.fromMessage(
+              'Cannot resolve field "text" of "Todo" from a value of type ${obj.runtimeType}: expected a Map or an instance of Todo.',
+            ),
     ),
     field<dynamic, dynamic>(
       'completed',
       graphQLBoolean,
       deprecationReason: 'Use `completion_status` instead.',
-      resolve: (obj, _) => (obj as TodoEntity).completed,
+      resolve: (obj, _) => obj is TodoEntity
+          ? obj.completed
+          : obj == null
+          ? null
+          : throw GraphQLException.fromMessage(
+              'Cannot resolve field "completed" of "Todo" from a value of type ${obj.runtimeType}: expected a Map or an instance of Todo.',
+            ),
     ),
     field<dynamic, dynamic>(
       'completion_status',
       completionStatusGraphQLType,
-      resolve: (obj, _) => (obj as TodoEntity).completionStatus,
+      resolve: (obj, _) => obj is TodoEntity
+          ? obj.completionStatus
+          : obj == null
+          ? null
+          : throw GraphQLException.fromMessage(
+              'Cannot resolve field "completion_status" of "Todo" from a value of type ${obj.runtimeType}: expected a Map or an instance of Todo.',
+            ),
     ),
   ],
 );

@@ -13,163 +13,63 @@
   - [Usage](#usage)
   - [Subscriptions](#subscriptions)
   - [Using Services](#using-services)
-  - [Documentation](#documentation)
+  - [Generating Types](#generating-types)
 
-A complete implementation of the official [GraphQL specification](https://facebook.github.io/graphql/October2016/#sec-Language) - these are the [Angel3 framework](https://pub.dev/packages/angel3_framework)-specific bindings.
-
-The goal of this project is to provide to server-side users of Dart an alternative to REST API's. `package:angel3_graphql`, which, when combined with the allows server-side Dart users to build backends with GraphQL and virtually any database imaginable.
+GraphQL for the [Angel3 framework](https://pub.dev/packages/angel3_framework): request handlers that serve a GraphQL API over HTTP and WebSockets, GraphiQL, and resolvers backed by Angel services. It builds on [`package:graphql_server2`](https://pub.dev/packages/graphql_server2), which implements the [GraphQL specification](https://spec.graphql.org/), so you can build a GraphQL backend with Dart and virtually any database.
 
 ## Installation
 
-To install `package:angel3_graphql`, add the following to your `pubspec.yaml`:
+Add the following to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-    angel3_framework: ^10.0.0
-    angel3_graphql: ^10.0.0
+  angel3_framework: ^10.0.0
+  angel3_graphql: ^10.0.0
+  angel3_serialize: ^10.0.0
+  graphql_schema2: ^8.0.0
+  graphql_server2: ^9.0.0
+
+dev_dependencies:
+  angel3_serialize_generator: ^10.0.0
+  build_runner: ^2.7.0
+  graphql_generator2: ^8.0.0
 ```
+
+The generators are needed only to generate GraphQL types from your models, as below.
 
 ## Usage
 
-Using this package is very similar to GraphQL.js - you define a schema, and then mount `graphQLHttp` in your router to start serving. This implementation supports GraphQL features like introspection, so you can play around with `graphiql` as well!
+Using this package is much like GraphQL.js: define a schema, and mount `graphQLHttp` in your router to serve it. Introspection is supported, so you can explore the API with GraphiQL.
 
-Firstly, define your schema. A GraphQL schema contains an *object type* that defines all querying operations that can be applied to the backend.
+A schema has a *query* type, of the operations that read data, and optionally a *mutation* type, of those that change it, and a *subscription* type, of real-time events (see [Subscriptions](#subscriptions)).
 
-A GraphQL schema may also have a *mutation* object type, which defines operations that change the backend's state, and optionally a *subscription* type, which defines real-time interactions (coming soon!).
-
-Use `package:graphql_generator2` to generate GraphQL types from your existing `Model`/PODO classes (here, `todoGraphQLType` for a `Todo` class annotated with `@graphQLClass`), so GraphQL is aware of them without duplicated effort. See [Documentation](#documentation).
+Here, `todoGraphQLType` is generated from the `TodoEntity` model by `package:graphql_generator2` (see [Generating Types](#generating-types)), so GraphQL knows the model without duplicated effort. Run `dart run build_runner build` to generate it:
 
 ```dart
 import 'package:angel3_framework/angel3_framework.dart';
+import 'package:angel3_framework/http.dart';
 import 'package:angel3_graphql/angel3_graphql.dart';
+import 'package:angel3_serialize/angel3_serialize.dart';
 import 'package:graphql_schema2/graphql_schema2.dart';
 import 'package:graphql_server2/graphql_server2.dart';
 
-Future configureServer(Angel app) async {
-    var queryType = objectType(
-        'Query',
-        description: 'A simple API that manages your to-do list.',
-        fields: [
-            field(
-                'todos',
-                listOf(todoGraphQLType.nonNullable()),
-                resolve: resolveViaServiceIndex(todoService),
-            ),
-            field(
-                'todo',
-                todoGraphQLType,
-                resolve: resolveViaServiceRead(todoService),
-                inputs: [
-                    GraphQLFieldInput('id', graphQLId.nonNullable()),
-                ],
-            ),
-        ],
-    );
+part 'main.g.dart';
 
-    var mutationType = objectType(
-        'Mutation',
-        description: 'Modify the to-do list.',
-        fields: [
-            field(
-                'create',
-                graphQLString,
-            ),
-        ],
-    );
+@serializable
+@graphQLClass
+abstract class TodoEntity extends Model {
+  String? get text;
 
-    var schema = graphQLSchema(
-        queryType: queryType,
-        mutationType: mutationType,
-    );
+  @GraphQLDocumentation(description: 'Whether this item is complete.')
+  bool? get isComplete;
 }
-```
 
-After you've created your `GraphQLSchema`, you just need to wrap in a call to `graphQLHttp`, a request handler that responds to GraphQL.
+void main() async {
+  var app = Angel();
+  var http = AngelHttp(app);
+  var todoService = app.use('api/todos', MapService());
 
-In *development*, it's also highly recommended to mount the `graphiQL` handler, which serves GraphQL's official visual interface, for easy querying and feedback.
-
-```dart
-app.all('/graphql', graphQLHttp(GraphQL(schema)));
-app.get('/graphiql', graphiQL());
-```
-
-All that's left now is just to start the server!
-
-```dart
-var server = await http.startServer('127.0.0.1', 3000);
-var uri =
-    Uri(scheme: 'http', host: server.address.address, port: server.port);
-var graphiqlUri = uri.replace(path: 'graphiql');
-print('Listening at $uri');
-print('Access graphiql at $graphiqlUri');
-```
-
-Visit your `/graphiql` endpoint, and you'll see the `graphiql` UI, ready-to-go!
-
-![Graphiql screenshot](./img/angel_graphql.png)
-
-Now you're ready to build a GraphQL API!
-
-## Subscriptions
-
-Example: [`Source code`](https://github.com/dart-backend/graphql_dart/tree/master/angel_graphql/example/subscription.dart)
-
-In GraphQL, as of the June 2018 spec, clients can subscribe to streams of events from the server. In your schema, all you need to do is return a `Stream` from a `resolve` callback, rather than a plain object:
-
-```dart
-var postAdded = postService.afterCreated
-      .asStream()
-      .map((e) => {'postAdded': e.result})
-      .asBroadcastStream();
-
-var schema = graphQLSchema(
-  // ...
-  subscriptionType: objectType(
-    'Subscription',
-    fields: [
-      field('postAdded', postType, resolve: (_, __) => postAdded),
-    ],
-  ),
-);
-```
-
-By default, `graphQLHttp` has no support for subscriptions, because regular HTTP requests are stateless, and are not ideal for continuous data pushing. You can add your own handler:
-
-```dart
-graphQLHttp(graphQL, onSubscription: (req, res, stream) {
-  // Do something with the stream here. It's up to you.
-});
-```
-
-There is, however, `graphQLWS`, which implements Apollo's `subscriptions-transport-ws` protocol:
-
-```dart
-app.get('/subscriptions', graphQLWS(GraphQL(schema)));
-```
-
-You can then use existing JavaScript clients to handle subscriptions.
-
-The `graphiQL` handler also supports using subscriptions. In the following snippet, the necessary scripts will be added to the rendered page, so that the `subscriptions-transport-ws` client can be used by GraphiQL:
-
-```dart
-app.get('/graphiql',
-    graphiQL(subscriptionsEndpoint: 'ws://localhost:3000/subscriptions'));
-```
-
-**NOTE: Apollo's spec for the aforementioned protocol is very far outdated, and completely inaccurate,**
-**See this issue for more:**
-**<https://github.com/apollographql/subscriptions-transport-ws/issues/551>**
-
-## Using Services
-
-What would Angel be without services? For those unfamiliar - in Angel, `Service` is a base class that implements CRUD functionality, and serves as the database interface within an Angel application. They are well-suited for NoSQL or other databases without a schema (they can be used with SQL, but that's not their primary focus).
-
-`package:angel3_graphql` has functionality to resolve fields by interacting with services.
-
-Consider our previous example, and note the calls to `resolveViaServiceIndex` and `resolveViaServiceRead`:
-
-```dart
-var queryType = objectType(
+  var queryType = objectType(
     'Query',
     description: 'A simple API that manages your to-do list.',
     fields: [
@@ -182,56 +82,124 @@ var queryType = objectType(
         'todo',
         todoGraphQLType,
         resolve: resolveViaServiceRead(todoService),
-        inputs: [
-          GraphQLFieldInput('id', graphQLId.nonNullable()),
-        ],
+        inputs: [GraphQLFieldInput('id', graphQLId.nonNullable())],
       ),
     ],
   );
+
+  var mutationType = objectType(
+    'Mutation',
+    description: 'Modify the to-do list.',
+    fields: [
+      field(
+        'createTodo',
+        todoGraphQLType,
+        inputs: [
+          GraphQLFieldInput('data', todoGraphQLType.coerceToInputObject()),
+        ],
+        resolve: resolveViaServiceCreate(todoService),
+      ),
+    ],
+  );
+
+  var schema = graphQLSchema(queryType: queryType, mutationType: mutationType);
+
+  // Serve GraphQL, and GraphiQL to explore it in development.
+  app.all('/graphql', graphQLHttp(GraphQL(schema)));
+  app.get('/graphiql', graphiQL());
+
+  var server = await http.startServer('127.0.0.1', 3000);
+  print('Listening at http://${server.address.address}:${server.port}');
+  print('Access GraphiQL at http://${server.address.address}:${server.port}/graphiql');
+}
 ```
 
-In all, there are:
+Visit `/graphiql`, and you'll see the GraphiQL UI, ready to go:
+
+![GraphiQL screenshot](../img/angel_graphql.png)
+
+Complete example: [`example/main.dart`](https://github.com/dart-backend/graphql_dart/tree/master/packages/angel_graphql/example/main.dart)
+
+## Subscriptions
+
+Example: [`example/subscription.dart`](https://github.com/dart-backend/graphql_dart/tree/master/packages/angel_graphql/example/subscription.dart)
+
+Clients can subscribe to streams of events from the server. In your schema, return a `Stream` from a `resolve` callback, rather than a plain object:
+
+```dart
+var postAdded = postService.afterCreated
+    .asStream()
+    .map((e) => {'postAdded': e.result})
+    .asBroadcastStream();
+
+var schema = graphQLSchema(
+  queryType: queryType,
+  subscriptionType: objectType(
+    'Subscription',
+    fields: [field('postAdded', postType, resolve: (_, _) => postAdded)],
+  ),
+);
+```
+
+HTTP requests are not suited to pushing data continuously, so `graphQLHttp` does not serve subscriptions unless you handle their streams yourself:
+
+```dart
+graphQLHttp(graphQL, onSubscription: (req, res, stream) {
+  // Do something with the stream here. It's up to you.
+});
+```
+
+`graphQLWS` serves them over WebSockets, with Apollo's `subscriptions-transport-ws` protocol, so you can use existing JavaScript clients:
+
+```dart
+app.get('/subscriptions', graphQLWS(GraphQL(schema)));
+```
+
+GraphiQL can use subscriptions too: give `graphiQL` the endpoint, and it adds the `subscriptions-transport-ws` client to its page:
+
+```dart
+app.get(
+  '/graphiql',
+  graphiQL(subscriptionsEndpoint: 'ws://localhost:3000/subscriptions'),
+);
+```
+
+**NOTE: Apollo's specification of the protocol is out of date with what its client expects. See <https://github.com/apollographql/subscriptions-transport-ws/issues/551>.**
+
+WebSockets are served over HTTP/1.1.
+
+## Using Services
+
+In Angel, a `Service` implements CRUD operations, and is the database interface of an application. `package:angel3_graphql` resolves fields with services: in the example above, `resolveViaServiceIndex`, `resolveViaServiceRead` and `resolveViaServiceCreate`. In all, there are:
 
 - `resolveViaServiceIndex`
 - `resolveViaServiceFindOne`
-- `resolveViaServiceRead`
-- `resolveViaServiceCreate`
-- `resolveViaServiceModify`
-- `resolveViaServiceUpdate`
-- `resolveViaServiceRemove`
+- `resolveViaServiceRead` (with an `id` argument)
+- `resolveViaServiceCreate` (with a `data` argument)
+- `resolveViaServiceModify` (with `id` and `data`)
+- `resolveViaServiceUpdate` (with `id` and `data`)
+- `resolveViaServiceRemove` (with an `id`)
 
-As one might imagine, using these convenience helpers makes it much quicker to implement CRUD functionality in a GraphQL API.
+Arguments are passed to the service as its query, with the request's context, and `Providers.graphQL` as the provider, so hooks can tell GraphQL requests apart.
 
-## Documentation
+## Generating Types
 
-Using `package:graphql_generator2`, you can generate GraphQL schemas for concrete Dart types:
+[`package:graphql_generator2`](https://pub.dev/packages/graphql_generator2) generates a GraphQL type for each `@graphQLClass` model, as `todoGraphQLType` for `TodoEntity` above. With [`package:angel3_serialize_generator`](https://pub.dev/packages/angel3_serialize_generator), `dart run build_runner build` generates both the `Todo` model and `todoGraphQLType`.
+
+Its fields have resolvers, so a resolver can return `Todo` models, the maps of `toJson()`, or the records of a service:
 
 ```dart
-part 'todo.g.dart';
-
-@serializable
-@graphQLClass
-abstract class TodoEntity extends Model {
-  String? get text;
-
-  @GraphQLDocumentation(description: 'Whether this item is complete.')
-  bool? get isComplete;
-}
-
-Future configureServer(Angel app) async {
-  var schema = graphQLSchema(
-    queryType: objectType('Query', fields: [
-      // Resolvers can return `Todo` models or maps.
-      field('todos', listOf(todoGraphQLType), resolve: (_, _) => [Todo(text: 'Clean your room!')]),
-    ]),
-  );
-}
+field(
+  'todos',
+  listOf(todoGraphQLType),
+  resolve: (_, _) => [Todo(text: 'Clean your room!')],
+);
 ```
 
-`dart run build_runner build` generates the `Todo` model and `todoGraphQLType`, whose fields resolve from a `Todo` or a map.
+Fields the serializer excludes, such as `@SerializableField(exclude: true)`, are not part of the GraphQL type. You can also give descriptions to types, fields and arguments, with doc comments, `@GraphQLDocumentation`, or the `description` parameter of most helpers.
 
-For more documentation, see: [`package:graphql_generator2`](https://pub.dev/packages/graphql_generator2)
+See [`package:graphql_generator2`](https://pub.dev/packages/graphql_generator2) and [`package:graphql_schema2`](https://pub.dev/packages/graphql_schema2) for more.
 
-You can also manually provide documentation for parameters and endpoints, via a `description` parameter on almost all related functions.
+## Migrating from 9.x
 
-See [`package:graphql_schema2`](https://pub.dev/packages/graphql_schema2) for more documentation.
+`convertDartType` and the other mirrors helpers are removed from `package:graphql_server2`: generate types with `package:graphql_generator2` instead, as above. See the [change log](https://pub.dev/packages/angel3_graphql/changelog) for what changed in 10.0.0.

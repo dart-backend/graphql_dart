@@ -10,9 +10,16 @@ import 'package:angel3_serialize/angel3_serialize.dart';
 import 'package:graphql_schema2/graphql_schema2.dart';
 ''';
 
+/// The library of [source], with the directives [imports] before its `part`.
+String _library(String source, String imports) =>
+    "$_imports$imports\npart 'model.g.dart';\n$source";
+
 /// The code [graphQLBuilder] generates of [source], a library of the package
 /// `a` with the other libraries [others], by their paths, and the directives
 /// [imports] before its `part`.
+///
+/// Fails the test if the builder logs an error, so that a builder that throws
+/// does not pass as one that generated nothing.
 Future<String> generate(
   String source, {
   Map<String, String> others = const {},
@@ -20,23 +27,31 @@ Future<String> generate(
 }) async {
   var readerWriter = TestReaderWriter(rootPackage: 'a');
   await readerWriter.testing.loadIsolateSources();
+  var errors = <String>[];
   await testBuilder(
     graphQLBuilder(BuilderOptions.empty),
     {
-      'a|lib/model.dart': "$_imports$imports\npart 'model.g.dart';\n$source",
+      'a|lib/model.dart': _library(source, imports),
       for (var MapEntry(:key, :value) in others.entries) 'a|lib/$key': value,
     },
     rootPackage: 'a',
     readerWriter: readerWriter,
+    onLog: (log) {
+      if (log.level.value >= 1000) errors.add('${log.message} ${log.error}');
+    },
   );
+  expect(errors, isEmpty, reason: 'The builder failed');
   // A hidden output, which the combining builder puts in `model.g.dart`.
   var output = AssetId(
     'a',
     '.dart_tool/build/generated/a/lib/model.graphql_generator2.g.part',
   );
-  return readerWriter.testing.exists(output)
-      ? readerWriter.testing.readString(output)
-      : '';
+  expect(
+    readerWriter.testing.exists(output),
+    isTrue,
+    reason: 'Nothing was generated',
+  );
+  return readerWriter.testing.readString(output);
 }
 
 /// The errors of compiling the library of [source] with the code generated of
@@ -50,7 +65,7 @@ Future<List<String>> compileErrors(
   var generated = await generate(source, others: others, imports: imports);
   return resolveSources(
     {
-      'a|lib/model.dart': "$_imports$imports\npart 'model.g.dart';\n$source",
+      'a|lib/model.dart': _library(source, imports),
       'a|lib/model.g.dart': "part of 'model.dart';\n$generated",
       for (var MapEntry(:key, :value) in others.entries) 'a|lib/$key': value,
     },
@@ -73,14 +88,53 @@ Future<List<String>> compileErrors(
 void main() {
   const timeout = Timeout(Duration(minutes: 3));
 
-  test('generates a resolver for each field', () async {
-    var code = await generate('''
+  test('generates a resolver for each field, which compiles', () async {
+    const source = '''
 @graphQLClass
 class Item {
   String? name;
 }
+''';
+    var code = await generate(source);
+    expect(code, contains('obj is Item'));
+    expect(code, contains('? obj.name'));
+    expect(code, contains(': obj == null'));
+    expect(code, contains('throw GraphQLException.fromMessage('));
+    expect(
+      code,
+      contains(
+        r'"name" of "Item" from a value of type ${obj.runtimeType}: '
+        'expected a Map or an instance of Item.',
+      ),
+    );
+    expect(await compileErrors(source), isEmpty);
+  }, timeout: timeout);
+
+  test(r'compiles names and doc comments with a $', () async {
+    const source = r'''
+@graphQLClass
+class Item$ {
+  /// Costs $5.
+  String? a$b;
+}
+''';
+    var code = await generate(source);
+    expect(code, contains(r"'a\$b'"));
+    expect(code, contains(r'instance of Item\$.'));
+    expect(code, contains(r"'Costs \$5.'"));
+    expect(await compileErrors(source), isEmpty);
+  }, timeout: timeout);
+
+  test('names the generated class of a model in its error', () async {
+    var code = await generate('''
+@serializable
+@graphQLClass
+abstract class _Account {
+  String? get name;
+}
 ''');
-    expect(code, contains("resolve: (obj, _) => (obj as Item).name"));
+    expect(code, contains('obj is _Account'));
+    expect(code, contains('instance of Account.'));
   }, timeout: timeout);
 
   test('leaves out static and private fields, and compiles', () async {
@@ -105,8 +159,9 @@ class Item extends Base {
     );
   }, timeout: timeout);
 
-  test('leaves out fields the serializer excludes', () async {
-    var code = await generate('''
+  group('leaves out fields the serializer excludes', () {
+    test('as abstract getters of a model', () async {
+      var code = await generate('''
 @serializable
 @graphQLClass
 abstract class AccountEntity {
@@ -116,9 +171,36 @@ abstract class AccountEntity {
   String? get passwordHash;
 }
 ''');
-    expect(code, contains("'name'"));
-    expect(code, isNot(contains('password')));
-  }, timeout: timeout);
+      expect(code, contains("'name'"));
+      expect(code, isNot(contains('password')));
+    }, timeout: timeout);
+
+    test('as final fields', () async {
+      const source = '''
+@graphQLClass
+class User {
+  final String name;
+
+  @SerializableField(exclude: true)
+  final String passwordHash;
+
+  @exclude
+  final String? token;
+
+  @SerializableField(exclude: true, canSerialize: true)
+  final String? shown;
+
+  User(this.name, this.passwordHash, this.token, this.shown);
+}
+''';
+      var code = await generate(source);
+      expect(code, contains("'name'"));
+      expect(code, contains("'shown'"));
+      expect(code, isNot(contains('password')));
+      expect(code, isNot(contains('token')));
+      expect(await compileErrors(source), isEmpty);
+    }, timeout: timeout);
+  });
 
   test('gives an enum value as it is, for the enum type to name', () async {
     const source = '''
@@ -136,8 +218,9 @@ class Item {
 }
 ''';
     var code = await generate(source);
-    expect(code, contains('(obj as Item).color,'));
-    expect(code, isNot(contains('.name')));
+    expect(code, contains('? obj.color\n'));
+    expect(code, isNot(contains('obj.color.name')));
+    expect(code, isNot(contains('obj.color?.name')));
     expect(await compileErrors(source), isEmpty);
   }, timeout: timeout);
 }

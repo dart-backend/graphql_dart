@@ -18,7 +18,35 @@ Builder graphQLBuilder(_) {
 }
 
 var _docComment = RegExp(r'^/// ', multiLine: true);
+
+/// [name], a Dart or GraphQL name, which goes into a generated string, with its
+/// `$`s escaped, as a Dart name may hold one. A name holds no backslash or
+/// quote to escape.
+String _noInterpolation(String name) => name.replaceAll(r'$', r'\$');
 var _graphQLDoc = TypeChecker.typeNamed(GraphQLDocumentation);
+
+/// `SerializableField`, and `Exclude`, which extends it, of `angel3_serialize`.
+const _serializableField = TypeChecker.fromUrl(
+  'package:angel3_serialize/angel3_serialize.dart#SerializableField',
+);
+
+/// Whether [field] is left out of serialization by an annotation on it, or on
+/// its getter: `@SerializableField(exclude: true)` or `@exclude`, unless it
+/// may still be serialized. Read here, as the serializer's context records
+/// exclusions only of the fields it serializes, which a `final` field is not.
+bool _isExcluded(FieldElement field) {
+  for (var element in <Element>[field, ?field.getter]) {
+    for (var annotation in _serializableField.annotationsOf(element)) {
+      var reader = ConstantReader(annotation);
+      if (reader.peek('exclude')?.boolValue == true &&
+          reader.peek('canSerialize')?.boolValue != true) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 var _graphQLClassTypeChecker = TypeChecker.typeNamed(GraphQLClass);
 
 class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
@@ -134,7 +162,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
     }
 
     if (docString != null) {
-      named['description'] = literalString(
+      named['description'] = literalString2(
         docString.replaceAll(_docComment, '').replaceAll('\n', '\\n'),
       );
     }
@@ -146,7 +174,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
       b.body.add(
         Field((b) {
           // enumTypeFromStrings(String name, List<String> values, {String description}
-          var args = <Expression>[literalString(clazz.displayName)];
+          var args = <Expression>[literalString2(clazz.displayName)];
           var values = clazz.firstFragment.fields
               .where((f) => f.element.isEnumConstant)
               .map((f) => f.name);
@@ -183,7 +211,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
 
       b.body.add(
         Field((b) {
-          var args = <Expression>[literalString(ctx!.modelClassName!)];
+          var args = <Expression>[literalString2(ctx!.modelClassName!)];
           var named = <String, Expression>{
             'isInterface': literalBool(isInterface(clazz)),
           };
@@ -228,7 +256,8 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
             // given out either.
             if (field.isStatic ||
                 field.isPrivate ||
-                ctx.excluded[field.name]?.canSerialize == false) {
+                ctx.excluded[field.name]?.canSerialize == false ||
+                _isExcluded(field)) {
               continue;
             }
 
@@ -262,7 +291,7 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
                   dep.peek('expires')?.stringValue ??
                   'Expires: ${deprecated.message}.';
 
-              named['deprecationReason'] = literalString(reason);
+              named['deprecationReason'] = literalString2(reason);
             }
 
             // Description finder...
@@ -297,10 +326,25 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
 
             // Resolve the field from a model object; a Map is read by the
             // server before the resolver is called. An enum value is given as
-            // it is, for the field's GraphQL enum type to name.
+            // it is, for the field's GraphQL enum type to name. Another value
+            // is a GraphQL error, not a TypeError, which would fail the
+            // request.
+            // A null parent is null, as the server resolves it without a
+            // resolver. The message names the generated class, which users
+            // return, rather than a private entity class it extends.
+            var graphQLName = ctx.resolveFieldName(field.displayName)!;
+            var modelName = _noInterpolation(ctx.modelClassName!);
+            var message =
+                'Cannot resolve field "${_noInterpolation(graphQLName)}" of '
+                '"$modelName" from a value of type \${obj.runtimeType}: '
+                'expected a Map or an instance of $modelName.';
             named['resolve'] = CodeExpression(
               Code(
-                '(obj, _) => (obj as ${clazz.displayName}).${field.displayName}',
+                '(obj, _) => obj is ${clazz.displayName} '
+                '? obj.${field.displayName} '
+                ': obj == null '
+                '? null '
+                ": throw GraphQLException.fromMessage('$message')",
               ),
             );
 
@@ -309,12 +353,13 @@ class _GraphQLGenerator extends GeneratorForAnnotation<GraphQLClass> {
             fields.add(
               refer('field').call(
                 [
-                  literalString(ctx.resolveFieldName(field.displayName)!),
-                  type ??= _inferType(
-                    clazz.displayName,
-                    field.displayName,
-                    field.type,
-                  ),
+                  literalString2(graphQLName),
+                  type ??
+                      _inferType(
+                        clazz.displayName,
+                        field.displayName,
+                        field.type,
+                      ),
                 ],
                 named,
                 [refer('dynamic'), refer('dynamic')],

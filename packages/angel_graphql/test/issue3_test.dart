@@ -52,4 +52,21 @@ void main() {
     // toJson() keeps the CompletionStatus enum value; it is output by name.
     expect(await graphQLFor(todo.toJson()).parseAndExecute(query), expected);
   });
+
+  test('a null parent resolves to null', () {
+    expect(todoGraphQLType.fields.first.resolve!(null, {}), isNull);
+  });
+
+  test('another object is a GraphQL error, not a TypeError', () {
+    expect(
+      graphQLFor(Object()).parseAndExecute('{ todo { text } }'),
+      throwsA(
+        isA<GraphQLException>().having(
+          (e) => e.errors.first.message,
+          'message',
+          contains('expected a Map or an instance of Todo'),
+        ),
+      ),
+    );
+  });
 }
