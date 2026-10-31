@@ -11,6 +11,7 @@
 ### New in 10.0.0
 
 * `graphQLWS` serves the `graphql-transport-ws` protocol of the `graphql-ws` library, which current clients use, such as Apollo Client 3, urql and GraphiQL 2, as well as Apollo's older `subscriptions-transport-ws`, on the same endpoint: the client's WebSocket subprotocol chooses (`graphql-transport-ws`, or `graphql-ws` for the older one, also when it asks for none).
+* `graphiQL` serves GraphiQL 4, with React 18, where it served GraphiQL 0.11 from 2018. Its scripts are pinned to exact versions and checked by their integrity hashes. With a `subscriptionsEndpoint`, which may now be a path of the page's host, it runs subscriptions over `graphql-transport-ws`, where it used the `subscriptions-transport-ws` client. The endpoints are written into the page as JSON, so a quote no longer breaks its script.
 * `graphQLWS(onConnect: ...)` accepts or rejects a connection, given its request and the payload of its `connection_init`, such as credentials, and `connectionInitWaitTimeout` how long to wait for it.
 
 ### Fixes in 10.0.0

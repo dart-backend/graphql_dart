@@ -174,16 +174,15 @@ app.get(
 
 A rejected connection is closed (with code 4403 for `graphql-transport-ws`). `keepAliveInterval` sets how often to send keep-alive messages, and `connectionInitWaitTimeout` how long to wait for a `connection_init`.
 
-GraphiQL can use subscriptions too: give `graphiQL` the endpoint, and it adds the `subscriptions-transport-ws` client to its page:
+GraphiQL can run subscriptions too: give `graphiQL` the endpoint of `graphQLWS`, a path of the page's host or a `ws://` or `wss://` URL, and it subscribes over `graphql-transport-ws`:
 
 ```dart
-app.get(
-  '/graphiql',
-  graphiQL(subscriptionsEndpoint: 'ws://localhost:3000/subscriptions'),
-);
+app.get('/graphiql', graphiQL(subscriptionsEndpoint: '/subscriptions'));
 ```
 
-The bundled GraphiQL page uses the older protocol. **NOTE: Apollo's specification of that protocol is out of date with what its client expects. See <https://github.com/apollographql/subscriptions-transport-ws/issues/551>.**
+The page loads GraphiQL 4 and React 18 from unpkg, pinned to exact versions and checked by their integrity hashes, so it needs internet access in the browser.
+
+**NOTE: Apollo's specification of the older protocol is out of date with what its client expects. See <https://github.com/apollographql/subscriptions-transport-ws/issues/551>.**
 
 WebSockets are served over HTTP/1.1.
 
