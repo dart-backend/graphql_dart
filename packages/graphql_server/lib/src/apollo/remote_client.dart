@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:stream_channel/stream_channel.dart';
 
@@ -20,7 +21,31 @@ class RemoteClient extends StreamChannelMixin<OperationMessage> {
   }
 
   RemoteClient(StreamChannel<String> channel)
-    : this.withoutJson(jsonDocument.bind(channel).cast<Map>());
+    : this.withoutJson(_jsonChannel(channel));
+
+  /// The JSON objects of the text messages of [channel]; a message that is
+  /// not a JSON object is left out.
+  ///
+  /// Not `jsonDocument.bind(channel).cast<Map>()`, whose sink fails with a
+  /// `TypeError` as soon as anything is added to it.
+  static StreamChannel<Map> _jsonChannel(StreamChannel<String> channel) {
+    var outgoing = StreamController<Map>();
+    outgoing.stream
+        .map(json.encode)
+        .listen(channel.sink.add, onDone: channel.sink.close);
+    return StreamChannel(
+      channel.stream.expand((text) {
+        try {
+          var message = json.decode(text);
+          return message is Map ? [message] : const <Map>[];
+        } on FormatException {
+          return const <Map>[];
+        }
+      }),
+      outgoing.sink,
+    );
+  }
+
   @override
   StreamSink<OperationMessage> get sink => _ctrl.foreign.sink;
 

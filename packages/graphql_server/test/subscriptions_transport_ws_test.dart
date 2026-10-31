@@ -131,4 +131,18 @@ void main() {
     expect((await next())['type'], 'data');
     await server.done.timeout(Duration.zero, onTimeout: () {});
   });
+
+  test('a RemoteClient reads and writes JSON text', () async {
+    var text = StreamChannelController<String>();
+    var client = RemoteClient(text.local);
+    var received = client.stream.first;
+    text.foreign.sink
+      ..add('not json')
+      ..add('{"type": "connection_init"}');
+    expect((await received).type, 'connection_init');
+
+    var sent = text.foreign.stream.first;
+    client.sink.add(OperationMessage(OperationMessage.gqlConnectionAck));
+    expect(await sent, '{"type":"connection_ack"}');
+  });
 }

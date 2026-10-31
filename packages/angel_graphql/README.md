@@ -149,11 +149,30 @@ graphQLHttp(graphQL, onSubscription: (req, res, stream) {
 });
 ```
 
-`graphQLWS` serves them over WebSockets, with Apollo's `subscriptions-transport-ws` protocol, so you can use existing JavaScript clients:
+`graphQLWS` serves them over WebSockets, so you can use existing JavaScript clients:
 
 ```dart
 app.get('/subscriptions', graphQLWS(GraphQL(schema)));
 ```
+
+It speaks both WebSocket protocols for GraphQL, chosen by the subprotocol the client asks for:
+
+* `graphql-transport-ws`, of the [`graphql-ws`](https://github.com/enisdenjo/graphql-ws) library, which current clients use, such as Apollo Client 3, urql and GraphiQL 2;
+* `graphql-ws`, of Apollo's older `subscriptions-transport-ws`, also for a client that asks for none.
+
+Queries and mutations can be sent over the socket too. To authenticate connections, check the payload of their `connection_init`:
+
+```dart
+app.get(
+  '/subscriptions',
+  graphQLWS(
+    GraphQL(schema),
+    onConnect: (req, payload) => payload?['token'] == 'secret',
+  ),
+);
+```
+
+A rejected connection is closed (with code 4403 for `graphql-transport-ws`). `keepAliveInterval` sets how often to send keep-alive messages, and `connectionInitWaitTimeout` how long to wait for a `connection_init`.
 
 GraphiQL can use subscriptions too: give `graphiQL` the endpoint, and it adds the `subscriptions-transport-ws` client to its page:
 
@@ -164,7 +183,7 @@ app.get(
 );
 ```
 
-**NOTE: Apollo's specification of the protocol is out of date with what its client expects. See <https://github.com/apollographql/subscriptions-transport-ws/issues/551>.**
+The bundled GraphiQL page uses the older protocol. **NOTE: Apollo's specification of that protocol is out of date with what its client expects. See <https://github.com/apollographql/subscriptions-transport-ws/issues/551>.**
 
 WebSockets are served over HTTP/1.1.
 

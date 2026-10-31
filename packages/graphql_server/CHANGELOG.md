@@ -26,6 +26,7 @@ var graphQL = GraphQL(
 
 * **Subscriptions:** Cancelling a subscription's stream stops its source at once, where it waited for the source's next event, so a quiet source was never cancelled.
 * **Subscriptions:** The `errors` of a failed subscription event are a list of errors, where they were a list of one list.
+* **subscriptions_transport_ws:** `RemoteClient` of a `StreamChannel<String>`, such as a WebSocket's, reads and writes JSON, where its sink failed with a `TypeError` on the first message, so the protocol could not be served over text. A message that is not a JSON object is left out.
 * **subscriptions_transport_ws:** `stop` cancels an operation, as do `connection_terminate` and the end of the connection, where operations ran until their streams ended. An invalid `start` is answered with an `error` message, where it threw, and an event keeps its `errors`.
 * **Scalars:** A scalar field whose value is already in its serialized form, and valid, is output as it is, so a `Date` field accepts an ISO 8601 string, as a `MapService` stores dates, instead of failing with "must be DateTime".
 * **Arguments:** Arguments and variables are deserialized from their validated value, so an `Int` given for `Float!`, `[Float]` or a `Float!` input field is coerced instead of throwing a `TypeError`.
